@@ -44,10 +44,10 @@ function formatSpoolHeader($_header,$_text,$_id,$_group,$_isref,$_isread=true) {
         return '<span class="isref">'.htmlentities($_text).'</span>';
       } else {
         if ($_isread) {
-          return "<a href=\"article.php?group=$_group&id=$_id\">"
+          return "<a href=\"article.php?group=$_group&amp;id=$_id\">"
           .htmlentities($_text)."</a>";
         }else {
-          return "<a href=\"article.php?group=$_group&id=$_id\"><b>"
+          return "<a href=\"article.php?group=$_group&amp;id=$_id\"><b>"
           .htmlentities($_text)."</b></a>";
         }
       }
@@ -104,7 +104,7 @@ function formatDisplayHeader($_header,$_text,$_spool) {
       $p=array_pop($parents);
       while ($p) {
         $rsl .= "<a href=\"article.php?group={$_spool->group}"
-          ."&id=$p\">$ndx</a> ";
+          ."&amp;id=$p\">$ndx</a> ";
         $_spool->overview[$p]->desc++;
         $p = $_spool->overview[$p]->parent;
         $ndx++;
@@ -157,7 +157,7 @@ function displayshortcuts() {
           if ($first==$ndx) {
             echo "[$ndx-".min($ndx+$news['max']-1,sizeof($spool->overview))."] ";
           } else {
-            echo "[<a href=\"".$_SERVER['PHP_SELF']."?group=$group&first="
+            echo "[<a href=\"".$_SERVER['PHP_SELF']."?group=$group&amp;first="
            ."$ndx\">$ndx-".min($ndx+$news['max']-1,sizeof($spool->overview))
             ."</a>] ";
           }
@@ -170,10 +170,10 @@ function displayshortcuts() {
       echo "[<a href=\"thread.php?group=$group\">"
         .$locale['format']['group_b'].$group
         .$locale['format']['group_a']."</a>] ";
-      echo "[<a href=\"post.php?group=$group&id=$id&type=followup\">"
+      echo "[<a href=\"post.php?group=$group&amp;id=$id&amp;type=followup\">"
         .$locale['format']['followup']."</a>] ";
       if (checkcancel($post->headers)) {
-        echo "[<a href=\"article.php?group=$group&id=$id&type=cancel\">"
+        echo "[<a href=\"article.php?group=$group&amp;id=$id&amp;type=cancel\">"
         .$locale['format']['cancel']."</a>] ";
       }
       break;
