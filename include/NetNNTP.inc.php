@@ -29,11 +29,12 @@ class nntp {
      */
 
     function gline() {
-        $line = preg_replace("/(\r|\n)/", "", fgets($this->ns, 1200));
         if ($this->debug) {
+            $line = trim(fgets($this->ns, 1200));
             print "NNTP >>>> $line \n";
+            return $line;
         }
-        return $line;
+        return trim(fgets($this->ns, 1200));
     }
 
     /** puts a line on server
@@ -238,7 +239,7 @@ class nntp {
         if (preg_match("/^2\d{2} (\d+) (\d+) (\d+) ([^ ]+)/", $line, $regs)) {
             return array($regs[1], $regs[2], $regs[3], $regs[4]);
         }
-        return $false;
+        return false;
     }
 
     /** set the article pointer to the previous article in current group
@@ -257,7 +258,7 @@ class nntp {
         if (preg_match("/^2\d{2} \d+ <([^>]+)>/", $line, $regs)) {
             return "<{$regs[1]}>";
         }
-        return $false;
+        return false;
     }
 
     /** set the article pointer to the next article in current group
@@ -276,7 +277,7 @@ class nntp {
         if (preg_match("/^2\d{2} \d+ <([^>]+)>/", $line, $regs)) {
             return "<{$regs[1]}>";
         }
-        return $false;
+        return false;
     }
 
     /** set the current article pointer
@@ -461,12 +462,11 @@ class nntp {
         if (substr($this->gline(), 0, 1)!="2") {
             return false;
         }
-        $result = $this->gline();
+            
         $array  = array();
-        while ($result != ".") {
+        while (($result = $this->gline()) != '.') {
             preg_match("/([^ \t]+) (.*)$/", $result, $regs);
             $array[$regs[1]] = $regs[2];
-            $result          = $this->gline();
         }
         return $array;
     }
