@@ -64,7 +64,7 @@ class nntp {
       $host = $_host;
       $port = 119;
     }
-    $this->ns = fsockopen($host, $port, &$errno, &$errstr, $_timeout);
+    $this->ns = fsockopen($host, $port, $errno, $errstr, $_timeout);
     $this->debug = $_debug;
     if (!$this->ns) {
       if ($this->debug) {
@@ -320,7 +320,7 @@ class nntp {
     if (substr($this->gline(),0,1)!="2") return false;
     $result = $this->gline();
     while ($result != ".") {
-      preg_match("/([^ ]+) (\d+) (\d+) ./",$result,$regs);
+      preg_match("/([^ ]+) (\d+) (\d+) (.)/",$result,$regs);
       $array[$regs[1]]=array(intval($regs[2]),intval($regs[3]),
         intval($regs[4]));
       $result = $this->gline();
