@@ -64,7 +64,7 @@ $news['customhdr'] = "Content-Type: text/plain; charset=iso-8859-15\n"
   ."Mime-Version: 1.0\n"
   ."Content-Transfer-Encoding: 8bit\n"
   ."HTTP-Posting-Host: ".gethostbyname($_SERVER['REMOTE_ADDR'])."\n"
-  ."User-Agent: Banana 0.7beta\n";
+  ."User-Agent: Banana 0.7.1\n";
 
 $css = array(
  'bananashortcuts' => 'bananashortcuts',
