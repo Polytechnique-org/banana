@@ -7,6 +7,20 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
+if(!function_exists('_file_put_contents')) {
+    function file_put_contents($filename, $data) {
+        $fp = fopen($filename, 'w');
+        if(!$fp) {
+            trigger_error('file_put_contents cannot write in file '.$filename, E_USER_ERROR);
+            return;
+        }
+        fputs($fp, $data);
+        fclose($fp);
+
+    }
+}
+
+
 /** Class spoolhead
  *  class used in thread overviews
  */
@@ -21,7 +35,7 @@ class SpoolHead
     /** reference of parent */
     var $parent;
     /** paren is direct */
-    var $direct_parent;
+    var $parent_direct;
     /** array of children */
     var $children = Array();
     /** true if post is read */
@@ -55,9 +69,11 @@ class SpoolHead
  * builds and updates spool 
  */
 
+define("BANANA_SPOOL_VERSION", '0.2');
+
 class spool
 {
-#  var $date;
+    var $version;
     /**  spool */
     var $overview;
     /**  group name */
@@ -75,39 +91,43 @@ class spool
     function spool(&$_nntp, $_group, $_display=0, $_since="")
     {
         global $news;
+
         $spool_path = dirname(dirname(__FILE__)).'/spool';
+        $spoolfile  = "$spool_path/spool-$_group.dat";
+
         $groupinfo  = $_nntp->group($_group);
+        $first      = max($groupinfo[2]-$news['maxspool'], $groupinfo[1]);
+        $last       = $groupinfo[2];
+
         if (!$groupinfo) {
             $this = null;
             return false;
         }
-        $spoolfile = realpath("$spool_path/spool-$_group.dat");
         if (file_exists($spoolfile)) {
             $this   = unserialize(file_get_contents($spoolfile));
-            $keys   = array_values($this->ids);
-            rsort($keys);
-            $first  = max($groupinfo[2]-$news['maxspool'], $groupinfo[1]);
-            $last   = $groupinfo[2];
-            // remove expired messages
-            $msgids = array_flip($this->ids);
-            for ($id=min(array_keys($this->overview)); $id<$first; $id++) { 
-                $this->delid($id);
-            }
-            $this->ids = array_flip($msgids);
-            $first     = max(array_keys($this->overview))+1;
-        } else {
-            $first = max($groupinfo[2]-$news['maxspool'], $groupinfo[1]);
-            $last  = $groupinfo[2];
-            $this->group = $_group;
         }
 
-        if (($first<=$groupinfo[2]) && ($groupinfo[0]!=0)) {
-            $dates    = array_map("strtotime", $_nntp->xhdr("Date","$first-$last"));
-            $msgids   = $_nntp->xhdr("Message-ID","$first-$last");
-            $subjects = array_map("headerdecode",$_nntp->xhdr("Subject", "$first-$last"));
-            $froms    = array_map("headerdecode",$_nntp->xhdr("From", "$first-$last"));
-            $refs     = $_nntp->xhdr("References","$first-$last");
-            #$this->date=$nntp->date;
+        if ($this->version == BANANA_SPOOL_VERSION) {
+            $keys   = array_values($this->ids);
+            rsort($keys);
+            // remove expired messages
+            for ($id=min(array_keys($this->overview)); $id<$first; $id++) { 
+                $this->delid($id, false);
+            }
+            $first  = max(array_keys($this->overview))+1;
+        } else {
+            unset($this->overview, $this->ids);
+            $this->group   = $_group;
+            $this->version = BANANA_SPOOL_VERSION;
+        }
+
+        if (($first<$last) && $groupinfo[0]) {
+            $dates    = array_map("strtotime",    $_nntp->xhdr("Date",    "$first-$last"));
+            $subjects = array_map("headerdecode", $_nntp->xhdr("Subject", "$first-$last"));
+            $froms    = array_map("headerdecode", $_nntp->xhdr("From",    "$first-$last"));
+            $msgids   = $_nntp->xhdr("Message-ID", "$first-$last");
+            $refs     = $_nntp->xhdr("References", "$first-$last");
+
             if (isset($this->ids)) {
                 $this->ids = array_merge($this->ids, array_flip($msgids));
             } else {
@@ -115,38 +135,34 @@ class spool
             }
 
             foreach ($msgids as $id=>$msgid) {
-                if (isset($this->overview[$id])) {
-                    $msg = $this->overview[$id];
-                    $msg->desc++;
-                } else {
-                    $msg = new spoolhead($dates[$id], $subjects[$id], $froms[$id], 1);
-                }
-                $refs[$id]          = str_replace("><","> <", $refs[$id]);
-                $msgrefs            = preg_split("/( |\t)/", strtr($refs[$id],$this->ids));
+                $msg                = new spoolhead($dates[$id], $subjects[$id], $froms[$id], 1);
+                $refs[$id]          = str_replace("><", "> <", $refs[$id]);
+                $msgrefs            = preg_split("/( |\t)/", strtr($refs[$id], $this->ids));
                 $parents            = preg_grep("/^\d+$/", $msgrefs);
                 $msg->parent        = array_pop($parents);
-                $msg->parent_direct = preg_match("/^\d+$/",array_pop($msgrefs));
+                $msg->parent_direct = preg_match("/^\d+$/", array_pop($msgrefs));
+            
                 $p = $msg->parent;
                 while ($p) {
                     if (isset($this->overview[$p])) {
                         $this->overview[$p]->desc++;
-                        $p = isset($this->overview[$p]->parent) ? $this->overview[$p]->parent : false;
+                        $p = $this->overview[$p]->parent;
                     } else {
                         $this->overview[$p] = new spoolhead($dates[$p], $subjects[$p], $froms[$p], 1);
-                        $p = false; 
+                        break;
                     }
                 }
-                if ($msg->parent!="") {
+                if ($msg->parent) {
                     $this->overview[$msg->parent]->children[] = $id;
                 }
                 $this->overview[$id] = $msg;
             }
             uasort($this->overview, "spoolcompare");
-            file_put_contents("$spool_path/spool-$_group.dat", serialize($this));
+            file_put_contents($spoolfile, serialize($this));
         }
 
         if ($_since) {
-            $newpostsids = $_nntp->newnews($_since,$_group);
+            $newpostsids = $_nntp->newnews($_since, $_group);
             if (sizeof($newpostsids)) {
                 $newpostsids = array_intersect($newpostsids, array_keys($this->ids));
                 if ($newpostsids && !is_null($newpostsids)) {
@@ -155,14 +171,13 @@ class spool
                         $this->overview[$this->ids[$mid]]->descunread = 1;
                         $parentmid = $this->ids[$mid];
                         while (isset($parentmid)) {
-                            $this->overview[$parentmid]->descunread++;
+                            $this->overview[$parentmid]->descunread ++;
                             $parentmid = $this->overview[$parentmid]->parent;
                         }
                     }
                 }
             }
             if (sizeof($newpostsids)>0) {
-                $flipids = array_flip($this->ids);
                 switch ($_display) {
                     case 1:
                         foreach ($this->overview as $i=>$p) {
@@ -176,6 +191,7 @@ class spool
                         break;
 
                     case 2:
+                        $flipids = array_flip($this->ids);
                         foreach ($this->overview as $i=>$p) {
                             if ($p->isread) {
                                 unset($this->overview[$i]);
@@ -212,7 +228,7 @@ class spool
      * @param $_id MSGNUM of post
      */
 
-    function delid($_id)
+    function delid($_id, $write=true)
     {
         if (isset($this->overview[$_id])) {
             if (sizeof($this->overview[$_id]->parent)) {
@@ -237,13 +253,15 @@ class spool
                 }
             }
             unset($this->overview[$_id]);
-            $msgid = array_search($_id,$this->ids);
+            $msgid = array_search($_id, $this->ids);
             if ($msgid) {
                 unset($this->ids[$msgid]);
             }
             
-            $spool_path = dirname(dirname(__FILE__)).'/spool';
-            file_put_contents("$spool_path/spool-$_group.dat", serialize($this));
+            if ($write) {
+                $spool_path = dirname(dirname(__FILE__)).'/spool';
+                file_put_contents("$spool_path/spool-$_group.dat", serialize($this));
+            }
         }
     }
 
@@ -258,7 +276,7 @@ class spool
      * @param $_head BOOLEAN true if first post in thread
      */
 
-    function disp_desc($_id,$_index="",$_first=0,$_last=0,$_ref="", $_pfx_node="", $_pfx_end="",$_head=true) {
+    function disp_desc($_id, $_index="", $_first=0, $_last=0, $_ref="", $_pfx_node="", $_pfx_end="", $_head=true) {
         global $css;
         $debug    = false;
         $spfx_f   = '<img src="img/k1.gif" height="21" width="9" alt="o" />'; 
@@ -279,20 +297,20 @@ class spool
         if (!sizeof($this->overview[$_id]->children) && ($_index<=$_last) && ($_index>=$_first)) {
             echo '<tr class="'.($_index%2?$css["pair"]:$css["impair"])."\">\n";
             echo "<td class=\"{$css['date']}\">"
-                .formatSpoolHeader("date",$this->overview[$_id]->date,$_id,
-                        $this->group,($_index==$_ref),$this->overview[$_id]->isread)
+                .formatSpoolHeader("date", $this->overview[$_id]->date, $_id,
+                        $this->group, ($_index==$_ref), $this->overview[$_id]->isread)
                 ." </td>\n";
             echo "<td class=\"{$css['subject']}\"><div class=\"{$css['tree']}\">"
                 .$_pfx_node.($_head?$spfx_f:
                         ($this->overview[$_id]->parent_direct?$spfx_s:$spfx_snd))
                 ."</div>"
-                .formatSpoolHeader("subject",$this->overview[$_id]->subject,$_id,
-                        $this->group,($_index==$_ref),$this->overview[$_id]->isread)
+                .formatSpoolHeader("subject", $this->overview[$_id]->subject, $_id,
+                        $this->group, ($_index==$_ref), $this->overview[$_id]->isread)
                 .($debug?" $_id $_index ".
                         $this->overview[$_id]->desc." ".$this->overview[$_id]->descunread." ":"")." </td>\n";
             echo "<td class=\"{$css['author']}\">"
-                .formatSpoolHeader("from",$this->overview[$_id]->from,$_id,
-                        $this->group,($_index==$_ref),$this->overview[$_id]->isread)
+                .formatSpoolHeader("from", $this->overview[$_id]->from, $_id,
+                        $this->group, ($_index==$_ref), $this->overview[$_id]->isread)
                 ." </td>\n</tr>";
             return true;
         } 
@@ -300,18 +318,18 @@ class spool
         if (($_index<=$_last) && ($_index>=$_first)) {
             echo '<tr class="'.($_index%2?$css["pair"]:$css["impair"])."\">\n";
             echo "<td class=\"{$css['date']}\">"
-                .formatSpoolHeader("date",$this->overview[$_id]->date,$_id,
-                        $this->group,($_index==$_ref),$this->overview[$_id]->isread)
+                .formatSpoolHeader("date", $this->overview[$_id]->date, $_id,
+                        $this->group, ($_index==$_ref), $this->overview[$_id]->isread)
                 ." </td>\n";
             echo "<td class=\"{$css['subject']}\"><div class=\"{$css['tree']}\">"
                 .$_pfx_node.$spfx_n."</div>"
-                .formatSpoolHeader("subject",$this->overview[$_id]->subject,$_id,
-                        $this->group,($_index==$_ref),$this->overview[$_id]->isread)
+                .formatSpoolHeader("subject", $this->overview[$_id]->subject, $_id,
+                        $this->group, ($_index==$_ref), $this->overview[$_id]->isread)
                 .($debug?" $_id $_index ".
                         $this->overview[$_id]->desc." ".$this->overview[$_id]->descunread." ":"")." </td>\n";
             echo "<td class=\"{$css['author']}\">"
-                .formatSpoolHeader("from",$this->overview[$_id]->from,$_id,
-                        $this->group,($_index==$_ref),$this->overview[$_id]->isread)
+                .formatSpoolHeader("from", $this->overview[$_id]->from, $_id,
+                        $this->group, ($_index==$_ref), $this->overview[$_id]->isread)
                 ." </td>\n</tr>";
         }
         $index=$_index+1;
@@ -319,13 +337,13 @@ class spool
             if (($index+$this->overview[$child]->desc-1>=$_first)
                     ||($index<$_last)){
                 if (sizeof($children)) {
-                    $this->disp_desc($child,$index,$_first,$_last,$_ref,$_pfx_end.
+                    $this->disp_desc($child, $index, $_first, $_last, $_ref, $_pfx_end.
                             ($this->overview[$child]->parent_direct?$spfx_T:$spfx_Tnd),
-                            $_pfx_end.$spfx_I,false);
+                            $_pfx_end.$spfx_I, false);
                 } else {
-                    $this->disp_desc($child,$index,$_first,$_last,$_ref,$_pfx_end.
+                    $this->disp_desc($child, $index, $_first, $_last, $_ref, $_pfx_end.
                             ($this->overview[$child]->parent_direct?$spfx_L:$spfx_Lnd),
-                            $_pfx_end.$spfx_e,false);
+                            $_pfx_end.$spfx_e, false);
                 }
             }
             $index += $this->overview[$child]->desc;
@@ -338,13 +356,13 @@ class spool
      * @param $_ref STRING MSGNUM of current/selectionned post
      */
 
-    function disp($_first=0,$_last=0,$_ref="") {
+    function disp($_first=0, $_last=0, $_ref="") {
         global $css;
         $index = 1;
         if (sizeof($this->overview)) {
             foreach ($this->overview as $id=>$msg) {
                 if (!isset($msg->parent)) {
-                    $this->disp_desc($id,$index,$_first,$_last,$_ref);
+                    $this->disp_desc($id, $index, $_first, $_last, $_ref);
                     $index += $msg->desc;
                 }
             }
