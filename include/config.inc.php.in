@@ -14,36 +14,17 @@ $news['maxspool'] = 3000;
 $news['hdecode'] = array('from','name','organization','subject');
 
 // headers in article.php
-$news['head'] = array(
-        'From' => 'from',
-        'Subject' => 'subject',
-        'Newsgroups' => 'newsgroups',
-        'Followup-To' => 'followup',
-        'Date' => 'date',
-        'Message-ID' => 'msgid',
-        'Organization' => 'organization',
-        'References' => 'references',
-        'X-Face' => 'xface',
-);
+$news['head'] = array('content-transfer-encoding', 'content-type', 'date', 'followup-to', 'from',
+        'message-id', 'newsgroups', 'organization', 'references', 'subject', 'x-face');
 
-// headers in article.php
-$news['headdisp']=array(
-        'from',
-        'subject',
-        'newsgroups',
-        'followup',
-        'date',
-        'organization',
-        'references',
-        'xface'
-        );
+$news['headdisp'] = array('date', 'followup-to', 'from', 'newsgroups', 'organization', 'references', 'subject', 'x-face');
 
 // overview configuration in article.php
 $news['threadtop'] = 5;
 $news['threadbottom'] = 5;
 
 // wordwrap configuration
-$news['wrap'] = 80;
+$news['wrap'] = 74;
 
 // overview configuration in thread.php
 $news['max'] = 50;
@@ -53,7 +34,7 @@ $news['customhdr'] = "Content-Type: text/plain; charset=iso-8859-15\n"
 ."Mime-Version: 1.0\n"
 ."Content-Transfer-Encoding: 8bit\n"
 ."HTTP-Posting-Host: ".gethostbyname($_SERVER['REMOTE_ADDR'])."\n"
-."User-Agent: Banana 0.7.1\n";
+."User-Agent: Banana @VERSION@\n";
 
 $css = array(
         'bananashortcuts' => 'bananashortcuts',
