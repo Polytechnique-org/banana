@@ -41,7 +41,7 @@ $spool = new spool($nntp,$group,$profile['display'],$profile['lastnews']);
 if (!$spool) error("nntpspool");
 $nntp->group($group);
 
-$post = new NNNTPost($nntp,$id);
+$post = new NNTPPost($nntp,$id);
 if (!$post) {
   if ($nntp->lasterrorcode == "423") {
     $spool->delid($id);
