@@ -28,4 +28,19 @@ if (!isset($_SESSION['profile']) && (!isset($_POST['action']) ||
   $_SESSION['displaytype'] = $_POST['displaytype'];
   $_SESSION['profile'] = true;
 }
+
+// refresh-post protection
+$sname = $_SERVER['SCRIPT_NAME'];
+$array = explode('/',$sname);
+$sname = array_pop($array);
+unset($array);
+switch ($sname) {
+  case "thread.php":
+    if (!isset($_SESSION['bananapostok'])) 
+      $_SESSION['bananapostok']=true;
+    break;
+  default:
+    $_SESSION['bananapostok']=true;
+    break;
+}
 ?>

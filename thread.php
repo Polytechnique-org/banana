@@ -65,7 +65,8 @@ $first = (isset($_REQUEST['first'])?
 $last  = (isset($_REQUEST['first'])?
   (floor($_REQUEST['first']/$max+1)*$max):$max);
 
-if (isset($_REQUEST['action']) && (isset($_REQUEST['type']))) {
+if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) && 
+(isset($_SESSION['bananapostok'])) && ($_SESSION['bananapostok'])) {
   switch ($_REQUEST['type']) {  
     case 'cancel':
       $mid = array_search($id,$spool->ids);
@@ -140,6 +141,7 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type']))) {
       }
       break;
   }
+  $_SESSION['bananapostok']=false;
   $spool = new spool($mynntp,$group,$profile['display'],
     $profile['lastnews']);
   if (!$spool) {
