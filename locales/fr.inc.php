@@ -20,7 +20,7 @@ function locale_header_date($_text) {
     "ven","sam");
   $months = array("janv.","fév.","mars","avr.","mai","juin",
     "juil.","août","sept.","oct.","nov.","déc.");
-  if ($now-$_text < 86400) {
+  if (($now-$_text < 39600) || ($dnow["yday"]==$date["yday"])) {
     return date("H:i",$_text);
   } elseif (($now-$_text < 2*86400) and ((($date["yday"]-$dnow["yday"])%365)==1)) {
     return "hier ".date("H:i",$_text);
