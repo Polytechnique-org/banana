@@ -20,7 +20,7 @@ class NNTPPost {
    * @param $_nntp RESOURCE handle to NNTP socket
    * @param $_id STRING MSGNUM or MSGID (a group should be selected in this case)  
    */
-  function post(&$_nntp,$_id) {
+  function NNTPPost(&$_nntp,$_id) {
     $this->headers = new headers($_nntp,$_id);
     if (!$this->headers) {
       $this = false;
