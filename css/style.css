@@ -1,0 +1,124 @@
+/********************************************************************************
+* css/style.css : Default css
+* ---------------
+*
+* This file is part of the banana distribution
+* Copyright: See COPYING files that comes with this distribution
+********************************************************************************/
+
+div.title {
+  font-size: 200%;
+  text-align: center;
+  padding-bottom: 1em;
+}
+
+div.bloc {
+  width: 100%;
+}
+
+p.footer {
+  border-top: 1px #DDDDDD solid;
+}
+
+div.shortcuts {
+  text-align: left;
+  padding-bottom: 1em;
+  padding-top: 1em;
+}
+
+div.tree {
+  float: left;
+  padding-right: 0.3em;
+}
+
+span.isref {
+  font-style: italic;
+}
+
+table.bicol {
+  background-color: #eeeeee;
+  color: inherit;
+  border: 1px solid #336699;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table.bicol tr.impair {}
+
+table.bicol tr.pair {
+  background-color: #eeeed0;
+  color: inherit;
+}
+
+table.bicol th {
+  background-color: #336699;
+  color: #FFFFFF;
+  font-weight: bold;
+  text-align: center;
+  vertical-align: middle;
+}
+
+table.bicol td {
+  color: #000000;
+  background-color: inherit;
+  padding-left: 0.4em;
+  padding-right: 0.4em;
+}
+
+table.bicol td.nopadd {
+  padding-left: 0em;
+  padding-right: 0em;
+}
+
+table.bicol td.total,td.unread,td.date {
+  text-align: center;
+  padding-left: 0.1em;
+  padding-right: 0.1em;
+}
+
+table.bicol td.subject,td.group,td.from,td.description {
+  text-align: left;
+}
+
+table.bicol td.bicoltitre,span.bicoltitre {
+  color: #000000;
+  background-color: inherit;
+  font-weight: bold;
+}
+
+table.bicol td.bouton {
+  text-align: right;
+}
+
+table.overview {
+  background-color: #eeeeee;
+  color: inherit;
+  width: 100%;
+}
+
+table.overview tr.impair {}
+
+table.overview tr.pair {
+  background-color: #eeeed0;
+  color: inherit;
+}
+
+table.overview th {
+  background-color: #336699;
+  color: #FFFFFF;
+  font-weight: bold;
+  text-align: center;
+  vertical-align: middle;
+}
+
+table.overview td {
+  color: #000000;
+  background-color: inherit;
+  padding-left: 0.4em;
+  padding-right: 0.4em;
+}
+
+table.overview td.subject,td.group,td.from,td.description {
+  text-align: left;
+}
+
