@@ -19,6 +19,8 @@ class spoolhead {
   var $from;
   /** reference of parent */
   var $parent;
+  /** paren is direct */
+  var $direct_parent;
   /** array of children */
   var $children;
   /** true if post is read */
@@ -125,6 +127,7 @@ class spool {
         $msgrefs=preg_split("/( |\t)/",strtr($refs[$id],$this->ids));
         $parents=preg_grep("/^\d+$/",$msgrefs);
         $msg->parent=array_pop($parents);
+        $msg->parent_direct=preg_match("/^\d+$/",array_pop($msgrefs));
         $p = $msg->parent;
         while ($p) {
           if (isset($this->overview[$p])) {
@@ -229,6 +232,7 @@ class spool {
           $this->overview[$_id]->children);
           foreach ($this->overview[$_id]->children as $c) {
             $this->overview[$c]->parent = $this->overview[$_id]->parent;
+            $this->overview[$c]->parent_direct = false;
           }
         }
         $p = $this->overview[$_id]->parent;
@@ -273,6 +277,9 @@ class spool {
     $debug = false;
     $spfx_f = '<img src="img/k1.gif" height="21" width="9" alt="o" />'; 
     $spfx_n = '<img src="img/k2.gif" height="21" width="9" alt="*" />'; 
+    $spfx_Tnd = '<img src="img/T-direct.gif" height="21" width="12" alt="+" />';
+    $spfx_Lnd = '<img src="img/L-direct.gif" height="21" width="12" alt="`" />';
+    $spfx_snd = '<img src="img/s-direct.gif" height="21" width="5" alt="-" />';
     $spfx_T = '<img src="img/T.gif" height="21" width="12" alt="+" />';
     $spfx_L = '<img src="img/L.gif" height="21" width="12" alt="`" />';
     $spfx_s = '<img src="img/s.gif" height="21" width="5" alt="-" />';
@@ -289,7 +296,9 @@ class spool {
         $this->group,($_index==$_ref),$this->overview[$_id]->isread)
         ." </td>\n";
       echo "<td class=\"{$css['subject']}\"><div class=\"{$css['tree']}\">"
-        .$_pfx_node.($_head?$spfx_f:$spfx_s)."</div>"
+        .$_pfx_node.($_head?$spfx_f:
+                ($this->overview[$_id]->parent_direct?$spfx_s:$spfx_snd))
+        ."</div>"
         .formatSpoolHeader("subject",$this->overview[$_id]->subject,$_id,
         $this->group,($_index==$_ref),$this->overview[$_id]->isread)
         .($debug?" $_id $_index ".
@@ -323,11 +332,13 @@ class spool {
       if (($index+$this->overview[$child]->desc-1>=$_first)
       ||($index<$_last)){
         if (sizeof($children)) {
-          $this->disp_desc($child,$index,$_first,$_last,$_ref,
-            $_pfx_end.$spfx_T,$_pfx_end.$spfx_I,false);
+          $this->disp_desc($child,$index,$_first,$_last,$_ref,$_pfx_end.
+            ($this->overview[$child]->parent_direct?$spfx_T:$spfx_Tnd),
+            $_pfx_end.$spfx_I,false);
         } else {
-          $this->disp_desc($child,$index,$_first,$_last,$_ref,
-            $_pfx_end.$spfx_L,$_pfx_end.$spfx_e,false);
+          $this->disp_desc($child,$index,$_first,$_last,$_ref,$_pfx_end.
+            ($this->overview[$child]->parent_direct?$spfx_L:$spfx_Lnd),
+            $_pfx_end.$spfx_e,false);
         }
       }
       $index += $this->overview[$child]->desc;
