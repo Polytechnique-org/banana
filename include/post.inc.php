@@ -12,7 +12,7 @@
 
 class BananaPost
 {
-    var $nb;
+    var $id;
     /** headers */
     var $headers;
     /** body */
@@ -26,7 +26,7 @@ class BananaPost
     function BananaPost($_id)
     {
         global $banana;
-        $this->nb = $_id;
+        $this->id = $_id;
         $this->_header();
 
         $this->body = join("\n", $banana->nntp->body($_id));
@@ -47,7 +47,7 @@ class BananaPost
     function _header()
     {
         global $banana;
-        $hdrs = $banana->nntp->head($this->nb);
+        $hdrs = $banana->nntp->head($this->id);
         if (!$hdrs) {
             $this = null;
             return false;
@@ -79,6 +79,14 @@ class BananaPost
         $this->name = preg_replace('/<[^ ]*>/', '', $this->name);
         $this->name = trim($this->name);
     }
+
+    function checkcancel() {
+        if (function_exists('hook_checkcancel')) {
+            return hook_checkcancel($this->headers);
+        }
+        return ($this->headers['from'] == $_SESSION['name']." <".$_SESSION['mail'].">");
+    }
+
 }
 
 ?>

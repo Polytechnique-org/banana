@@ -35,9 +35,9 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type']))
         case 'cancel':
             $banana->nntp->group($group);
             $mid  = array_search($id, $banana->spool->ids);
-            $post = new BananaPost($id);
+            $banana->newPost($id);
 
-            if (checkcancel($post->headers)) {
+            if ($banana->post && $banana->post->checkcancel()) {
                 $message = 'From: '.$banana->profile['name']."\n"
                     ."Newsgroups: $group\n"
                     ."Subject: cmsg $mid\n"
@@ -75,10 +75,10 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type']))
 
         case 'followupok':
             $rq=$banana->nntp->group($group);
-            $post = new BananaPost($id);
-            if ($post) {
-                $refs = (isset($post->headers['references'])?
-                $post->headers['references']." ":"").$post->headers['message-id'];
+            $banana->newPost($id);
+            if ($banana->post) {
+                $refs = (isset($banana->post->headers['references'])?
+                $banana->post->headers['references']." ":"").$banana->post->headers['message-id'];
             }
 
             $body = preg_replace("/\n\.[ \t\r]*\n/m","\n..\n",$_REQUEST['body']);
@@ -107,7 +107,7 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type']))
 <h1><?php echo $group; ?></h1>
 <?php
 if (isset($text)) { echo $text; }
-displayshortcuts();
+displayshortcuts($first);
 
 ?>
 
@@ -128,7 +128,7 @@ $banana->spool->disp($first, $last);
 $banana->nntp->quit();
 echo "</table>";
 
-displayshortcuts();
+displayshortcuts($first);
 
 require_once("include/footer.inc.php");
 ?>

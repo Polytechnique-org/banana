@@ -23,12 +23,12 @@ if (isset($group)) {
 
 if (isset($group) && isset($id) && isset($_REQUEST['type']) && ($_REQUEST['type']=='followup')) {
     $rq   = $banana->nntp->group($group);
-    $post = new BananaPost($id);
+    $banana->newPost($id);
     $body = '';
-    if ($post) {
-        $subject = (preg_match("/^re\s*:\s*/i", $post->headers['subject']) ? '' : 'Re: ').$post->headers['subject'];
-        $body    = $post->name." wrote :\n".wrap($post->body, "> ");
-        $target  = isset($post->headers['followup-to']) ? $post->headers['followup-to'] : $post->headers['newsgroups'];
+    if ($banana->post) {
+        $subject = (preg_match("/^re\s*:\s*/i", $banana->post->headers['subject']) ? '' : 'Re: ').$banana->post->headers['subject'];
+        $body    = $banana->post->name." wrote :\n".wrap($banana->post->body, "> ");
+        $target  = isset($banana->post->headers['followup-to']) ? $banana->post->headers['followup-to'] : $banana->post->headers['newsgroups'];
     }
 }
 

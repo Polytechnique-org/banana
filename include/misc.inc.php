@@ -13,13 +13,6 @@
 
 function _b_($str) { return utf8_decode(dgettext('banana', utf8_encode($str))); }
 
-function checkcancel($_headers) {
-    if (function_exists('hook_checkcancel')) {
-        return hook_checkcancel($_headers);
-    }
-    return ($_headers['from'] == $_SESSION['name']." <".$_SESSION['mail'].">");
-}
-
 /********************************************************************************
  *  HEADER STUFF
  */

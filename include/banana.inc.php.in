@@ -11,7 +11,6 @@ require_once("include/misc.inc.php");
 require_once("include/groups.inc.php");
 require_once("include/format.inc.php");
 require_once("include/error.inc.php");
-require_once("include/post.inc.php");
 
 class Banana
 {
@@ -38,6 +37,7 @@ class Banana
     
     var $nntp;
     var $spool;
+    var $post;
 
     function Banana()
     {
@@ -53,6 +53,12 @@ class Banana
         require_once('include/spool.inc.php');
         $this->spool = new BananaSpool($group, $disp, $since);
         if (!$this->spool) { error('nntpspool'); }
+    }
+
+    function newPost($id)
+    {
+        require_once("include/post.inc.php");
+        $this->post = new BananaPost($id);
     }
 
     function _setupProfile()

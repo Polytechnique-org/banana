@@ -19,9 +19,8 @@ if (isset($_REQUEST['id'])) {
 
 $banana->newSpool($group, $banana->profile['display'], $banana->profile['lastnews']);
 $banana->nntp->group($group);
-
-$post = new BananaPost($id);
-if (!$post) {
+$banana->newPost($id);
+if (!$banana->post) {
     if ($banana->nntp->lasterrorcode == "423") {
         $banana->spool->delid($id);
     }
@@ -34,7 +33,7 @@ $ndx = $banana->spool->getndx($id);
 <h1><?php echo _b_('Message'); ?></h1>
 
 <?php
-if (isset($_GET['type']) && ($_GET['type']=='cancel') && (checkcancel($post->headers))) {
+if (isset($_GET['type']) && $_GET['type']=='cancel' && $banana->post->checkcancel()) {
 ?>
 <p class="<?php echo $css['error']?>">
   <?php echo _b_('Voulez-vous vraiment annuler ce message ?'); ?>
@@ -60,8 +59,8 @@ summary="<?php echo _b_('Contenu du message'); ?>">
   </tr>
 <?php
     foreach ($banana->show_hdr as $hdr) {
-        if (isset($post->headers[$hdr])) {
-            $res = formatdisplayheader($hdr, $post->headers[$hdr]);
+        if (isset($banana->post->headers[$hdr])) {
+            $res = formatdisplayheader($hdr, $banana->post->headers[$hdr]);
             if ($res)
                 echo "<tr><td class=\"{$css['bicoltitre']}\">".header_translate($hdr)."</td>"
                     ."<td>$res</td></tr>\n";
@@ -75,7 +74,7 @@ summary="<?php echo _b_('Contenu du message'); ?>">
   </tr> 
   <tr>
     <td colspan="2">
-      <pre><?php echo formatbody($post->body); ?></pre>
+      <pre><?php echo formatbody($banana->post->body); ?></pre>
     </td>
   </tr>
   <tr>
