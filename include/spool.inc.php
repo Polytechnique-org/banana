@@ -114,19 +114,21 @@ class spool
             for ($id=min(array_keys($this->overview)); $id<$first; $id++) { 
                 $this->delid($id, false);
             }
-            $first  = max(array_keys($this->overview))+1;
+            $start  = max(array_keys($this->overview))+1;
         } else {
             unset($this->overview, $this->ids);
             $this->group   = $_group;
             $this->version = BANANA_SPOOL_VERSION;
+            $start         = $first;
         }
 
-        if (($first<$last) && $groupinfo[0]) {
-            $dates    = array_map("strtotime",    $_nntp->xhdr("Date",    "$first-$last"));
-            $subjects = array_map("headerdecode", $_nntp->xhdr("Subject", "$first-$last"));
-            $froms    = array_map("headerdecode", $_nntp->xhdr("From",    "$first-$last"));
-            $msgids   = $_nntp->xhdr("Message-ID", "$first-$last");
-            $refs     = $_nntp->xhdr("References", "$first-$last");
+        if (($start<$last) && $groupinfo[0]) {
+
+            $dates    = array_map("strtotime",    $_nntp->xhdr("Date",    "$start-$last"));
+            $subjects = array_map("headerdecode", $_nntp->xhdr("Subject", "$start-$last"));
+            $froms    = array_map("headerdecode", $_nntp->xhdr("From",    "$start-$last"));
+            $msgids   = $_nntp->xhdr("Message-ID", "$start-$last");
+            $refs     = $_nntp->xhdr("References", "$start-$last");
 
             if (isset($this->ids)) {
                 $this->ids = array_merge($this->ids, array_flip($msgids));
@@ -203,6 +205,7 @@ class spool
                 }
             }
         }
+        
         return true;
     }
 
