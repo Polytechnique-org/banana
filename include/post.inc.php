@@ -35,6 +35,9 @@ class Post {
       (preg_match("/quoted-printable/",$this->headers->contentencoding))) {
         $this->body = quoted_printable_decode($this->body);
       }
+      if(preg_match('!charset=([^;]*);!', $this->headers->contenttype, $matches)) {
+	$this->body = iconv($matches[1], 'iso-8859-1', $this->body);
+      }
   }
 }
 
