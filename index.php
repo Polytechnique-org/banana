@@ -8,6 +8,7 @@
 ********************************************************************************/
 
 require_once("include/session.inc.php");
+require_once("include/misc.inc.php");
 require_once("include/password.inc.php");
 require_once("include/NetNNTP.inc.php");
 require_once("include/groups.inc.php");
@@ -32,7 +33,7 @@ $newgroups = new groups($nntp,1);
 ?>
 
 <h1>
-  <?php echo _('Les forums de Banana'); ?>
+  <?php echo _b_('Les forums de Banana'); ?>
 </h1>
 
 <?php
@@ -44,16 +45,16 @@ displayshortcuts();
 <table class="<?php echo $css["bicol"];?>" cellspacing="0" cellpadding="2">
   <tr>
     <th>
-      <?php echo _('Total'); ?>
+      <?php echo _b_('Total'); ?>
     </th>
     <th>
-      <?php echo _('Nouveaux'); ?>
+      <?php echo _b_('Nouveaux'); ?>
     </th>
     <th>
-      <?php echo _('Nom'); ?>
+      <?php echo _b_('Nom'); ?>
     </th>
     <th>
-      <?php echo _('Description'); ?>
+      <?php echo _b_('Description'); ?>
     </th>
   </tr>
 <?php
@@ -85,18 +86,18 @@ foreach ($groups->overview as $g => $d) {
 if (count($newgroups->overview) and count($profile['subscribe'])) {
 ?>
 <p class="normal">
-<?php echo _('Les forums suivants ont été créés depuis ton dernier passage :'); ?>
+<?php echo _b_('Les forums suivants ont été créés depuis ton dernier passage :'); ?>
 </p>
 <table class="<?php echo $css["bicol"];?>" cellspacing="0" cellpadding="2">
   <tr>
     <th>
-      <?php echo _('Total'); ?>
+      <?php echo _b_('Total'); ?>
     </th>
     <th>
-      <?php echo _('Nom'); ?>
+      <?php echo _b_('Nom'); ?>
     </th>
     <th>
-      <?php echo _('Description'); ?>
+      <?php echo _b_('Description'); ?>
     </th>
   </tr>
 <?php

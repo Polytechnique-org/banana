@@ -50,21 +50,21 @@ $ndx = $spool->getndx($id);
 
 ?>
 <h1>
-  <?php echo _('Message'); ?>
+  <?php echo _b_('Message'); ?>
 </h1>
 
 <?php
 if (isset($_GET['type']) && ($_GET['type']=='cancel') && (checkcancel($post->headers))) {
 ?>
 <p class="<?php echo $css['error']?>">
-  <?php echo _('Voulez-vous vraiment annuler ce message ?'); ?>
+  <?php echo _b_('Voulez-vous vraiment annuler ce message ?'); ?>
 </p>
 <form action="thread.php" method="post">
   <input type="hidden" name="group" value="<?php echo $group;?>" />
   <input type="hidden" name="id" value="<?php 
     echo $id;?>" />
   <input type="hidden" name="type" value="cancel" />
-  <input type="submit" name="action" value="<?php echo _('OK'); ?>" />
+  <input type="submit" name="action" value="<?php echo _b_('OK'); ?>" />
 </form>
 <?
 }
@@ -73,10 +73,10 @@ displayshortcuts();
 ?>
 
 <table class="<?php echo $css['bicol']?>" cellpadding="0" cellspacing="0" 
-summary="<?php echo _('Contenu du message'); ?>">
+summary="<?php echo _b_('Contenu du message'); ?>">
   <tr>
     <th colspan="2">
-      <?php echo _('En-têtes'); ?>
+      <?php echo _b_('En-têtes'); ?>
     </th>
   </tr>
 <?php
@@ -89,7 +89,7 @@ foreach ($news['headdisp'] as $nick) {
 ?>
   <tr>
     <th colspan="2">
-      <?php echo _('Corps'); ?>
+      <?php echo _b_('Corps'); ?>
     </th>
   </tr> 
   <tr>
@@ -99,7 +99,7 @@ foreach ($news['headdisp'] as $nick) {
   </tr>
   <tr>
     <th colspan="2">
-      <?php echo _('Aperçu'); ?>
+      <?php echo _b_('Aperçu'); ?>
     </th>
   </tr> 
   <tr>

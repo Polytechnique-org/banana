@@ -64,12 +64,12 @@ function displayshortcuts() {
     $sname = basename($_SERVER['SCRIPT_NAME']);
 
     echo '<div class="shortcuts">';
-    echo '[<a href="disconnect.php">'._('Déconnexion').'</a>] ';
+    echo '[<a href="disconnect.php">'._b_('Déconnexion').'</a>] ';
 
     switch ($sname) {
         case 'thread.php' :
-            echo '[<a href="index.php">'._('Liste des forums').'</a>] ';
-            echo "[<a href=\"post.php?group=$group\">"._('Nouveau message')."</a>] ";
+            echo '[<a href="index.php">'._b_('Liste des forums').'</a>] ';
+            echo "[<a href=\"post.php?group=$group\">"._b_('Nouveau message')."</a>] ";
             if (sizeof($spool->overview)>$news['max']) {
                 for ($ndx=1; $ndx<=sizeof($spool->overview); $ndx += $news['max']) {
                     if ($first==$ndx) {
@@ -83,15 +83,15 @@ function displayshortcuts() {
             }
             break;
         case 'article.php' :
-            echo '[<a href="index.php">'._('Liste des forums').'</a>] ';
+            echo '[<a href="index.php">'._b_('Liste des forums').'</a>] ';
             echo "[<a href=\"thread.php?group=$group\">$group</a>] ";
-            echo "[<a href=\"post.php?group=$group&amp;id=$id&amp;type=followup\">"._('Répondre')."</a>] ";
+            echo "[<a href=\"post.php?group=$group&amp;id=$id&amp;type=followup\">"._b_('Répondre')."</a>] ";
             if (checkcancel($post->headers)) {
-                echo "[<a href=\"article.php?group=$group&amp;id=$id&amp;type=cancel\">"._('Annuler ce message')."</a>] ";
+                echo "[<a href=\"article.php?group=$group&amp;id=$id&amp;type=cancel\">"._b_('Annuler ce message')."</a>] ";
             }
             break;
         case 'post.php' :
-            echo '[<a href="index.php">'._('Liste des forums').'</a>] ';
+            echo '[<a href="index.php">'._b_('Liste des forums').'</a>] ';
             echo "[<a href=\"thread.php?group=$group\">$group</a>]";
             break;
     }

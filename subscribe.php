@@ -8,6 +8,7 @@
 ********************************************************************************/
 
 require_once("include/session.inc.php");
+require_once("include/misc.inc.php");
 require_once("include/password.inc.php");
 require_once("include/NetNNTP.inc.php");
 require_once("include/groups.inc.php");
@@ -30,7 +31,7 @@ $groups = new groups($nntp,2);
 ?>
 
 <h1>
-  <?php echo _('Abonnements'); ?>
+  <?php echo _b_('Abonnements'); ?>
 </h1>
 
 <?php
@@ -50,16 +51,16 @@ displayshortcuts();
 <table class="<?php echo $css["bicol"];?>" cellspacing="0" cellpadding="2">
   <tr>
     <th>
-      <?php echo _('Total'); ?>
+      <?php echo _b_('Total'); ?>
     </th>
     <th>
-      <?php echo _('Abonné'); ?>
+      <?php echo _b_('Abonné'); ?>
     </th>
     <th>
-      <?php echo _('Nom'); ?>
+      <?php echo _b_('Nom'); ?>
     </th>
     <th>
-      <?php echo _('Description'); ?>
+      <?php echo _b_('Description'); ?>
     </th>
   </tr>
 <?php

@@ -7,6 +7,8 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
+function _b_($str) { return dgettext('banana', $str); }
+
 function _headerdecode($charset, $c, $str) {
     $s = ($c == 'Q') ? quoted_printable_decode($str) : base64_decode($str);
     $s = iconv($charset, 'iso-8859-15', $s);
@@ -20,14 +22,14 @@ function headerDecode($value) {
 
 function header_translate($hdr) {
     switch (strtolower($hdr)) {
-        case 'from':            return _('De');
-        case 'subject':         return _('Sujet');
-        case 'newsgroups':      return _('Forums');
-        case 'followup':        return _('Suivi-à');
-        case 'date':            return _('Date');
-        case 'organization':    return _('Organisation');
-        case 'references':      return _('Références');
-        case 'xface':           return _('Image');
+        case 'from':            return _b_('De');
+        case 'subject':         return _b_('Sujet');
+        case 'newsgroups':      return _b_('Forums');
+        case 'followup':        return _b_('Suivi-à');
+        case 'date':            return _b_('Date');
+        case 'organization':    return _b_('Organisation');
+        case 'references':      return _b_('Références');
+        case 'xface':           return _b_('Image');
         default:
             return $hdr;
     }
@@ -44,7 +46,7 @@ function fancyDate($stamp) {
     if ($today == $dday) {
         $format = "%H:%M";
     } elseif ($today == 1 + $dday) {
-        $format = _('hier')." %H:%M";
+        $format = _b_('hier')." %H:%M";
     } elseif ($today < 7 + $dday) {
         $format = '%A %H:%M';
     } else {

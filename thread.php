@@ -68,12 +68,12 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
         $result = $nntp->post($message);
         if ($result) {
           $spool->delid($id);
-          $text = "<p class=\"normal\">"._('Message annulé')."</p>";
+          $text = "<p class=\"normal\">"._b_('Message annulé')."</p>";
         } else {
-          $text = "<p class=\"error\">"._('Impossible d\'annuler le message')."</p>";
+          $text = "<p class=\"error\">"._b_('Impossible d\'annuler le message')."</p>";
         }
       } else {
-        $text="<p class=\"error\">\n\t"._('Vous n\'avez pas les permissions pour annuler ce message')."\n</p>";
+        $text="<p class=\"error\">\n\t"._b_('Vous n\'avez pas les permissions pour annuler ce message')."\n</p>";
       }
       break;
     case 'new':
@@ -90,9 +90,9 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
         .wrap($body,"",$news['wrap']);
       $result = $nntp->post($message);
       if ($result) {
-        $text="<p class=\"normal\">"._('Message posté')."</p>";
+        $text="<p class=\"normal\">"._b_('Message posté')."</p>";
       } else {
-        $text="<p class=\"error\">"._('Impossible de poster le message')."</p>";
+        $text="<p class=\"error\">"._b_('Impossible de poster le message')."</p>";
       }
       break;
     case 'followupok':
@@ -117,9 +117,9 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
         .wrap($body,"",$news['wrap']);
       $result = $nntp->post($message);
       if ($result) {
-        $text="<p class=\"normal\">"._('Message posté')."</p>";
+        $text="<p class=\"normal\">"._b_('Message posté')."</p>";
       } else {
-        $text="<p class=\"error\">"._('Impossible de poster le message')."</p>";
+        $text="<p class=\"error\">"._b_('Impossible de poster le message')."</p>";
       }
       break;
   }
@@ -145,13 +145,13 @@ displayshortcuts();
 <table class="<?php echo $css['bicol']?>" cellpadding="0" cellspacing="0" border="0">
   <tr>
     <th class="<?php echo $css['date']?>">
-      <?php echo _('Date'); ?>
+      <?php echo _b_('Date'); ?>
     </th>
     <th class="<?php echo $css['subject']?>">
-      <?php echo _('Sujet'); ?>
+      <?php echo _b_('Sujet'); ?>
     </th>
     <th class="<?php echo $css['from']?>">
-      <?php echo _('Auteur'); ?>
+      <?php echo _b_('Auteur'); ?>
     </th>
   </tr>
 <?php

@@ -8,6 +8,7 @@
 ********************************************************************************/
 
 require_once("include/session.inc.php");
+require_once("include/misc.inc.php");
 require_once("include/profile.inc.php");
 require_once("include/error.inc.php");
 
@@ -18,10 +19,10 @@ session_destroy();
 require_once("include/header.inc.php");
 ?>
 <div class="title">
-  <?php echo _('Déconnexion effectuée !'); ?>
+  <?php echo _b_('Déconnexion effectuée !'); ?>
 </div>
 <p class="normal">
-  <?php echo _('Retour au <a href="index.php">profil</a>'); ?>
+  <?php echo _b_('Retour au <a href="index.php">profil</a>'); ?>
 </p>
 <?php
 require_once("include/footer.inc.php");
