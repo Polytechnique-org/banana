@@ -10,7 +10,7 @@
 session_start();
 
 // verify if a profile has been submitted
-if (!isset($_SESSION['profile']) && isset($_POST['action'] && $_POST['action']!="OK")) {
+if (!isset($_SESSION['profile']) && isset($_POST['action']) && $_POST['action']!="OK") {
   $_SESSION['name'] = $_POST['profile_name'];
   $_SESSION['mail'] = $_POST['profile_mail'];
   $_SESSION['org'] = $_POST['profile_org'];
