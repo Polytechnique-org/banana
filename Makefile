@@ -20,7 +20,7 @@ clean:
 	make -C po clean
 
 %: %.in Makefile
-	sed -e 's,@VERSION@,$(VERSION),g' $< > $@
+	sed -e 's,@VERSION@,$(VERSION) The Bearded Release,g' $< > $@
 
 
 # banana package targets
