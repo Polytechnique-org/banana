@@ -9,17 +9,8 @@
 
 session_start();
 
-//sets sessions variables
-if (!isset($_SESSION['profile']) && (!isset($_POST['action']) || 
-(isset($_POST['action']) && ($_POST['action']!="OK")))) {
-  require("include/profile.inc.php");
-  $profile=getprofile();
-  require($profile['locale']);
-  require("header.inc.php");
-  require("profile_form.inc.php");
-  require("footer.inc.php");
-  exit;
-} elseif (!isset($_SESSION['profile'])) {
+// verify if a profile has been submitted
+if (!isset($_SESSION['profile']) && isset($_POST['action'] && $_POST['action']!="OK")) {
   $_SESSION['name'] = $_POST['profile_name'];
   $_SESSION['mail'] = $_POST['profile_mail'];
   $_SESSION['org'] = $_POST['profile_org'];
@@ -28,6 +19,17 @@ if (!isset($_SESSION['profile']) && (!isset($_POST['action']) ||
   $_SESSION['passwd'] = $_POST['profile_passwd'];
   $_SESSION['displaytype'] = $_POST['displaytype'];
   $_SESSION['profile'] = true;
+}
+
+//sets sessions variables
+if (!isset($_SESSION['profile'])) {
+  require("include/profile.inc.php");
+  $profile=getprofile();
+  require($profile['locale']);
+  require("header.inc.php");
+  require("profile_form.inc.php");
+  require("footer.inc.php");
+  exit;
 }
 
 // refresh-post protection
