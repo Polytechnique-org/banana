@@ -87,7 +87,7 @@ class spool {
 	  // remove expired messages
 	  $msgids=array_flip($this->ids);
 	  for ($id=min(array_keys($this->overview)); $id<$first; $id++) { 
-		$this->delid[$id];
+		$this->delid($id);
 	  }
 	  $this->ids=array_flip($msgids);
 	  $first=max(array_keys($this->overview))+1;
@@ -114,9 +114,12 @@ class spool {
       }
 
       foreach ($msgids as $id=>$msgid) {
-        $msg = new spoolhead($dates[$id],$subjects[$id],$froms[$id],
-          (isset($this->overview[$id]->desc)?
-          $this->overview[$id]->desc+1:1));
+        if (isset($this->overview[$id])) {
+          $msg = $this->overview[$id];
+          $msg->desc++;
+        } else {
+          $msg = new spoolhead($dates[$id],$subjects[$id],$froms[$id],1);
+        }
         $refs[$id]=str_replace("><","> <",$refs[$id]);
         $msgrefs=preg_split("/( |\t)/",strtr($refs[$id],$this->ids));
         $parents=preg_grep("/^\d+$/",$msgrefs);
