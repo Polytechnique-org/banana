@@ -147,7 +147,7 @@ function displayshortcuts($first = -1) {
     $res  = '<div class="banana_scuts">';
     $res .= '[<a href="?">'._b_('Liste des forums').'</a>] ';
     if (is_null($group)) {
-        return $res.'</div>';
+        return $res.'[<a href="?subscribe=1">'._b_('Abonnements').'</a>]</div>';
     }
    
     $res .= "[<a href=\"?group=$group\">$group</a>] ";

@@ -1,0 +1,341 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-01-07 19:02+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: banana/article.php:55 banana/article.php:53
+#: banana/include/banana.inc.php:116 banana/include/banana.inc.php:169
+msgid "Message"
+msgstr ""
+
+#: banana/article.php:62 banana/article.php:60 banana/article.php:25
+#: banana/include/banana.inc.php:88
+msgid "Voulez-vous vraiment annuler ce message ?"
+msgstr ""
+
+#: banana/article.php:69 banana/article.php:67 banana/article.php:31
+msgid "OK"
+msgstr ""
+
+#: banana/article.php:78 banana/article.php:76
+msgid "Contenu du message"
+msgstr ""
+
+#: banana/article.php:81 banana/post.php:83 banana/article.php:79
+#: banana/post.php:81
+msgid "En-ttes"
+msgstr ""
+
+#: banana/article.php:94 banana/post.php:130 banana/article.php:92
+#: banana/post.php:128 banana/include/banana.inc.php:151
+#: banana/include/post.inc.php:107 banana/include/banana.inc.php:229
+#: banana/include/post.inc.php:111 banana/post.inc.php:111
+msgid "Corps"
+msgstr ""
+
+#: banana/article.php:104 banana/article.php:102
+msgid "Aperu"
+msgstr ""
+
+#: banana/disconnect.php:23 banana/disconnect.php:21 banana/disconnect.php:22
+msgid "Dconnexion effectue !"
+msgstr ""
+
+#: banana/disconnect.php:26 banana/disconnect.php:24 banana/disconnect.php:25
+msgid "Retour au <a href=\"index.php\">profil</a>"
+msgstr ""
+
+#: banana/index.php:37 banana/index.php:35 banana/index.php:36
+#: banana/include/banana.inc.php:61 banana/include/banana.inc.php:114
+msgid "Les forums de Banana"
+msgstr ""
+
+#: banana/index.php:49 banana/index.php:95 banana/subscribe.php:55
+#: banana/index.php:47 banana/index.php:93 banana/subscribe.php:53
+#: banana/index.php:48 banana/index.php:94 banana/subscribe.php:54
+#: banana/include/groups.inc.php:87 banana/groups.inc.php:87
+msgid "Total"
+msgstr ""
+
+#: banana/index.php:52 banana/index.php:50 banana/index.php:51
+#: banana/include/groups.inc.php:91 banana/groups.inc.php:91
+msgid "Nouveaux"
+msgstr ""
+
+#: banana/index.php:55 banana/index.php:98 banana/post.php:88
+#: banana/subscribe.php:61 banana/index.php:53 banana/index.php:96
+#: banana/post.php:86 banana/subscribe.php:59 banana/index.php:54
+#: banana/index.php:97 banana/subscribe.php:60
+#: banana/include/banana.inc.php:146 banana/include/groups.inc.php:93
+#: banana/include/banana.inc.php:224 banana/groups.inc.php:93
+msgid "Nom"
+msgstr ""
+
+#: banana/index.php:58 banana/index.php:101 banana/subscribe.php:64
+#: banana/index.php:56 banana/index.php:99 banana/subscribe.php:62
+#: banana/index.php:57 banana/index.php:100 banana/subscribe.php:63
+#: banana/include/groups.inc.php:93 banana/groups.inc.php:93
+msgid "Description"
+msgstr ""
+
+#: banana/index.php:90 banana/index.php:88 banana/index.php:89
+msgid "Les forums suivants ont t crs depuis ton dernier passage :"
+msgstr ""
+
+#: banana/post.php:71 banana/install.d/format.inc.php:72 banana/post.php:69
+#: banana/include/banana.inc.php:142 banana/include/misc.inc.php:162
+#: banana/include/banana.inc.php:220 banana/include/misc.inc.php:156
+#: banana/misc.inc.php:156
+msgid "Nouveau message"
+msgstr ""
+
+#: banana/post.php:96 banana/thread.php:153 banana/include/misc.inc.php:24
+#: banana/post.php:94 banana/thread.php:151 banana/include/misc.inc.php:26
+#: banana/include/misc.inc.php:28 banana/include/banana.inc.php:147
+#: banana/include/misc.inc.php:43 banana/include/spool.inc.php:360
+#: banana/include/banana.inc.php:225 banana/include/misc.inc.php:34
+#: banana/misc.inc.php:34 banana/spool.inc.php:360
+msgid "Sujet"
+msgstr ""
+
+#: banana/post.php:105 banana/include/misc.inc.php:25 banana/post.php:103
+#: banana/include/misc.inc.php:27 banana/include/misc.inc.php:29
+#: banana/include/banana.inc.php:148 banana/include/misc.inc.php:44
+#: banana/include/banana.inc.php:226 banana/include/misc.inc.php:35
+#: banana/misc.inc.php:35
+msgid "Forums"
+msgstr ""
+
+#: banana/article.php:79 banana/post.php:81 banana/include/banana.inc.php:145
+#: banana/include/post.inc.php:96 banana/include/banana.inc.php:223
+#: banana/include/post.inc.php:100 banana/post.inc.php:100
+msgid "En-têtes"
+msgstr ""
+
+#: banana/article.php:102
+msgid "Aperçu"
+msgstr ""
+
+#: banana/disconnect.php:22
+msgid "Déconnexion effectuée !"
+msgstr ""
+
+#: banana/index.php:89 banana/include/banana.inc.php:63
+#: banana/include/banana.inc.php:116
+msgid "Les forums suivants ont été créés depuis ton dernier passage :"
+msgstr ""
+
+#: banana/post.php:112 banana/include/misc.inc.php:30
+#: banana/include/misc.inc.php:45 banana/include/misc.inc.php:36
+#: banana/misc.inc.php:36
+msgid "Suivi-à"
+msgstr ""
+
+#: banana/post.php:120 banana/include/misc.inc.php:32
+#: banana/install.d/profile_form.inc.php:40 banana/include/banana.inc.php:150
+#: banana/include/misc.inc.php:47 banana/include/profile_form.inc.php:40
+#: banana/include/banana.inc.php:228 banana/include/misc.inc.php:38
+#: banana/misc.inc.php:38
+msgid "Organisation"
+msgstr ""
+
+#: banana/subscribe.php:34 banana/include/banana.inc.php:77
+#: banana/include/banana.inc.php:130 banana/misc.inc.php:150
+msgid "Abonnements"
+msgstr ""
+
+#: banana/subscribe.php:57
+msgid "Abonné"
+msgstr ""
+
+#: banana/thread.php:71 banana/thread.php:43
+msgid "Message annulé"
+msgstr ""
+
+#: banana/thread.php:73 banana/thread.php:45 banana/include/banana.inc.php:198
+msgid "Impossible d'annuler le message"
+msgstr ""
+
+#: banana/thread.php:76 banana/thread.php:48 banana/include/banana.inc.php:184
+msgid "Vous n'avez pas les permissions pour annuler ce message"
+msgstr ""
+
+#: banana/thread.php:93 banana/thread.php:120 banana/thread.php:63
+#: banana/thread.php:88
+msgid "Message posté"
+msgstr ""
+
+#: banana/thread.php:95 banana/thread.php:122 banana/thread.php:65
+#: banana/thread.php:90 banana/include/banana.inc.php:265
+msgid "Impossible de poster le message"
+msgstr ""
+
+#: banana/thread.php:148 banana/include/misc.inc.php:31
+#: banana/include/misc.inc.php:46 banana/include/spool.inc.php:359
+#: banana/include/misc.inc.php:37 banana/misc.inc.php:37
+#: banana/spool.inc.php:359
+msgid "Date"
+msgstr ""
+
+#: banana/thread.php:154 banana/include/spool.inc.php:361
+#: banana/spool.inc.php:361
+msgid "Auteur"
+msgstr ""
+
+#: banana/include/misc.inc.php:27 banana/include/misc.inc.php:42
+#: banana/include/misc.inc.php:33 banana/misc.inc.php:33
+msgid "De"
+msgstr ""
+
+#: banana/include/misc.inc.php:33 banana/include/misc.inc.php:48
+#: banana/include/misc.inc.php:39 banana/misc.inc.php:39
+msgid "Références"
+msgstr ""
+
+#: banana/include/misc.inc.php:34 banana/include/misc.inc.php:49
+#: banana/include/misc.inc.php:40 banana/misc.inc.php:40
+msgid "Image"
+msgstr ""
+
+#: banana/include/misc.inc.php:51 banana/include/misc.inc.php:121
+#: banana/include/misc.inc.php:115 banana/misc.inc.php:115
+msgid "hier"
+msgstr ""
+
+#: banana/install.d/error.inc.php:17 banana/include/error.inc.php:17
+msgid "Impossible de se connecter au serveur de forums"
+msgstr ""
+
+#: banana/install.d/error.inc.php:22 banana/include/error.inc.php:22
+msgid "L'authentification sur le serveur de forums a échoué"
+msgstr ""
+
+#: banana/install.d/error.inc.php:28 banana/include/error.inc.php:28
+msgid "Il n'y a pas de forum sur ce serveur"
+msgstr ""
+
+#: banana/install.d/error.inc.php:36 banana/include/error.inc.php:36
+msgid "Impossible d'accéder au forum"
+msgstr ""
+
+#: banana/install.d/error.inc.php:45 banana/include/error.inc.php:45
+msgid "Impossible d'accéder au message.  Le message a peut-être été annulé"
+msgstr ""
+
+#: banana/install.d/format.inc.php:67
+msgid "Déconnexion"
+msgstr ""
+
+#: banana/install.d/format.inc.php:71 banana/install.d/format.inc.php:86
+#: banana/install.d/format.inc.php:94 banana/include/misc.inc.php:161
+#: banana/include/misc.inc.php:176 banana/include/misc.inc.php:186
+#: banana/include/misc.inc.php:148 banana/misc.inc.php:148
+msgid "Liste des forums"
+msgstr ""
+
+#: banana/install.d/format.inc.php:88 banana/include/misc.inc.php:179
+#: banana/include/misc.inc.php:171 banana/misc.inc.php:171
+msgid "Répondre"
+msgstr ""
+
+#: banana/install.d/format.inc.php:90 banana/include/misc.inc.php:182
+#: banana/include/misc.inc.php:174 banana/misc.inc.php:174
+msgid "Annuler ce message"
+msgstr ""
+
+#: banana/install.d/profile_form.inc.php:11
+#: banana/include/profile_form.inc.php:11
+msgid "Bienvenue sur Banana !"
+msgstr ""
+
+#: banana/install.d/profile_form.inc.php:19
+#: banana/include/profile_form.inc.php:19
+msgid "Définis tes paramètres"
+msgstr ""
+
+#: banana/install.d/profile_form.inc.php:24
+#: banana/include/profile_form.inc.php:24
+msgid "Nom (par exemple Jean Dupont)"
+msgstr ""
+
+#: banana/install.d/profile_form.inc.php:32
+#: banana/include/profile_form.inc.php:32
+msgid "Adresse mail"
+msgstr ""
+
+#: banana/install.d/profile_form.inc.php:48
+#: banana/include/profile_form.inc.php:48
+msgid "Signature"
+msgstr ""
+
+#: banana/install.d/profile_form.inc.php:56
+#: banana/include/profile_form.inc.php:56
+msgid "Affichage"
+msgstr ""
+
+#: banana/install.d/profile_form.inc.php:62
+#: banana/include/profile_form.inc.php:62
+msgid "Tous les messages"
+msgstr ""
+
+#: banana/install.d/profile_form.inc.php:68
+#: banana/include/profile_form.inc.php:68
+msgid "Seulement les fils de discussion comportant des messages non lus"
+msgstr ""
+
+#: banana/install.d/profile_form.inc.php:73
+#: banana/include/profile_form.inc.php:73
+msgid "Authentification sur le serveur NNTP"
+msgstr ""
+
+#: banana/install.d/profile_form.inc.php:78
+#: banana/include/profile_form.inc.php:78
+msgid "Login (laisser anonyme pour un login en anonyme)"
+msgstr ""
+
+#: banana/install.d/profile_form.inc.php:86
+#: banana/include/profile_form.inc.php:86
+msgid "Mot de passe"
+msgstr ""
+
+#: banana/include/banana.inc.php:112 banana/include/banana.inc.php:165
+msgid "Impossible d'accéder au message.   Le message a peut-être été annulé"
+msgstr ""
+
+#: banana/include/banana.inc.php:134 banana/include/banana.inc.php:212
+msgid "a écrit"
+msgstr ""
+
+#: banana/include/banana.inc.php:149 banana/include/banana.inc.php:227
+msgid "Suivi à"
+msgstr ""
+
+#: banana/include/groups.inc.php:89 banana/groups.inc.php:89
+msgid "Abo."
+msgstr ""
+
+#: banana/include/post.inc.php:110 banana/include/post.inc.php:114
+#: banana/post.inc.php:114
+msgid "apercu"
+msgstr ""
+
+#: banana/include/spool.inc.php:372 banana/spool.inc.php:372
+msgid "Aucun message dans ce forum"
+msgstr ""
+
+#: banana/include/banana.inc.php:54
+msgid "Impossible de contacter le serveur"
+msgstr ""

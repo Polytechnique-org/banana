@@ -115,7 +115,7 @@ class BananaGroups {
         $html .= '</table>';
 
         if ($show_form) {
-            return '<form method="post" action="'.$_SERVER['PHP_SELF'].'"><div class="center"><input type="submit" /></div>'
+            return '<form method="post" action="?"><div class="center"><input type="submit" /></div>'
                 .$html.'<div class="center"><input type="submit" /></div></form>';
         }
         

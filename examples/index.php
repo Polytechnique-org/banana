@@ -7,7 +7,7 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-require_once("include/banana.inc.php");
+require_once("banana/banana.inc.php");
 $res = Banana::run();
 
 ?>
