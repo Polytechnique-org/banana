@@ -76,7 +76,6 @@ class spool {
       return false;
     }
 	$spoolfile=realpath("./spool/spool-$_group.dat");
-echo $spoolfile;
     if (file_exists($spoolfile)) {
       $f = fopen($spoolfile,"r");
       $this = unserialize(fread($f,filesize($spoolfile)));
