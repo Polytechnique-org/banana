@@ -69,24 +69,35 @@ class spool {
    */
    
   function spool(&$_nntp,$_group,$_display=0,$_since=""){
+	global $news;
     $groupinfo = $_nntp->group($_group);
     if (!$groupinfo) {
       $this = false;
       return false;
     }
-    if (file_exists("/home/basile/dev/banana-dev/spool/spool-$_group.dat")) {
-      $f = fopen("/home/basile/dev/banana-dev/spool/spool-$_group.dat","r");
-      $this = unserialize(fread($f,filesize("/home/basile/dev/banana-dev/spool/spool-$_group.dat")));
+	$spoolfile=realpath("./spool/spool-$_group.dat");
+echo $spoolfile;
+    if (file_exists($spoolfile)) {
+      $f = fopen($spoolfile,"r");
+      $this = unserialize(fread($f,filesize($spoolfile)));
       fclose($f);
       $keys = array_values($this->ids);
       rsort($keys);
-      $first = $keys[0]+1;
+      $first = max($groupinfo[2]-$news['maxspool'],$groupinfo[1]);
       $last = $groupinfo[2];
+	  // remove expired messages
+	  $msgids=array_flip($this->ids);
+	  for ($id=min(array_keys($this->overview)); $id<$first; $id++) { 
+		$this->delid[$id];
+	  }
+	  $this->ids=array_flip($msgids);
+	  $first=max(array_keys($this->overview))+1;
     } else {
-      $first = $groupinfo[1];
+      $first = max($groupinfo[2]-$news['maxspool'],$groupinfo[1]);
       $last = $groupinfo[2];
       $this->group = $_group;
     }
+	
     if (($first<=$groupinfo[2]) && ($groupinfo[0]!=0)) {
       $dates = array_map("strtotime",
         $_nntp->xhdr("Date","$first-$last"));
