@@ -1,6 +1,6 @@
-banana (1.0-0) unstable; urgency=low
+banana (1.0-1) unstable; urgency=low
 
   * First upstream release.
 
- -- Pierre Habouzit <pierre.habouzit@m4x.org>  Fri,  7 Jan 2005 22:37:03 +0100
+ -- Pierre Habouzit <pierre.habouzit@m4x.org>  Wed, 19 Jan 2005 21:55:41 +0100
 
