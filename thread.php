@@ -131,6 +131,7 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
         .stripslashes($_REQUEST['followup'])."\n":"")
         ."References: $refs\n"
         .$news['customhdr']
+        .$profile['customhdr']
         ."\n"
         .wrap($body,"",$news['wrap']);
       $result = $mynntp->post($message);
