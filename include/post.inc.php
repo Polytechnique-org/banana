@@ -35,10 +35,6 @@ class Post {
       (preg_match("/quoted-printable/",$this->headers->contentencoding))) {
         $this->body = quoted_printable_decode($this->body);
       }
-    if (!$this->body) {
-      $this = false;
-      return false;
-    }
   }
 }
 
