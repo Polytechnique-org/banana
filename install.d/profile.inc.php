@@ -27,6 +27,7 @@ function getprofile() {
     .htmlentities($_SESSION['mail']).">";
   $array['sig'] = $_SESSION['sig'];
   $array['org']  = $_SESSION['org'];
+  $array['customhdr'] = "";
   $array['display'] = $_SESSION['displaytype'];
   $array['lastnews'] = time()-86400;
   $array['locale'] = "locales/fr.inc.php";
