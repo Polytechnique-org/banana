@@ -22,7 +22,7 @@ function formatSpoolHeader($_header,$_text,$_id,$_group,$_isref,$_isread=true) {
   global $locale;
   switch ($_header) {
     case "date": 
-      return date($locale['format']['datefmt'],$_text);
+      return locale_header_date($_text);
     case "from":
 #     From: mark@cbosgd.ATT.COM
 #     From: mark@cbosgd.ATT.COM (Mark Horton)
