@@ -256,6 +256,7 @@ class spool {
 
   function disp_desc($_id,$_index="",$_first=0,$_last=0,$_ref="",
   $_pfx_node="", $_pfx_end="",$_head=true) {
+    global $css;
     $debug = false;
     $spfx_f = '<img src="img/k1.gif" height="21" width="9" alt="o" />'; 
     $spfx_n = '<img src="img/k2.gif" height="21" width="9" alt="*" />'; 
@@ -269,18 +270,18 @@ class spool {
     
     if (!sizeof($this->overview[$_id]->children) && ($_index<=$_last)
     && ($_index>=$_first)) {
-      echo '<tr class="'.($_index%2?"pair":"impair")."\">\n";
-      echo "<td class=\"date\">"
+      echo '<tr class="'.($_index%2?$css["pair"]:$css["impair"])."\">\n";
+      echo "<td class=\"{$css['date']}\">"
         .formatSpoolHeader("date",$this->overview[$_id]->date,$_id,
         $this->group,($_index==$_ref),$this->overview[$_id]->isread)
         ." </td>\n";
-      echo "<td class=\"subject\"><div class=\"tree\">"
+      echo "<td class=\"{$css['subject']}\"><div class=\"{$css['tree']}\">"
         .$_pfx_node.($_head?$spfx_f:$spfx_s)."</div>"
         .formatSpoolHeader("subject",$this->overview[$_id]->subject,$_id,
         $this->group,($_index==$_ref),$this->overview[$_id]->isread)
         .($debug?" $_id $_index ".
         $this->overview[$_id]->desc." ".$this->overview[$_id]->descunread." ":"")." </td>\n";
-      echo "<td class=\"author\">"
+      echo "<td class=\"{$css['author']}\">"
         .formatSpoolHeader("from",$this->overview[$_id]->from,$_id,
         $this->group,($_index==$_ref),$this->overview[$_id]->isread)
         ." </td>\n</tr>";
@@ -288,18 +289,18 @@ class spool {
     } 
     $children = $this->overview[$_id]->children;
     if (($_index<=$_last) && ($_index>=$_first)) {
-      echo '<tr class="'.($_index%2?"pair":"impair")."\">\n";
-      echo "<td class=\"date\">"
+      echo '<tr class="'.($_index%2?$css["pair"]:$css["impair"])."\">\n";
+      echo "<td class=\"{$css['date']}\">"
          .formatSpoolHeader("date",$this->overview[$_id]->date,$_id,
          $this->group,($_index==$_ref),$this->overview[$_id]->isread)
          ." </td>\n";
-      echo "<td class=\"subject\"><div class=\"tree\">"
+      echo "<td class=\"{$css['subject']}\"><div class=\"{$css['tree']}\">"
         .$_pfx_node.$spfx_n."</div>"
         .formatSpoolHeader("subject",$this->overview[$_id]->subject,$_id,
         $this->group,($_index==$_ref),$this->overview[$_id]->isread)
         .($debug?" $_id $_index ".
         $this->overview[$_id]->desc." ".$this->overview[$_id]->descunread." ":"")." </td>\n";
-      echo "<td class=\"author\">"
+      echo "<td class=\"{$css['author']}\">"
         .formatSpoolHeader("from",$this->overview[$_id]->from,$_id,
         $this->group,($_index==$_ref),$this->overview[$_id]->isread)
         ." </td>\n</tr>";
@@ -327,6 +328,7 @@ class spool {
    */
 
   function disp($_first=0,$_last=0,$_ref="") {
+    global $css;
     $index=1;
     if (sizeof($this->overview)) {
       foreach ($this->overview as $id=>$msg) {
@@ -336,7 +338,7 @@ class spool {
         }
       }
     } else {
-     echo "<tr class=\"pair\">\n";
+     echo "<tr class=\"{$css['pair']}\">\n";
      echo "\t<td colspan=\"3\">\n";
      echo "\t\tNo post in this newsgroup\n";
      echo "\t</td>\n";

@@ -34,13 +34,13 @@ $groups = new groups($nntp);
 
 ?>
 
-<div class="title">
+<div class="<?php echo $css["title"];?>">
   <?php echo $locale['index']['title'];?>
 </div>
 
 <?php
 if (!sizeof($groups->overview)) {
-  echo '<p class="normal">';
+  echo "<p class=\"{$css['normal']}\">";
   echo "\n".$locale['error']['nogroup']."\n";
   echo "</p>\n";
   require("include/footer.inc.php");
@@ -50,7 +50,7 @@ if (!sizeof($groups->overview)) {
 displayshortcuts();
 ?>
 
-<table class="bicol" cellspacing="0" cellpadding="2" 
+<table class="<?php echo $css["bicol"];?>" cellspacing="0" cellpadding="2" 
   summary="<?php echo $locale['index']['summary'];?>">
   <tr>
     <th>
@@ -73,17 +73,17 @@ foreach ($groups->overview as $g => $d) {
   $groupinfo = $nntp->group($g);
   $newarts = $nntp->newnews($profile['lastnews'],$g);
 ?>
-  <tr class="<?php echo ($pair?"pair":"impair");?>" >
-    <td class="total">
+  <tr class="<?php echo ($pair?$css["pair"]:$css["impair"]);?>" >
+    <td class="<?php echo $css["total"]; ?>">
       <?php echo $groupinfo[0]; ?>
     </td>
-    <td class="unread">
+    <td class="<?php echo $css["unread"]; ?>">
       <?php echo sizeof($newarts); ?>
     </td>
-    <td class="group">
+    <td class="<?php echo $css["group"]; ?>">
       <?php echo "<a href=\"thread.php?group=$g\">$g</a>";?>
     </td>
-    <td class="description">
+    <td class="<?php echo $css["description"]; ?>">
       <?php echo $d[0];?>
     </td>
   </tr>
