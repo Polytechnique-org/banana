@@ -1,1 +1,1 @@
-precious ^locale
+precious ^(locale|spool)
