@@ -7,22 +7,22 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-require("include/session.inc.php");
-require("include/encoding.inc.php");
-require("include/format.inc.php");
-require("include/config.inc.php");
-require("include/NetNNTP.inc.php");
-include("include/post.inc.php");
-require("include/spool.inc.php");
-require("include/password.inc.php");
-require("include/profile.inc.php");
-include("include/wrapper.inc.php");
-include("include/error.inc.php");
+require_once("include/session.inc.php");
+require_once("include/encoding.inc.php");
+require_once("include/format.inc.php");
+require_once("include/config.inc.php");
+require_once("include/NetNNTP.inc.php");
+require_once("include/post.inc.php");
+require_once("include/spool.inc.php");
+require_once("include/password.inc.php");
+require_once("include/profile.inc.php");
+require_once("include/wrapper.inc.php");
+require_once("include/error.inc.php");
 
 $profile=getprofile();
-require($profile['locale']);
+require_once($profile['locale']);
 
-require("include/header.inc.php");
+require_once("include/header.inc.php");
 
 if (isset($_REQUEST['group'])) {
   $group=htmlentities(strtolower($_REQUEST['group']));
@@ -169,5 +169,5 @@ echo "</table>";
 
 displayshortcuts();
 
-require("include/footer.inc.php");
+require_once("include/footer.inc.php");
 ?>

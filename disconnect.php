@@ -7,17 +7,17 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-require("include/session.inc.php");
-require("include/profile.inc.php");
-require("include/error.inc.php");
+require_once("include/session.inc.php");
+require_once("include/profile.inc.php");
+require_once("include/error.inc.php");
 
 $profile=getprofile();
-require($profile['locale']);
+require_once($profile['locale']);
 
 $_SESSION=array();
 session_destroy();
 
-require("include/header.inc.php");
+require_once("include/header.inc.php");
 ?>
 <div class="title">
   <?php echo $locale['disconnect']['title'];?>
@@ -26,5 +26,5 @@ require("include/header.inc.php");
   <?php echo $locale['disconnect']['back'];?>
 </p>
 <?php
-require("include/footer.inc.php");
+require_once("include/footer.inc.php");
 ?>

@@ -7,19 +7,19 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-require("include/session.inc.php");
-require("include/password.inc.php");
-require("include/NetNNTP.inc.php");
-require("include/groups.inc.php");
-require("include/format.inc.php");
-require("include/config.inc.php");
-require("include/profile.inc.php");
-require("include/error.inc.php");
+require_once("include/session.inc.php");
+require_once("include/password.inc.php");
+require_once("include/NetNNTP.inc.php");
+require_once("include/groups.inc.php");
+require_once("include/format.inc.php");
+require_once("include/config.inc.php");
+require_once("include/profile.inc.php");
+require_once("include/error.inc.php");
 
 $profile=getprofile();
-require($profile['locale']);
+require_once($profile['locale']);
 
-require("include/header.inc.php");
+require_once("include/header.inc.php");
 
 $nntp = new nntp($news['server']);
 if (!$nntp) error("nntpsock");
@@ -130,5 +130,5 @@ if (count($newgroups->overview) and count($profile['subscribe'])) {
 displayshortcuts();
 
 $nntp->quit();
-require("include/footer.inc.php");
+require_once("include/footer.inc.php");
 ?>

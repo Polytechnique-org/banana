@@ -23,12 +23,12 @@ if (!isset($_SESSION['profile']) && isset($_POST['action']) && $_POST['action']=
 
 //sets sessions variables
 if (!isset($_SESSION['profile'])) {
-  require("include/profile.inc.php");
+  require_once("include/profile.inc.php");
   $profile=getprofile();
-  require($profile['locale']);
-  require("header.inc.php");
-  require("profile_form.inc.php");
-  require("footer.inc.php");
+  require_once($profile['locale']);
+  require_once("header.inc.php");
+  require_once("profile_form.inc.php");
+  require_once("footer.inc.php");
   exit;
 }
 

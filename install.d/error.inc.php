@@ -16,20 +16,20 @@ function error($_type) {
   switch ($_type) {
     case "nntpsock":
       echo "<p class=\"error\">\n\t".$locale['error']['connect']."\n</p>";
-      require("include/footer.inc.php");
+      require_once("include/footer.inc.php");
       exit;
       break;  
     case "nntpauth":
       echo "<p class=\"error\">\n\t".$locale['error']['credentials']
         ."\n</p>";
-      require("include/footer.inc.php");
+      require_once("include/footer.inc.php");
       exit;
       break;
     case "nntpgroups":
       echo "<p class=\"{$css['normal']}\">";
       echo "\n".$locale['error']['nogroup']."\n";
       echo "</p>\n";
-      require("include/footer.inc.php");
+      require_once("include/footer.inc.php");
       exit;
       break;
     case "nntpspool":
@@ -37,7 +37,7 @@ function error($_type) {
       echo "[<a href=\"index.php\">Liste des forums</a>]\n";
       echo "</div>\n";
       echo "<p class=\"error\">\n\t".$locale['error']['group']."\n</p>";
-      require("footer.inc.php");
+      require_once("footer.inc.php");
       exit;
       break;
     case "nntpart":
@@ -46,7 +46,7 @@ function error($_type) {
       echo "[<a href=\"thread.php?group=$group\">$group</a>] \n";
       echo "</div>\n";
       echo "<p class=\"error\">\n\t".$locale['error']['post']."\n</p>";
-      require("footer.inc.php");
+      require_once("footer.inc.php");
       exit;
       break;
   }
