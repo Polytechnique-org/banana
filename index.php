@@ -30,8 +30,8 @@ if ($news['user']!="anonymous") {
     exit;
   }
 }
-$groups = new groups($nntp);
-
+$groups = new groups($nntp,0);
+$newgroups = new groups($nntp,1);
 ?>
 
 <div class="<?php echo $css["title"];?>">
@@ -92,6 +92,47 @@ foreach ($groups->overview as $g => $d) {
 ?>
 </table>
 <?php
+if (count($newgroups->overview) and count($profile['subscribe'])) {
+?>
+<p class="normal">
+<?php echo $locale['index']['newgroupstext']; ?>
+</p>
+<table class="<?php echo $css["bicol"];?>" cellspacing="0" cellpadding="2" 
+  summary="<?php echo $locale['index']['summary'];?>">
+  <tr>
+    <th>
+      <?php echo $locale['index']['total'];?>
+    </th>
+    <th>
+      <?php echo $locale['index']['name'];?>
+    </th>
+    <th>
+      <?php echo $locale['index']['description'];?>
+    </th>
+  </tr>
+<?php
+  $pair = true;
+  foreach ($newgroups->overview as $g => $d) {
+    $pair = !$pair;
+    $groupinfo = $nntp->group($g);
+?>
+  <tr class="<?php echo ($pair?$css["pair"]:$css["impair"]);?>" >
+    <td class="<?php echo $css["total"]; ?>">
+      <?php echo $groupinfo[0]; ?>
+    </td>
+    <td class="<?php echo $css["group"]; ?>">
+      <?php echo "<a href=\"thread.php?group=$g\">$g</a>";?>
+    </td>
+    <td class="<?php echo $css["description"]; ?>">
+      <?php echo $d[0];?>
+    </td>
+  </tr>
+<?php
+  } //foreach
+?>
+</table>
+<?php
+} // new newsgroups ?
 
 displayshortcuts();
 

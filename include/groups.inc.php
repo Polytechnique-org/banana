@@ -20,26 +20,43 @@ class groups {
    * @param $_nntp RESOURCE handle to NNTP socket
    */
 
-  function groups(&$_nntp) {
+  function groups(&$_nntp,$_type=0) {
+    global $profile;
     $desc=$_nntp->xgtitle();
-    $list=$_nntp->liste();
+    if ($_type==1) {
+      $list=$_nntp->newgroups($profile['lastnews']);
+    } else {
+      $list=$_nntp->liste();
+    }
     if (!$list) {
-      $this="list";
+      $this->overview=array();
       return false;
     }
     if (isset($desc)) {
       foreach ($desc as $g=>$d) {
-        $this->overview[$g][0]=$d;
-        $this->overview[$g][1]=$list[$g][0];
+        if ((($_type==0) and (in_array($g,$profile['subscribe']) or !count($profile['subscribe'])))
+          or (($_type==1) and in_array($g,array_keys($list)))
+          or ($_type==2)) {
+          $this->overview[$g][0]=$d;
+          $this->overview[$g][1]=$list[$g][0];
+        }
       }
       foreach (array_diff(array_keys($list),array_keys($desc)) as $g) {
-        $this->overview[$g][0]="-";
-        $this->overview[$g][1]=$list[$g][0];
+        if ((($_type==0) and (in_array($g,$profile['subscribe']) or !count($profile['subscribe'])))
+          or (($_type==1) and in_array($g,array_keys($list)))
+          or ($_type==2)) {
+          $this->overview[$g][0]="-";
+          $this->overview[$g][1]=$list[$g][0];
+        }
       }
     } else {
       foreach ($list as $g=>$l) {
-        $this->overview[$g][0]="-";
-        $this->overview[$g][1]=$l[0];
+        if ((($_type==0) and (in_array($g,$profile['subscribe']) or !count($profile['subscribe'])))
+          or (($_type==1) and in_array($g,array_keys($list)))
+          or ($_type==2)) {
+          $this->overview[$g][0]="-";
+          $this->overview[$g][1]=$l[0];
+        }
       }
     }
     return true;

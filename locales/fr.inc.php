@@ -28,6 +28,16 @@ $locale['index'] = array(
   'unread' => "Nouveaux",
   'name' => "Nom",
   'description' => "Description",
+  'newgroupstext' => "Les forums suivants ont été créés depuis ton dernier passage :"
+);
+
+$locale['subscribe'] = array(
+  'title' => "Abonnements",
+  'summary' => "Liste des forums",
+  'total' => "Total",
+  'subscribed' => "Abonné",
+  'name' => "Nom",
+  'description' => "Description",
 );
 
 $locale['article'] = array(
