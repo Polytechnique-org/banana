@@ -1,4 +1,11 @@
 <?php
+/********************************************************************************
+* install.d/config.inc.php : configuration file
+* --------------------------
+*
+* This file is part of the banana distribution
+* Copyright: See COPYING files that comes with this distribution
+********************************************************************************/
 
 /** comparison function for the overview 
  * @param $a OBJECT spoolhead 
