@@ -207,7 +207,7 @@ class spool {
       }
     }
     unset($this->overview[$_id]);
-    $msgid=array_search($this->ids,$_id);
+    $msgid=array_search($_id,$this->ids);
     if ($msgids) {
       unset($this->ids[$msgid]);
     }
@@ -246,8 +246,8 @@ class spool {
         }
       }
       unset($this->overview[$_id]);
-      $msgid=array_search($this->ids,$_id);
-      if ($msgids) {
+      $msgid=array_search($_id,$this->ids);
+      if ($msgid) {
         unset($this->ids[$msgid]);
       }
 #      $ids = array_flip($this->ids);
