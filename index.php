@@ -28,7 +28,7 @@ if ($news['user']!="anonymous") {
   if (!$result) error("nntpauth");
 }
 $groups = new groups($nntp,0);
-if (!count($groups->overview)) $groups=new groups($nntp,2)
+if (!count($groups->overview)) $groups=new groups($nntp,2);
     
 $newgroups = new groups($nntp,1);
 ?>
