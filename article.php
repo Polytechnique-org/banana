@@ -67,7 +67,7 @@ $ndx = $spool->getndx($_REQUEST['id']);
 </div>
 
 <?php
-if (($_GET['type']=='cancel') && (checkcancel($post->headers))) {
+if (isset($_GET['type']) && ($_GET['type']=='cancel') && (checkcancel($post->headers))) {
 ?>
 <p class="error">
   <?php echo $locale['article']['cancel'];?>

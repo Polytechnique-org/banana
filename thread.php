@@ -28,7 +28,10 @@ if (isset($_REQUEST['group'])) {
 } else {
   $group=htmlentities(strtolower(strtok(str_replace(" ","",$_REQUEST['newsgroups']),",")));
 }
-$id=htmlentities(strtolower($_REQUEST['id']));
+
+if (isset($_REQUEST['id'])) {
+  $id=htmlentities(strtolower($_REQUEST['id']));
+}
 
 //$mynntp = new nntp($news['server'],120,1);
 $mynntp = new nntp($news['server']);
@@ -55,7 +58,7 @@ if (!$spool) {
   exit;
 }
 $max = 50;
-if ($_REQUEST['first']>sizeof($spool->overview))
+if (isset($_REQUEST['first']) && ($_REQUEST['first']>sizeof($spool->overview)))
   $_REQUEST['first']=sizeof($spool->overview);
 $first = (isset($_REQUEST['first'])?
   (floor($_REQUEST['first']/$max)*$max+1):1);
@@ -148,7 +151,9 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type']))) {
     .$locale['thread']['group_a'];?>
 </div>
 <?php
-echo $text;
+if (isset($text)) {
+    echo $text;
+}
 displayshortcuts();
 
 ?>

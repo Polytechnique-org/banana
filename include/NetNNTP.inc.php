@@ -361,6 +361,7 @@ class nntp {
   function newnews($_since,$_groups="*",$_distributions="") {
     $distributions = preg_replace("/(\r|\n)/","",$_distributions);
     $groups = preg_replace("/(\r|\n)/","",$_groups);
+    $array=array();
     #assume $since is a unix timestamp
     $this->pline("NEWNEWS $_groups ".gmdate("ymd His",$_since)
     ." GMT $distributions\r\n");

@@ -107,7 +107,7 @@ class spool {
         "$first-$last"));
       $refs = $_nntp->xhdr("References","$first-$last");
 #      $this->date=$nntp->date;
-      if ($this->ids) {
+      if (isset($this->ids)) {
         $this->ids=array_merge($this->ids,array_flip($msgids));
       } else {
         $this->ids=array_flip($msgids);
@@ -124,7 +124,11 @@ class spool {
         $p = $msg->parent;
         while ($p) {
           $this->overview[$p]->desc++;
-          $p = $this->overview[$p]->parent;
+          if (isset($this->overview[$p]->parent)) {
+            $p = $this->overview[$p]->parent;
+          } else {
+            $p = false;
+          }
         }
         if ($msg->parent!="") 
           $this->overview[$msg->parent]->children[]=$id;

@@ -115,7 +115,7 @@ class Headers {
       $this->name = trim($match[3]);
       $this->mail = $match[1]."@".$match[2];
     }
-    $this->nb=$id;
+    $this->nb=$_id;
     $retour->numerr=0;
   }
 }
