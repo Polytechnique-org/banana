@@ -12,16 +12,27 @@ function locale_date($text) {
   return $rtext;
 }
 
-$locale['error'] = array(
+if (!isset($locale['error'])) $locale['error'] =array();
+if (!isset($locale['index'])) $locale['index'] =array();
+if (!isset($locale['subscribe'])) $locale['subscribe'] =array();
+if (!isset($locale['thread'])) $locale['thread'] =array();
+if (!isset($locale['format'])) $locale['format'] =array();
+if (!isset($locale['post'])) $locale['post'] =array();
+if (!isset($locale['article'])) $locale['article'] =array();
+if (!isset($locale['profile'])) $locale['profile'] =array();
+if (!isset($locale['headers'])) $locale['headers'] =array();
+if (!isset($locale['disconnect'])) $locale['disconnect'] =array();
+
+$locale['error'] = array_merge(array(
   'title' => "Erreur !!!",
   'connect' => "Impossible de se connecter au serveur de forums",
   'credentials' => "L'authentification sur le serveur de forums a échoué",
   'group' => "Impossible d'accéder au forum",
   'post' => "Impossible d'accéder au message. Le message a peut-être été annulé",
   'nogroup' => "Il n'y a pas de forum sur ce serveur"
-);
+),$locale['error']);
 
-$locale['index'] = array(
+$locale['index'] = array_merge(array(
   'title' => "Les forums de Banana",
   'summary' => "Liste des forums",
   'total' => "Total",
@@ -29,18 +40,18 @@ $locale['index'] = array(
   'name' => "Nom",
   'description' => "Description",
   'newgroupstext' => "Les forums suivants ont été créés depuis ton dernier passage :"
-);
+),$locale['index']);
 
-$locale['subscribe'] = array(
+$locale['subscribe'] = array_merge(array(
   'title' => "Abonnements",
   'summary' => "Liste des forums",
   'total' => "Total",
   'subscribed' => "Abonné",
   'name' => "Nom",
   'description' => "Description",
-);
+),$locale['subscribe']);
 
-$locale['article'] = array(
+$locale['article'] = array_merge(array(
   'message' => "Message",
   'cancel' => "Voulez-vous vraiment annuler ce message ?",
   'okbtn' => "OK",
@@ -48,18 +59,18 @@ $locale['article'] = array(
   'headers' => "En-têtes",
   'body' => "Corps",
   'overview' => "Aperçu"
-);
+),$locale['article']);
 
-$locale['thread'] = array(
+$locale['thread'] = array_merge(array(
   'group_a' => "",
   'group_b' => "Forum ",
   'date' => "Date",
   'subject' => "Sujet",
   'author' => "Auteur",
   'summary' => "Liste des messages"
-);
+),$locale['thread']);
 
-$locale['post'] = array(
+$locale['post'] = array_merge($locale['post'],array(
   'badcancel' => "Impossible d'annuler le message",
   'canceled' => "Message annulé",
   'badpost' => "Impossible de poster le message",
@@ -73,9 +84,9 @@ $locale['post'] = array(
   'fu2' => "Suivi-à",
   'organization' => "Organisation",
   'body' => "Corps"
-);
+));
 
-$locale['format'] = array(
+$locale['format'] = array_merge(array(
   'datefmt' => 'd/m/Y',
   'disconnection' => "Déconnexion",
   'grouplist' => "Liste des forums",
@@ -84,9 +95,9 @@ $locale['format'] = array(
   'followup' => "Répondre",
   'newpost' => "Nouveau message",
   'cancel' => "Annuler ce message"
-);
+),$locale['format']);
 
-$locale['profile'] = array(
+$locale['profile'] = array_merge(array(
   'title' => "Bienvenue sur Banana !",
   'define' => "Définis tes paramètres",
   'name' => "Nom (par exemple Jean Dupont)",
@@ -99,14 +110,14 @@ $locale['profile'] = array(
   'auth' => "Authentification sur le serveur NNTP",
   'login' => "Login (laisser anonyme pour un login en anonyme)",
   'passwd' => "Mot de passe"
-);
+),$locale['profile']);
 
-$locale['disconnect'] = array(
+$locale['disconnect'] = array_merge(array(
   'title' => "Déconnexion effectuée !",
   'back' => 'Retour au <a href="index.php">profil</a>'
-);
+),$locale['disconnect']);
 
-$locale['headers'] = array(
+$locale['headers'] = array_merge(array(
   'from' => 'De',
   'subject' => 'Sujet',
   'newsgroups' => 'Forums',
@@ -115,6 +126,6 @@ $locale['headers'] = array(
   'organization' => 'Organisation',
   'references' => 'Références',
   'xface' => 'Image'
-);
+),$locale['headers']);
 
 ?>
