@@ -137,27 +137,31 @@ class spool
             }
 
             foreach ($msgids as $id=>$msgid) {
-                $msg                = new spoolhead($dates[$id], $subjects[$id], $froms[$id], 1);
+                $msg                = new spoolhead($dates[$id], $subjects[$id], $froms[$id]);
                 $refs[$id]          = str_replace("><", "> <", $refs[$id]);
                 $msgrefs            = preg_split("/( |\t)/", strtr($refs[$id], $this->ids));
                 $parents            = preg_grep("/^\d+$/", $msgrefs);
                 $msg->parent        = array_pop($parents);
                 $msg->parent_direct = preg_match("/^\d+$/", array_pop($msgrefs));
-            
-                $p = $msg->parent;
-                while ($p) {
-                    if (isset($this->overview[$p])) {
-                        $this->overview[$p]->desc++;
-                        $p = $this->overview[$p]->parent;
-                    } else {
-                        $this->overview[$p] = new spoolhead($dates[$p], $subjects[$p], $froms[$p], 1);
-                        break;
-                    }
-                }
-                if ($msg->parent) {
-                    $this->overview[$msg->parent]->children[] = $id;
+                
+                if (isset($this->overview[$id])) {
+                    $msg->desc     = $this->overview[$id]->desc;
+                    $msg->children = $this->overview[$id]->children;
                 }
                 $this->overview[$id] = $msg;
+           
+                if ($p = $msg->parent) {
+                    if (empty($this->overview[$p])) {
+                        $this->overview[$p] = new spoolhead($dates[$p], $subjects[$p], $froms[$p], 1);
+                    }
+                    $this->overview[$msg->parent]->children[] = $id;
+
+                    while ($p) {
+                        $this->overview[$p]->desc += $msg->desc;
+                        $p = $this->overview[$p]->parent;
+                    }
+                    
+                }
             }
             uasort($this->overview, "spoolcompare");
             file_put_contents($spoolfile, serialize($this));
@@ -335,7 +339,7 @@ class spool
                         $this->group, ($_index==$_ref), $this->overview[$_id]->isread)
                 ." </td>\n</tr>";
         }
-        $index=$_index+1;
+        $index = $_index+1;
         while ($child = array_shift($children)) {
             if (($index+$this->overview[$child]->desc-1>=$_first)
                     ||($index<$_last)){
@@ -364,9 +368,9 @@ class spool
         $index = 1;
         if (sizeof($this->overview)) {
             foreach ($this->overview as $id=>$msg) {
-                if (!isset($msg->parent)) {
+                if (is_null($msg->parent)) {
                     $this->disp_desc($id, $index, $_first, $_last, $_ref);
-                    $index += $msg->desc;
+                    $index += $msg->desc ;
                 }
             }
         } else {
@@ -386,15 +390,16 @@ class spool
     function getndx($_id) {
         $ndx = 1;
         // on remonte l'arbre
-        $id_parent = $this->overview[$_id]->parent;
-        $id_curr   = $_id;
-        while (!is_null($id_parent)) {
-            for ($i=0; $i<array_search($id_curr, $this->overview[$id_parent]->children) ; $i++) {
+        while (true) {
+            $id_parent = $this->overview[$_id]->parent;
+            $id_curr   = $_id;
+            if (is_null($id_parent)) break;
+            $pos       = array_search($id_curr, $this->overview[$id_parent]->children);
+        
+            for ($i = 0; $i < $_pos ; $i++) {
                 $ndx += $this->overview[$this->overview[$id_parent]->children[$i]]->desc;
             }
             $ndx++; //noeud père
-            $id_curr   = $id_parent;
-            $id_parent = $this->overview[$id_curr]->parent;
         }
         // on compte les threads précédents
         foreach ($this->overview as $i=>$p) {
