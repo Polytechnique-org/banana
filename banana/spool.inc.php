@@ -124,7 +124,7 @@ class BananaSpool
 
     function _readFromFile()
     {
-        $file = dirname(dirname(__FILE__))."/spool/spool-{$this->group}.dat";
+        $file = $this->_spoolfile();
         if (file_exists($file)) {
             $this = unserialize(file_get_contents($file));
         }
@@ -132,7 +132,7 @@ class BananaSpool
 
     function _saveToFile()
     {
-        $file = dirname(dirname(__FILE__))."/spool/spool-{$this->group}.dat";
+        $file = $this->_spoolfile();
         uasort($this->overview, "spoolcompare");
 
         $this->roots = Array();
@@ -143,6 +143,14 @@ class BananaSpool
         }
         
         file_put_contents($file, serialize($this));
+    }
+
+    function _spoolfile()
+    {
+        global $banana;
+        $url = parse_url($banana->host);
+        $file = $url['host'].'_'.$url['port'].'_'.$this->group;
+        return dirname(dirname(__FILE__)).'/spool/'.$file;
     }
 
     function _updateSpool($arg)
