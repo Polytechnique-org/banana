@@ -231,8 +231,8 @@ class nntp {
     $this->pline("GROUP $group\r\n");
     $line = $this->gline();
     if (substr($line,0,1)!="2") {
-      $this->lasterrorcode = substr($result,0,3);
-      $this->lasterrortext = substr($result,4);
+      $this->lasterrorcode = substr($line,0,3);
+      $this->lasterrortext = substr($line,4);
       return false;
     }
     if (preg_match("/^2\d{2} (\d+) (\d+) (\d+) ([^ ]+)/",
