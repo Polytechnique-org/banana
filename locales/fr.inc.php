@@ -1,7 +1,7 @@
 <?php
 
 function locale_date($_text) {
-    return strftime("%A %d %B %Y, %H:%m (fuseau serveur)", strtotime($_text));
+    return strftime("%A %d %B %Y, %H:%M (fuseau serveur)", strtotime($_text));
 }
 
 function locale_header_date($_text) {

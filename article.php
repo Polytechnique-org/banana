@@ -8,8 +8,7 @@
 ********************************************************************************/
 
 require_once("include/session.inc.php");
-require_once("include/encoding.inc.php");
-require_once("include/wrapper.inc.php");
+require_once("include/misc.inc.php");
 require_once("include/format.inc.php");
 require_once("include/config.inc.php");
 require_once("include/NetNNTP.inc.php");

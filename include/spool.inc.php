@@ -80,6 +80,8 @@ class spool
     var $group;
     /**  array msgid => msgnum */
     var $ids;
+    /** thread starts */
+    var $roots;
 
     /** constructor
      * @param $_nntp RESOURCE NNTP socket filehandle
@@ -91,6 +93,8 @@ class spool
     function spool(&$_nntp, $_group, $_display=0, $_since="")
     {
         global $news;
+
+        $do_save    = false;
 
         $spool_path = dirname(dirname(__FILE__)).'/spool';
         $spoolfile  = "$spool_path/spool-$_group.dat";
@@ -111,8 +115,9 @@ class spool
             $keys   = array_values($this->ids);
             rsort($keys);
             // remove expired messages
-            for ($id=min(array_keys($this->overview)); $id<$first; $id++) { 
+            for ($id = min(array_keys($this->overview)); $id<$first; $id++) { 
                 $this->delid($id, false);
+                $do_save = true;
             }
             $start  = max(array_keys($this->overview))+1;
         } else {
@@ -123,6 +128,7 @@ class spool
         }
 
         if (($start<$last) && $groupinfo[0]) {
+            $do_save  = true;
 
             $dates    = array_map("strtotime",    $_nntp->xhdr("Date",    "$start-$last"));
             $subjects = array_map("headerdecode", $_nntp->xhdr("Subject", "$start-$last"));
@@ -163,9 +169,9 @@ class spool
                     
                 }
             }
-            uasort($this->overview, "spoolcompare");
-            file_put_contents($spoolfile, serialize($this));
         }
+
+        if ($do_save) { $this->save($spoolfile); }
 
         if ($_since) {
             $newpostsids = $_nntp->newnews($_since, $_group);
@@ -186,31 +192,35 @@ class spool
             if (sizeof($newpostsids)>0) {
                 switch ($_display) {
                     case 1:
-                        foreach ($this->overview as $i=>$p) {
-                            if (isset($this->overview[$i]) &&
-                                    !isset($this->overview[$i]->parent) && 
-                                    ($this->overview[$i]->descunread==0))
-                            {
+                        foreach ($this->roots as $i) {
+                            if ($this->overview[$i]->descunread==0) {
                                 $this->killdesc($i);
                             }
                         }
-                        break;
-
-                    case 2:
-                        $flipids = array_flip($this->ids);
-                        foreach ($this->overview as $i=>$p) {
-                            if ($p->isread) {
-                                unset($this->overview[$i]);
-                                unset($flipids[$i]);
-                            }
-                        }
-                        $this->ids = array_flip($flipids);
                         break;
                 }
             }
         }
         
         return true;
+    }
+
+    function cmp($a, $b) {
+        return $this->overview[$a]->date < $this->overview[$b]->date;
+    }
+
+    function save($file)
+    {
+        uasort($this->overview, "spoolcompare");
+
+        $this->roots = Array();
+        foreach($this->overview as $id=>$msg) {
+            if (is_null($msg->parent)) {
+                $this->roots[] = $id;
+            }
+        }
+        
+        file_put_contents($file, serialize($this));
     }
 
     /** kill post and childrens
@@ -224,9 +234,11 @@ class spool
                 $this->killdesc($c);
             }
         }
+        $pos = array_search($_id, $this->roots);
+        unset($this->roots[$pos]);
         unset($this->overview[$_id]);
         $msgid = array_search($_id, $this->ids);
-        if ($msgids) {
+        if ($msgid) {
             unset($this->ids[$msgid]);
         }
     }
@@ -266,8 +278,7 @@ class spool
             }
             
             if ($write) {
-                $spool_path = dirname(dirname(__FILE__)).'/spool';
-                file_put_contents("$spool_path/spool-$_group.dat", serialize($this));
+                $this->save(dirname(dirname(__FILE__)).'/spool');
             }
         }
     }
@@ -283,9 +294,8 @@ class spool
      * @param $_head BOOLEAN true if first post in thread
      */
 
-    function disp_desc($_id, $_index="", $_first=0, $_last=0, $_ref="", $_pfx_node="", $_pfx_end="", $_head=true) {
+    function disp_desc($_id, $_index, $_first=0, $_last=0, $_ref="", $_pfx_node="", $_pfx_end="", $_head=true) {
         global $css;
-        $debug    = false;
         $spfx_f   = '<img src="img/k1.gif" height="21" width="9" alt="o" />'; 
         $spfx_n   = '<img src="img/k2.gif" height="21" width="9" alt="*" />'; 
         $spfx_Tnd = '<img src="img/T-direct.gif" height="21" width="12" alt="+" />';
@@ -297,52 +307,40 @@ class spool
         $spfx_e   = '<img src="img/e.gif" height="21" width="12" alt="&nbsp;" />';
         $spfx_I   = '<img src="img/I.gif" height="21" width="12"alt="|" />';
 
-        if ($_index == "") {
-            $_index = $this->getndx($_id);
+        if ($_index + $this->overview[$_id]->desc < $_first || $_index > $_last) {
+            return;
         }
 
-        if (!sizeof($this->overview[$_id]->children) && ($_index<=$_last) && ($_index>=$_first)) {
+        if ($_index>=$_first) {
+            $us = ($_index == $_ref);
+            $hc = empty($this->overview[$_id]->children);
+
             echo '<tr class="'.($_index%2?$css["pair"]:$css["impair"])."\">\n";
             echo "<td class=\"{$css['date']}\">"
                 .formatSpoolHeader("date", $this->overview[$_id]->date, $_id,
-                        $this->group, ($_index==$_ref), $this->overview[$_id]->isread)
+                        $this->group, $us, $this->overview[$_id]->isread)
                 ." </td>\n";
-            echo "<td class=\"{$css['subject']}\"><div class=\"{$css['tree']}\">"
-                .$_pfx_node.($_head?$spfx_f:
-                        ($this->overview[$_id]->parent_direct?$spfx_s:$spfx_snd))
+            echo "<td class=\"{$css['subject']}\"><div class=\"{$css['tree']}\">$_pfx_node"
+                .($hc?($_head?$spfx_f:($this->overview[$_id]->parent_direct?$spfx_s:$spfx_snd)):$spfx_n)
                 ."</div>"
                 .formatSpoolHeader("subject", $this->overview[$_id]->subject, $_id,
-                        $this->group, ($_index==$_ref), $this->overview[$_id]->isread)
-                .($debug?" $_id $_index ".
-                        $this->overview[$_id]->desc." ".$this->overview[$_id]->descunread." ":"")." </td>\n";
-            echo "<td class=\"{$css['author']}\">"
-                .formatSpoolHeader("from", $this->overview[$_id]->from, $_id,
-                        $this->group, ($_index==$_ref), $this->overview[$_id]->isread)
-                ." </td>\n</tr>";
-            return true;
-        } 
-        $children = $this->overview[$_id]->children;
-        if (($_index<=$_last) && ($_index>=$_first)) {
-            echo '<tr class="'.($_index%2?$css["pair"]:$css["impair"])."\">\n";
-            echo "<td class=\"{$css['date']}\">"
-                .formatSpoolHeader("date", $this->overview[$_id]->date, $_id,
-                        $this->group, ($_index==$_ref), $this->overview[$_id]->isread)
+                        $this->group, $us, $this->overview[$_id]->isread)
                 ." </td>\n";
-            echo "<td class=\"{$css['subject']}\"><div class=\"{$css['tree']}\">"
-                .$_pfx_node.$spfx_n."</div>"
-                .formatSpoolHeader("subject", $this->overview[$_id]->subject, $_id,
-                        $this->group, ($_index==$_ref), $this->overview[$_id]->isread)
-                .($debug?" $_id $_index ".
-                        $this->overview[$_id]->desc." ".$this->overview[$_id]->descunread." ":"")." </td>\n";
             echo "<td class=\"{$css['author']}\">"
                 .formatSpoolHeader("from", $this->overview[$_id]->from, $_id,
-                        $this->group, ($_index==$_ref), $this->overview[$_id]->isread)
+                        $this->group, $us, $this->overview[$_id]->isread)
                 ." </td>\n</tr>";
-        }
+            if ($hc) {
+                return true;
+            }
+        } 
+
         $index = $_index+1;
+
+        $children = $this->overview[$_id]->children;
         while ($child = array_shift($children)) {
-            if (($index+$this->overview[$child]->desc-1>=$_first)
-                    ||($index<$_last)){
+            if ($index > $_last) { return; }
+            if ($index+$this->overview[$child]->desc >= $_first) {
                 if (sizeof($children)) {
                     $this->disp_desc($child, $index, $_first, $_last, $_ref, $_pfx_end.
                             ($this->overview[$child]->parent_direct?$spfx_T:$spfx_Tnd),
@@ -367,10 +365,11 @@ class spool
         global $css;
         $index = 1;
         if (sizeof($this->overview)) {
-            foreach ($this->overview as $id=>$msg) {
-                if (is_null($msg->parent)) {
-                    $this->disp_desc($id, $index, $_first, $_last, $_ref);
-                    $index += $msg->desc ;
+            foreach ($this->roots as $id) {
+                $this->disp_desc($id, $index, $_first, $_last, $_ref);
+                $index += $this->overview[$id]->desc ;
+                if ($index > $_last) {
+                    break;
                 }
             }
         } else {
@@ -388,27 +387,26 @@ class spool
      */
 
     function getndx($_id) {
-        $ndx = 1;
-        // on remonte l'arbre
+        $ndx    = 1;
+        $id_cur = $_id;
         while (true) {
-            $id_parent = $this->overview[$_id]->parent;
-            $id_curr   = $_id;
+            $id_parent = $this->overview[$id_cur]->parent;
             if (is_null($id_parent)) break;
-            $pos       = array_search($id_curr, $this->overview[$id_parent]->children);
+            $pos       = array_search($id_cur, $this->overview[$id_parent]->children);
         
-            for ($i = 0; $i < $_pos ; $i++) {
+            for ($i = 0; $i < $pos ; $i++) {
                 $ndx += $this->overview[$this->overview[$id_parent]->children[$i]]->desc;
             }
             $ndx++; //noeud père
+
+            $id_cur = $id_parent;
         }
-        // on compte les threads précédents
-        foreach ($this->overview as $i=>$p) {
-            if ($i==$id_curr) {
+
+        foreach ($this->roots as $i) {
+            if ($i==$id_cur) {
                 break;
             }
-            if (is_null($p->parent)) {
-                $ndx += $this->overview[$i]->desc;
-            }
+            $ndx += $this->overview[$i]->desc;
         }
         return $ndx;
     }
