@@ -49,7 +49,12 @@ if (isset($group) && isset($id) && isset($_REQUEST['type']) &&
     $subject = (preg_match("/^re:/i",$post->headers->subject)?"":"Re: ")
       .$post->headers->subject;
 	if ($profile['dropsig']) {
-	  $quotetext = preg_replace("/^(.*)\n-- \n.*$/m","\1",$post->body);
+      $cutoff=strpos($post->body,"\n-- \n");
+      if ($cuttoff) {
+	    $quotetext = substr($post->body,0,strpos($post->body,"\n-- \n"));
+      } else {
+	    $quotetext = $post->body;
+      }
 	} else {
 	  $quotetext = $post->body;
 	}
