@@ -43,7 +43,7 @@ $news['max'] = 50;
 $news['customhdr'] = "Content-Type: text/plain; charset=iso-8859-15\n"
   ."Mime-Version: 1.0\n"
   ."Content-Transfer-Encoding: 8bit\n"
-  ."HTTP-Posting-Host: ".$_SERVER['REMOTE_HOST']."\n"
+  ."HTTP-Posting-Host: ".gethostbyname($_SERVER['REMOTE_ADDR'])."\n"
   ."User-Agent: Banana 0.7beta\n";
 
 ?>
