@@ -16,12 +16,13 @@ banana.pot: ../banana/*.php
 	@xgettext --from-code=iso-8859-15 -j -k_b_ -o banana.pot $<
 
 %.lang: banana.pot ../banana/*.php %.po
-	@echo Generating $(@:.lang=)
+	@echo Generating $(@:.lang=.po)
 	@echo -n '    '
 	@mkdir -p ../locale/$(@:.lang=)/LC_MESSAGES/ 
-	@msgmerge -U $(@:.lang=).po $< 2> /dev/null
-	@msgfmt --statistics -c -v -o ../locale/$(@:.lang=)/LC_MESSAGES/banana.mo $(@:.lang=).po
+	@msgmerge -U $(@:lang=po) $< 2> /dev/null
+	@msgfmt --statistics -c -v -o ../locale/$(@:.lang=)/LC_MESSAGES/banana.mo $(@:lang=po)
 	@echo
+	@rm -f $(@:lang=po~)
 	@touch $@
 
 

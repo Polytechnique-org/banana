@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fr\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-01-07 19:35+0100\n"
+"POT-Creation-Date: 2005-01-07 20:29+0100\n"
 "PO-Revision-Date: 2005-01-02 17:13+0100\n"
 "Last-Translator: Pierre Habouzit <pierre.habouzit@m4x.org>\n"
 "Language-Team:  <fr@li.org>\n"
@@ -16,152 +16,143 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.9.1\n"
 
-#: banana/groups.inc.php:87 ../banana/groups.inc.php:87
-msgid "Total"
-msgstr "Total"
-
-#: banana/groups.inc.php:89 ../banana/groups.inc.php:89
-msgid "Abo."
-msgstr "Abo."
-
-#: banana/groups.inc.php:91 ../banana/groups.inc.php:91
-msgid "Nouveaux"
-msgstr "Nouveaux"
-
-#: banana/groups.inc.php:93 banana/banana.inc.php:234
-#: ../banana/groups.inc.php:93 ../banana/banana.inc.php:234
-msgid "Nom"
-msgstr "Nom"
-
-#: banana/groups.inc.php:93 ../banana/groups.inc.php:93
-msgid "Description"
-msgstr "Description"
-
-#: banana/misc.inc.php:33 ../banana/misc.inc.php:33
-msgid "De"
-msgstr "De"
-
-#: banana/misc.inc.php:34 banana/spool.inc.php:360 banana/banana.inc.php:235
-#: ../banana/misc.inc.php:34 ../banana/spool.inc.php:360
-#: ../banana/banana.inc.php:235
-msgid "Sujet"
-msgstr "Sujet"
-
-#: banana/misc.inc.php:35 banana/banana.inc.php:236 ../banana/misc.inc.php:35
-#: ../banana/banana.inc.php:236
-msgid "Forums"
-msgstr "Forums"
-
-#: banana/misc.inc.php:36 ../banana/misc.inc.php:36
-msgid "Suivi-à"
-msgstr "Suivi-à"
-
-#: banana/misc.inc.php:37 banana/spool.inc.php:359 ../banana/misc.inc.php:37
-#: ../banana/spool.inc.php:359
-msgid "Date"
-msgstr "Date"
-
-#: banana/misc.inc.php:38 banana/banana.inc.php:238 ../banana/misc.inc.php:38
-#: ../banana/banana.inc.php:238
-msgid "Organisation"
-msgstr "Organisation"
-
-#: banana/misc.inc.php:39 ../banana/misc.inc.php:39
-msgid "Références"
-msgstr "Références"
-
-#: banana/misc.inc.php:40 ../banana/misc.inc.php:40
-msgid "Image"
-msgstr "Image"
-
-#: banana/misc.inc.php:115 ../banana/misc.inc.php:115
-msgid "hier"
-msgstr "hier"
-
-#: banana/misc.inc.php:148 ../banana/misc.inc.php:148
-msgid "Liste des forums"
-msgstr "Liste des forums"
-
-#: banana/misc.inc.php:150 banana/banana.inc.php:140
-#: ../banana/misc.inc.php:150 ../banana/banana.inc.php:140
-msgid "Abonnements"
-msgstr "Abonnements"
-
-#: banana/misc.inc.php:156 banana/banana.inc.php:230
-#: ../banana/misc.inc.php:156 ../banana/banana.inc.php:230
-msgid "Nouveau message"
-msgstr "Nouveau message"
-
-#: banana/misc.inc.php:171 ../banana/misc.inc.php:171
-msgid "Répondre"
-msgstr "Répondre"
-
-#: banana/misc.inc.php:174 ../banana/misc.inc.php:174
-msgid "Annuler ce message"
-msgstr "Annuler ce message"
-
-#: banana/post.inc.php:100 banana/banana.inc.php:233
-#: ../banana/post.inc.php:100 ../banana/banana.inc.php:233
-msgid "En-têtes"
-msgstr "En-têtes"
-
-#: banana/post.inc.php:111 banana/banana.inc.php:239
-#: ../banana/post.inc.php:111 ../banana/banana.inc.php:239
-msgid "Corps"
-msgstr "Corps"
-
-#: banana/post.inc.php:114 ../banana/post.inc.php:114
-msgid "apercu"
-msgstr "apercu"
-
-#: banana/spool.inc.php:361 ../banana/spool.inc.php:361
-msgid "Auteur"
-msgstr "Auteur"
-
-#: banana/spool.inc.php:372 ../banana/spool.inc.php:372
-msgid "Aucun message dans ce forum"
-msgstr "Aucun message dans ce forum"
-
-#: banana/banana.inc.php:54 ../banana/banana.inc.php:54
+#: ../banana/banana.inc.php:54
 msgid "Impossible de contacter le serveur"
 msgstr "Impossible de contacter le serveur"
 
-#: banana/banana.inc.php:93 ../banana/banana.inc.php:93
+#: ../banana/banana.inc.php:93
 msgid "Voulez-vous vraiment annuler ce message ?"
 msgstr "Voulez-vous vraiment annuler ce message ?"
 
-#: banana/banana.inc.php:124 ../banana/banana.inc.php:124
+#: ../banana/banana.inc.php:124
 msgid "Les forums de Banana"
 msgstr "Les forums de Banana"
 
-#: banana/banana.inc.php:126 ../banana/banana.inc.php:126
+#: ../banana/banana.inc.php:126
 msgid "Les forums suivants ont été créés depuis ton dernier passage :"
 msgstr "Les forums suivants ont été créés depuis ton dernier passage :"
 
-#: banana/banana.inc.php:175 ../banana/banana.inc.php:175
+#: ../banana/banana.inc.php:140 ../banana/misc.inc.php:150
+msgid "Abonnements"
+msgstr "Abonnements"
+
+#: ../banana/banana.inc.php:175
 msgid "Impossible d'accéder au message.   Le message a peut-être été annulé"
 msgstr "Impossible d'accéder au message.   Le message a peut-être été annulé"
 
-#: banana/banana.inc.php:179 ../banana/banana.inc.php:179
+#: ../banana/banana.inc.php:179
 msgid "Message"
 msgstr "Message"
 
-#: banana/banana.inc.php:194 ../banana/banana.inc.php:194
+#: ../banana/banana.inc.php:194
 msgid "Vous n'avez pas les permissions pour annuler ce message"
 msgstr "Vous n'avez pas les permissions pour annuler ce message"
 
-#: banana/banana.inc.php:208 ../banana/banana.inc.php:208
+#: ../banana/banana.inc.php:208
 msgid "Impossible d'annuler le message"
 msgstr "Impossible d'annuler le message"
 
-#: banana/banana.inc.php:222 ../banana/banana.inc.php:222
+#: ../banana/banana.inc.php:222
 msgid "a écrit"
 msgstr "a écrit"
 
-#: banana/banana.inc.php:237 ../banana/banana.inc.php:237
+#: ../banana/banana.inc.php:230 ../banana/misc.inc.php:156
+msgid "Nouveau message"
+msgstr "Nouveau message"
+
+#: ../banana/banana.inc.php:233 ../banana/post.inc.php:100
+msgid "En-têtes"
+msgstr "En-têtes"
+
+#: ../banana/banana.inc.php:234 ../banana/groups.inc.php:93
+msgid "Nom"
+msgstr "Nom"
+
+#: ../banana/banana.inc.php:235 ../banana/misc.inc.php:34
+#: ../banana/spool.inc.php:360
+msgid "Sujet"
+msgstr "Sujet"
+
+#: ../banana/banana.inc.php:236 ../banana/misc.inc.php:35
+msgid "Forums"
+msgstr "Forums"
+
+#: ../banana/banana.inc.php:237
 msgid "Suivi à"
 msgstr "Suivi à"
 
-#: banana/banana.inc.php:275 ../banana/banana.inc.php:275
+#: ../banana/banana.inc.php:238 ../banana/misc.inc.php:38
+msgid "Organisation"
+msgstr "Organisation"
+
+#: ../banana/banana.inc.php:239 ../banana/post.inc.php:111
+msgid "Corps"
+msgstr "Corps"
+
+#: ../banana/banana.inc.php:275
 msgid "Impossible de poster le message"
 msgstr "Impossible de poster le message"
+
+#: ../banana/groups.inc.php:87
+msgid "Total"
+msgstr "Total"
+
+#: ../banana/groups.inc.php:89
+msgid "Abo."
+msgstr "Abo."
+
+#: ../banana/groups.inc.php:91
+msgid "Nouveaux"
+msgstr "Nouveaux"
+
+#: ../banana/groups.inc.php:93
+msgid "Description"
+msgstr "Description"
+
+#: ../banana/misc.inc.php:33
+msgid "De"
+msgstr "De"
+
+#: ../banana/misc.inc.php:36
+msgid "Suivi-à"
+msgstr "Suivi-à"
+
+#: ../banana/misc.inc.php:37 ../banana/spool.inc.php:359
+msgid "Date"
+msgstr "Date"
+
+#: ../banana/misc.inc.php:39
+msgid "Références"
+msgstr "Références"
+
+#: ../banana/misc.inc.php:40
+msgid "Image"
+msgstr "Image"
+
+#: ../banana/misc.inc.php:115
+msgid "hier"
+msgstr "hier"
+
+#: ../banana/misc.inc.php:148
+msgid "Liste des forums"
+msgstr "Liste des forums"
+
+#: ../banana/misc.inc.php:171
+msgid "Répondre"
+msgstr "Répondre"
+
+#: ../banana/misc.inc.php:174
+msgid "Annuler ce message"
+msgstr "Annuler ce message"
+
+#: ../banana/post.inc.php:114
+msgid "apercu"
+msgstr "apercu"
+
+#: ../banana/spool.inc.php:361
+msgid "Auteur"
+msgstr "Auteur"
+
+#: ../banana/spool.inc.php:372
+msgid "Aucun message dans ce forum"
+msgstr "Aucun message dans ce forum"
