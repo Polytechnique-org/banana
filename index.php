@@ -14,6 +14,7 @@ require("include/groups.inc.php");
 require("include/format.inc.php");
 require("include/config.inc.php");
 require("include/profile.inc.php");
+require("include/error.inc.php");
 
 $profile=getprofile();
 require($profile['locale']);
@@ -21,16 +22,14 @@ require($profile['locale']);
 require("include/header.inc.php");
 
 $nntp = new nntp($news['server']);
+if (!$nntp) error("nntpsock");
 if ($news['user']!="anonymous") {
   $result = $nntp->authinfo($news["user"],$news["pass"]);
-  if (!$result) {
-    echo "<p class=\"error\">\n\t".$locale['error']['credentials']
-      ."\n</p>";
-    require("include/footer.inc.php");
-    exit;
-  }
+  if (!$result) error("nntpauth");
 }
 $groups = new groups($nntp,0);
+if (!count($groups->overview)) $groups=new groups($nntp,2)
+    
 $newgroups = new groups($nntp,1);
 ?>
 
@@ -39,13 +38,7 @@ $newgroups = new groups($nntp,1);
 </div>
 
 <?php
-if (!sizeof($groups->overview)) {
-  echo "<p class=\"{$css['normal']}\">";
-  echo "\n".$locale['error']['nogroup']."\n";
-  echo "</p>\n";
-  require("include/footer.inc.php");
-  exit;
-}
+if (!sizeof($groups->overview)) error("nntpgroups");
 
 displayshortcuts();
 ?>

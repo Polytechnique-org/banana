@@ -17,6 +17,7 @@ require("include/spool.inc.php");
 require("include/post.inc.php");
 require("include/profile.inc.php");
 require("include/password.inc.php");
+require("include/error.inc.php");
 
 $profile=getprofile();
 require($profile['locale']);
@@ -30,38 +31,22 @@ if (isset($_REQUEST['id'])) {
   $id=htmlentities(strtolower($_REQUEST['id']));
 }
 
-$mynntp = new nntp($news['server']);
-if (!$mynntp) {
-  echo "<p class=\"error\">\n\t".$locale['error']['connect']."\n</p>";
-  require("include/footer.inc.php");
-  exit;
-}
-
+$nntp = new nntp($news['server']);
+if (!$nntp) error("nntpsock");
 if ($news['user']!="anonymous") {
-  $result = $mynntp->authinfo($news["user"],$news["pass"]);
-  if (!$result) {
-    echo "<p class=\"error\">\n\tYou have provided bad credentials to "
-    ."the server. Good bye !\n</p>";
-    require("include/footer.inc.php");
-    exit;
-  }
+  $result = $nntp->authinfo($news["user"],$news["pass"]);
+  if (!$result) erro("nntpauth");
 }
-$spool = new spool($mynntp,$group,$profile['display'],$profile['lastnews']);
-if (!$spool) {
-  echo "<p class=\"error\">\n\tError while accessing group.\n</p>";
-  require("include/footer.inc.php");
-  exit;
-}
-$mynntp->group($group);
+$spool = new spool($nntp,$group,$profile['display'],$profile['lastnews']);
+if (!$spool) error("nntpspool");
+$nntp->group($group);
 
-$post = new post($mynntp,$id);
+$post = new post($nntp,$id);
 if (!$post) {
-  if ($mynntp->lasterrorcode == "423") {
+  if ($nntp->lasterrorcode == "423") {
     $spool->delid($id);
   }
-  echo "<p class=\"error\">\n\tError while reading message.\n</p>";
-  require("include/footer.inc.php");
-  exit;
+  error("nntpart");
 }
 
 $ndx = $spool->getndx($id);

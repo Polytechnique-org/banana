@@ -17,6 +17,7 @@ require("include/spool.inc.php");
 require("include/password.inc.php");
 require("include/profile.inc.php");
 include("include/wrapper.inc.php");
+include("include/error.inc.php");
 
 $profile=getprofile();
 require($profile['locale']);
@@ -33,30 +34,16 @@ if (isset($_REQUEST['id'])) {
   $id=htmlentities(strtolower($_REQUEST['id']));
 }
 
-//$mynntp = new nntp($news['server'],120,1);
-$mynntp = new nntp($news['server']);
-if (!$mynntp) {
-  echo "<p class=\"error\">\n\t".$locale['error']['connect']."\n</p>";
-  require("include/footer.inc.php");
-  exit;
-}
-
+//$nntp = new nntp($news['server'],120,1);
+$nntp = new nntp($news['server']);
+if (!$nntp) error("nntpsock");
 if ($news['user']!="anonymous") {
-  $result = $mynntp->authinfo($news["user"],$news["pass"]);
-  if (!$result) {
-    echo "<p class=\"error\">\n\t".$locale['error']['credentials']
-      ."\n</p>";
-    require("include/footer.inc.php");
-    exit;
-  }
+  $result = $nntp->authinfo($news["user"],$news["pass"]);
+  if (!$result) error("nntpauth");
 }
-$spool = new spool($mynntp,$group,$profile['display'],
+$spool = new spool($nntp,$group,$profile['display'],
   $profile['lastnews']);
-if (!$spool) {
-  echo "<p class=\"error\">\n\t".$locale['error']['group']."\n</p>";
-  require("footer.inc.php");
-  exit;
-}
+if (!$spool) error("nntpspool");
 $max = 50;
 if (isset($_REQUEST['first']) && ($_REQUEST['first']>sizeof($spool->overview)))
   $_REQUEST['first']=sizeof($spool->overview);
@@ -70,8 +57,8 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
   switch ($_REQUEST['type']) {  
     case 'cancel':
       $mid = array_search($id,$spool->ids);
-      $mynntp->group($group);
-      $post = new post($mynntp,$id);
+      $nntp->group($group);
+      $post = new post($nntp,$id);
       
       if (checkcancel($post->headers)) {
         $message = 'From: '.$profile['name']."\n"
@@ -81,7 +68,7 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
           ."Control: cancel $mid\n"
           ."\n"
           ."Message canceled with Banana";
-        $result = $mynntp->post($message);
+        $result = $nntp->post($message);
         if ($result) {
           $spool->delid($id);
           $text="<p class=\"normal\">".$locale['post']['canceled']
@@ -107,7 +94,7 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
         .$news['customhdr']
         ."\n"
         .wrap($body,"",$news['wrap']);
-      $result = $mynntp->post($message);
+      $result = $nntp->post($message);
       if ($result) {
         $text="<p class=\"normal\">".$locale['post']['posted']."</p>";
       } else {
@@ -115,8 +102,8 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
       }
       break;
     case 'followupok':
-      $rq=$mynntp->group($group);
-      $post = new post($mynntp,$id);
+      $rq=$nntp->group($group);
+      $post = new post($nntp,$id);
       if ($post) {
         $refs = (isset($post->headers->references)?
                 $post->headers->references." ":"").$post->headers->msgid;
@@ -134,7 +121,7 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
         .$profile['customhdr']
         ."\n"
         .wrap($body,"",$news['wrap']);
-      $result = $mynntp->post($message);
+      $result = $nntp->post($message);
       if ($result) {
         $text="<p class=\"normal\">".$locale['post']['posted']."</p>";
       } else {
@@ -143,13 +130,9 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
       break;
   }
   $_SESSION['bananapostok']=false;
-  $spool = new spool($mynntp,$group,$profile['display'],
+  $spool = new spool($nntp,$group,$profile['display'],
     $profile['lastnews']);
-  if (!$spool) {
-    echo "<p class=\"error\">\n\t".$locale['error']['group']."\n</p>";
-    require("include/footer.inc.php");
-    exit;
-  }
+  if (!$spool) error("nntpspool");
 }
 
 
@@ -181,7 +164,7 @@ displayshortcuts();
   </tr>
 <?php
 $spool->disp($first,$last);
-$mynntp->quit();
+$nntp->quit();
 echo "</table>";
 
 displayshortcuts();

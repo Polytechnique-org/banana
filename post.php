@@ -17,6 +17,7 @@ require("include/spool.inc.php");
 require("include/password.inc.php");
 require("include/profile.inc.php");
 require("include/wrapper.inc.php");
+require("include/error.inc.php");
 
 $profile = getprofile();
 require($profile['locale']);
@@ -33,26 +34,17 @@ if (isset($group)) {
   $target = $group;
 }
 
-$mynntp = new nntp($news['server']);
-if (!$mynntp) {
-  echo "<p class=\"error\">\n\t".$locale['error']['connect']."\n</p>";
-  require("include/footer.inc.php");
-  exit;
-}
+$nntp = new nntp($news['server']);
+if (!$nntp) error("nntpsock");
 if ($news['user']!="anonymous") {
-  $result = $mynntp->authinfo($news["user"],$news["pass"]);
-  if (!$result) {
-    echo "<p class=\"error\">\n\t".$locale['error']['credentials']
-      ."\n</p>";
-    require("include/footer.inc.php");
-    exit;
-  }
+  $result = $nntp->authinfo($news["user"],$news["pass"]);
+  if (!$result) error("nntpauth");
 }
 
 if (isset($group) && isset($id) && isset($_REQUEST['type']) && 
   ($_REQUEST['type']=='followup')) {
-  $rq=$mynntp->group($group);
-  $post = new post($mynntp,$id);
+  $rq=$nntp->group($group);
+  $post = new post($nntp,$id);
   if ($post) {
     $subject = (preg_match("/^re:/i",$post->headers->subject)?"":"Re: ")
       .$post->headers->subject;
@@ -64,7 +56,7 @@ if (isset($group) && isset($id) && isset($_REQUEST['type']) &&
   }
 }
 
-$mynntp->quit();
+$nntp->quit();
 ?>
 <div class="<?php echo $css['title']?>">
   <?php echo $locale['post']['title'];?>
