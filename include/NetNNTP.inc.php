@@ -460,6 +460,7 @@ class nntp {
     $this->pline("XHDR $hdr $range \r\n");
     if (substr($this->gline(),0,1)!="2") return false;
     $result = $this->gline();
+    $array=array();
     while ($result != ".") {
       preg_match("/([^ \t]+) (.*)$/",$result,$regs);
       $array[$regs[1]]=$regs[2];
@@ -468,6 +469,27 @@ class nntp {
     return $array;
   }
 
+  /** obtain the header field $_hdr matching $_pat for all the messages specified
+   * @param $_hdr STRING name of the header (eg: 'From')
+   * @param $_range STRING range of articles 
+   * @param $_pat STRING pattern
+   * @return ARRAY MSGNUM => header value
+   */
+  
+  function xpat($_hdr,$_range,$_pat) {
+    $hdr = preg_replace("/(\r|\n)/","",$_hdr);
+    $range = preg_replace("/(\r|\n)/","",$_range);
+    $pat = preg_replace("/(\r|\n)/","",$_pat);
+    $this->pline("XPAT $hdr $range $pat\r\n");
+    if (substr($this->gline(),0,1)!="2") return false;
+    $result = $this->gline();
+    while ($result != ".") {
+      preg_match("/([^ \t]+) (.*)$/",$result,$regs);
+      $array[$regs[1]]=$regs[2];
+      $result = $this->gline();
+    }
+    return $array;
+  }
 }
 
 ?>
