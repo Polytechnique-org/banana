@@ -6,6 +6,18 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
+body {
+    color: black;
+    background-color: white;
+    width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+a:link    { color: blue; background: inherit; }
+a:visited { color: blue; background: inherit; }
+a:hover   { color: blue; background: inherit; text-decoration: underline; }
+
 div.title {
   font-size: 200%;
   text-align: center;
