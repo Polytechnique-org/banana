@@ -13,17 +13,14 @@ function wrap($_text,$_prefix="",$_length=72) {
         $sign = "\n-- \n" . array_pop($parts);
         $text = join("\n-- \n", $parts);
     } else {
-        $text = $_text;
         $sign = '';
+        $text = $_text;
     }
-    if ($_prefix != "") {
-        $lines = split("\n",$_text);
-        $text = $_prefix.join("\n$_prefix",$lines);
-    }
-    $exec="echo ".escapeshellarg($text)." | perl -MText::Autoformat -e 'autoformat {left=>1, right=>$_length, all=>1 };'";
-    exec($exec,$result);
+    
+    $cmd = "echo ".escapeshellarg($text)." | perl -MText::Autoformat -e 'autoformat {left=>1, right=>$_length, all=>1 };'";
+    exec($cmd, $result);
 
-    return join("\n",$result).$sign;
+    return $_prefix.join("\n$_prefix", $result).($_prefix ? '' : $sign);
 }
 
 ?>
