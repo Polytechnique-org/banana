@@ -8,7 +8,7 @@ function locale_date($_text) {
     "Juillet","Août","Septembre","Octobre","Novembre","Décembre");
   $rtext = $days[$date["wday"]]." ".$date["mday"]." "
     .$months[$date["mon"]-1]." ".$date["year"].", "
-    .date("H:i",strtotime($_text))." (heure serveur)";
+    .date("H:i",strtotime($_text))." (fuseau serveur)";
   return $rtext;
 }
 
