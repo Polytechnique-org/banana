@@ -241,6 +241,7 @@ class spool {
       $ids = array_flip($this->ids);
       unset($ids[$_id]);
       $this->ids = array_flip($ids);
+      $prefix_path=(preg_match("/\/scripts\/?$/",getcwd())?"..":".");    
       $f = fopen("$prefix_path/spool/spool-{$this->group}.dat","w");
       fputs($f,serialize($this));
       fclose($f);
