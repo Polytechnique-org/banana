@@ -1,0 +1,16 @@
+Source: banana
+Section: web
+Priority: optional
+Maintainer: Pierre Habouzit <pierre.habouzit@m4x.org>
+Standards-Version: 3.6.1
+Build-Depends-Indep: cdbs, debhelper (>= 4.1.16)
+
+Package: php-banana
+Architecture: all
+Depends: php4-cli
+Recommends: compface, imagemagick
+Description: foobar
+ Foobar
+ .
+ Homepage: http://opensource.polytechnique.org/banana/
+

@@ -1,0 +1,8 @@
+#! /bin/sh
+
+chown -R www-data /var/spool/banana
+
+#DEBHELPER#
+
+exit 0
+

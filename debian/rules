@@ -1,0 +1,20 @@
+#!/usr/bin/make -f
+include /usr/share/cdbs/1/rules/debhelper.mk
+
+# documentation
+DEB_INSTALL_DOCS_ALL :=
+DEB_INSTALL_DOCS_php-banana := AUTHORS TODO examples/
+
+# changelogs
+DEB_INSTALL_CHANGELOGS_ALL :=
+DEB_INSTALL_CHANGELOGS_php-banana := Changelog
+
+#directories
+DEB_INSTALL_DIRS_php-banana := var/spool/banana/
+
+install/php-banana::
+	make
+
+clean::
+	rm -f debian/compat
+	make clean
