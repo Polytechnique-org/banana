@@ -44,7 +44,7 @@ if ($news['user']!="anonymous") {
 if (isset($group) && isset($id) && isset($_REQUEST['type']) && 
   ($_REQUEST['type']=='followup')) {
   $rq=$nntp->group($group);
-  $post = new post($nntp,$id);
+  $post = new NNTPPost($nntp,$id);
   if ($post) {
     $subject = (preg_match("/^re:/i",$post->headers->subject)?"":"Re: ")
       .$post->headers->subject;

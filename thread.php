@@ -58,7 +58,7 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
     case 'cancel':
       $mid = array_search($id,$spool->ids);
       $nntp->group($group);
-      $post = new post($nntp,$id);
+      $post = new NNTPPost($nntp,$id);
       
       if (checkcancel($post->headers)) {
         $message = 'From: '.$profile['name']."\n"
@@ -103,7 +103,7 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
       break;
     case 'followupok':
       $rq=$nntp->group($group);
-      $post = new post($nntp,$id);
+      $post = new NNTPPost($nntp,$id);
       if ($post) {
         $refs = (isset($post->headers->references)?
                 $post->headers->references." ":"").$post->headers->msgid;

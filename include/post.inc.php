@@ -10,7 +10,7 @@
 /** class for posts
  */
 
-class Post {
+class NNTPPost {
   /** headers */
   var $headers;
   /** body */
