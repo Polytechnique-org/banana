@@ -123,11 +123,16 @@ class spool {
         $msg->parent=array_pop($parents);
         $p = $msg->parent;
         while ($p) {
-          $this->overview[$p]->desc++;
-          if (isset($this->overview[$p]->parent)) {
-            $p = $this->overview[$p]->parent;
+          if (isset($this->overview[$p])) {
+            $this->overview[$p]->desc++;
+            if (isset($this->overview[$p]->parent)) {
+              $p = $this->overview[$p]->parent;
+            } else {
+              $p = false;
+            }
           } else {
-            $p = false;
+            $this->overview[$p] = new spoolhead($dates[$p],$subjects[$p],$froms[$p],1);
+            $p = false; 
           }
         }
         if ($msg->parent!="") 
@@ -162,7 +167,8 @@ class spool {
         switch ($_display) {
           case 1:
             foreach ($this->overview as $i=>$p) {
-              if (!isset($this->overview[$i]->parent) && 
+              if (isset($this->overview[$i]) &&
+              !isset($this->overview[$i]->parent) && 
               ($this->overview[$i]->descunread==0)) {
                 $this->killdesc($i);
               }
