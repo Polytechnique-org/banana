@@ -61,15 +61,15 @@ if (isset($_GET['type']) && ($_GET['type']=='cancel') && (checkcancel($post->hea
 ?>
 <p class="<?php echo $css['error']?>">
   <?php echo $locale['article']['cancel'];?>
-  <form action="thread.php" method="post">
-    <input type="hidden" name="group" value="<?php echo $group;?>" />
-    <input type="hidden" name="id" value="<?php 
-      echo $id;?>" />
-    <input type="hidden" name="type" value="cancel" />
-    <input type="submit" name="action" value="<?php echo 
-      $locale['article']['okbtn'];?>" />
-  </form>
 </p>
+<form action="thread.php" method="post">
+  <input type="hidden" name="group" value="<?php echo $group;?>" />
+  <input type="hidden" name="id" value="<?php 
+    echo $id;?>" />
+  <input type="hidden" name="type" value="cancel" />
+  <input type="submit" name="action" value="<?php echo 
+    $locale['article']['okbtn'];?>" />
+</form>
 <?
 }
 
