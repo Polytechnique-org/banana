@@ -1,4 +1,12 @@
 <?php
+/********************************************************************************
+* post.php : posting page
+* ----------
+*
+* This file is part of the banana distribution
+* Copyright: See COPYING files that comes with this distribution
+********************************************************************************/
+
 require("include/session.inc.php");
 require("include/encoding.inc.php");
 require("include/format.inc.php");
