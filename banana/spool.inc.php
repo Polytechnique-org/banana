@@ -156,11 +156,11 @@ class BananaSpool
     function _updateSpool($arg)
     {
         global $banana;
-        $dates    = array_map(strtotime,    $banana->nntp->xhdr("Date",    $arg));
-        $subjects = array_map(headerdecode, $banana->nntp->xhdr("Subject", $arg));
-        $froms    = array_map(headerdecode, $banana->nntp->xhdr("From",    $arg));
-        $msgids   = $banana->nntp->xhdr("Message-ID", $arg);
-        $refs     = $banana->nntp->xhdr("References", $arg);
+        $dates    = array_map('strtotime',    $banana->nntp->xhdr('Date',    $arg));
+        $subjects = array_map('headerdecode', $banana->nntp->xhdr('Subject', $arg));
+        $froms    = array_map('headerdecode', $banana->nntp->xhdr('From',    $arg));
+        $msgids   = $banana->nntp->xhdr('Message-ID', $arg);
+        $refs     = $banana->nntp->xhdr('References', $arg);
 
         if (is_array($this->ids)) {
             $this->ids = array_merge($this->ids, array_flip($msgids));
