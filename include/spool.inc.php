@@ -94,7 +94,6 @@ class spool
         $groupinfo   = $_nntp->group($_group);
         if (!$groupinfo) { return ($this = null); }
 
-
         $this->_readFromFile();
 
         $do_save = false;
@@ -282,7 +281,7 @@ class spool
      * @param $_head BOOLEAN true if first post in thread
      */
 
-    function disp_desc($_id, $_index, $_first=0, $_last=0, $_ref="", $_pfx_node="", $_pfx_end="", $_head=true) {
+    function _disp_desc($_id, $_index, $_first=0, $_last=0, $_ref="", $_pfx_node="", $_pfx_end="", $_head=true) {
         global $css;
         $spfx_f   = '<img src="img/k1.gif" height="21" width="9" alt="o" />'; 
         $spfx_n   = '<img src="img/k2.gif" height="21" width="9" alt="*" />'; 
@@ -325,11 +324,11 @@ class spool
             if ($_index > $_last) { return; }
             if ($_index+$this->overview[$child]->desc >= $_first) {
                 if (sizeof($children)) {
-                    $this->disp_desc($child, $_index, $_first, $_last, $_ref,
+                    $this->_disp_desc($child, $_index, $_first, $_last, $_ref,
                             $_pfx_end.($this->overview[$child]->parent_direct?$spfx_T:$spfx_Tnd),
                             $_pfx_end.$spfx_I, false);
                 } else {
-                    $this->disp_desc($child, $_index, $_first, $_last, $_ref,
+                    $this->_disp_desc($child, $_index, $_first, $_last, $_ref,
                             $_pfx_end.($this->overview[$child]->parent_direct?$spfx_L:$spfx_Lnd),
                             $_pfx_end.$spfx_e, false);
                 }
@@ -349,7 +348,7 @@ class spool
         $index = 1;
         if (sizeof($this->overview)) {
             foreach ($this->roots as $id) {
-                $this->disp_desc($id, $index, $_first, $_last, $_ref);
+                $this->_disp_desc($id, $index, $_first, $_last, $_ref);
                 $index += $this->overview[$id]->desc ;
                 if ($index > $_last) { break; }
             }
