@@ -343,8 +343,9 @@ class nntp {
     ." GMT $distributions\r\n");
     if (substr($this->gline(),0,1)!="2") return false;
     $result = $this->gline();
+    $array=array();
     while ($result != ".") {
-      preg_match("/([^ ]+) (\d+) (\d+) ./",$result,$regs);
+      preg_match("/([^ ]+) (\d+) (\d+) (.)/",$result,$regs);
       $array[$regs[1]]=array(intval($regs[2]),intval($regs[3]),
         intval($regs[4]));
       $result = $this->gline();
