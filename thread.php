@@ -7,7 +7,6 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-require("locales/locales.inc.php");
 require("include/session.inc.php");
 require("include/encoding.inc.php");
 require("include/format.inc.php");
@@ -19,9 +18,10 @@ require("include/password.inc.php");
 require("include/profile.inc.php");
 include("include/wrapper.inc.php");
 
-require("include/header.inc.php");
+$profile=getprofile();
+require($profile['locale']);
 
-$profile = getprofile();
+require("include/header.inc.php");
 
 if (isset($_REQUEST['group'])) {
   $group=htmlentities(strtolower($_REQUEST['group']));

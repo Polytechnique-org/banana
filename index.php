@@ -7,13 +7,16 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-require("locales/locales.inc.php");
 require("include/session.inc.php");
 require("include/password.inc.php");
 require("include/NetNNTP.inc.php");
 require("include/groups.inc.php");
 require("include/format.inc.php");
 require("include/config.inc.php");
+require("include/profile.inc.php");
+
+$profile=getprofile();
+require($profile['locale']);
 
 require("include/header.inc.php");
 

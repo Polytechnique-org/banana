@@ -1,5 +1,4 @@
 <?php
-require("locales/locales.inc.php");
 require("include/session.inc.php");
 require("include/encoding.inc.php");
 require("include/format.inc.php");
@@ -11,8 +10,10 @@ require("include/password.inc.php");
 require("include/profile.inc.php");
 require("include/wrapper.inc.php");
 
-require("include/header.inc.php");
 $profile = getprofile();
+require($profile['locale']);
+
+require("include/header.inc.php");
 $group=htmlentities(strtolower($_REQUEST['group']));
 $id=htmlentities(strtolower($_REQUEST['id']));
 
