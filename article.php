@@ -23,7 +23,12 @@ require($profile['locale']);
 
 require("include/header.inc.php");
 
-$group=strtolower(htmlentities($_REQUEST['group']));
+if (isset($_REQUEST['group'])) {
+  $group=htmlentities(strtolower($_REQUEST['group']));
+}
+if (isset($_REQUEST['id'])) {
+  $id=htmlentities(strtolower($_REQUEST['id']));
+}
 
 $mynntp = new nntp($news['server']);
 if (!$mynntp) {
@@ -49,32 +54,32 @@ if (!$spool) {
 }
 $mynntp->group($group);
 
-$post = new post($mynntp,$_REQUEST['id']);
+$post = new post($mynntp,$id);
 if (!$post) {
   if ($mynntp->lasterrorcode == "423") {
-    $spool->delid($_REQUEST['id']);
+    $spool->delid($id);
   }
   echo "<p class=\"error\">\n\tError while reading message.\n</p>";
   require("include/footer.inc.php");
   exit;
 }
 
-$ndx = $spool->getndx($_REQUEST['id']);
+$ndx = $spool->getndx($id);
 
 ?>
-<div class="title">
+<div class="<?php echo $css['title']?>">
   <?php echo $locale['article']['message'];?>
 </div>
 
 <?php
 if (isset($_GET['type']) && ($_GET['type']=='cancel') && (checkcancel($post->headers))) {
 ?>
-<p class="error">
+<p class="<?php echo $css['error']?>">
   <?php echo $locale['article']['cancel'];?>
   <form action="thread.php" method="post">
     <input type="hidden" name="group" value="<?php echo $group;?>" />
     <input type="hidden" name="id" value="<?php 
-      echo $_REQUEST['id'];?>" />
+      echo $id;?>" />
     <input type="hidden" name="type" value="cancel" />
     <input type="submit" name="action" value="<?php echo 
       $locale['article']['okbtn'];?>" />
@@ -86,7 +91,7 @@ if (isset($_GET['type']) && ($_GET['type']=='cancel') && (checkcancel($post->hea
 displayshortcuts();
 ?>
 
-<table class="bicol" cellpadding="0" cellspacing="0" 
+<table class="<?php echo $css['bicol']?>" cellpadding="0" cellspacing="0" 
 summary="<?php echo $locale['article']['summary'];?>">
   <tr>
     <th colspan="2">
@@ -96,7 +101,7 @@ summary="<?php echo $locale['article']['summary'];?>">
 <?php
 foreach ($news['head'] as $real => $nick) {
   if (isset($post->headers->$nick)) 
-    echo "<tr><td class=\"bicoltitre\">$real</td>"
+    echo "<tr><td class=\"{$css['bicoltitre']}\">$real</td>"
     ."<td>".formatdisplayheader($nick,$post->headers->$nick,$spool)
     ."</td></tr>\n";
 }
@@ -117,8 +122,9 @@ foreach ($news['head'] as $real => $nick) {
     </th>
   </tr> 
   <tr>
-    <td class="nopadd" colspan="2">
-      <table class="overview" cellpadding="0" cellspacing="0" summary="overview">
+    <td class="<?php echo $css['nopadd']?>" colspan="2">
+      <table class="<?php echo $css['overview']?>" cellpadding="0" 
+      cellspacing="0" summary="overview">
 <?php
 $spool->disp($ndx-$news['threadtop'],$ndx+$news['threadbottom'],$ndx);
 ?>
