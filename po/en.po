@@ -1,0 +1,158 @@
+# translation of en.po to 
+# This file is distributed under the same license as the PACKAGE package.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER.
+# Pierre Habouzit <pierre.habouzit@m4x.org>, 2005.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: en\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-01-07 20:29+0100\n"
+"PO-Revision-Date: 2005-01-02 17:13+0100\n"
+"Last-Translator: Pierre Habouzit <pierre.habouzit@m4x.org>\n"
+"Language-Team:  <en@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.9.1\n"
+
+#: ../banana/banana.inc.php:54
+msgid "Impossible de contacter le serveur"
+msgstr "Server unreachable"
+
+#: ../banana/banana.inc.php:93
+msgid "Voulez-vous vraiment annuler ce message ?"
+msgstr "Do you really want to cancel that post ?"
+
+#: ../banana/banana.inc.php:124
+msgid "Les forums de Banana"
+msgstr "Banana's Bewsgroups"
+
+#: ../banana/banana.inc.php:126
+msgid "Les forums suivants ont été créés depuis ton dernier passage :"
+msgstr "This newsgroups are recent :"
+
+#: ../banana/banana.inc.php:140 ../banana/misc.inc.php:150
+msgid "Abonnements"
+msgstr "Subscription list"
+
+#: ../banana/banana.inc.php:175
+msgid "Impossible d'accéder au message.   Le message a peut-être été annulé"
+msgstr "The post is not reachable.  It may have been canceled"
+
+#: ../banana/banana.inc.php:179
+msgid "Message"
+msgstr "Post"
+
+#: ../banana/banana.inc.php:194
+msgid "Vous n'avez pas les permissions pour annuler ce message"
+msgstr "You are not allowed to cancel that post"
+
+#: ../banana/banana.inc.php:208
+msgid "Impossible d'annuler le message"
+msgstr "Impossible to cancel that post"
+
+#: ../banana/banana.inc.php:222
+msgid "a écrit"
+msgstr "wrote"
+
+#: ../banana/banana.inc.php:230 ../banana/misc.inc.php:156
+msgid "Nouveau message"
+msgstr "New post"
+
+#: ../banana/banana.inc.php:233 ../banana/post.inc.php:100
+msgid "En-têtes"
+msgstr "Headers"
+
+#: ../banana/banana.inc.php:234 ../banana/groups.inc.php:93
+msgid "Nom"
+msgstr "From"
+
+#: ../banana/banana.inc.php:235 ../banana/misc.inc.php:34
+#: ../banana/spool.inc.php:360
+msgid "Sujet"
+msgstr "Subject"
+
+#: ../banana/banana.inc.php:236 ../banana/misc.inc.php:35
+msgid "Forums"
+msgstr "NewsGroups"
+
+#: ../banana/banana.inc.php:237
+msgid "Suivi à"
+msgstr "Followup To"
+
+#: ../banana/banana.inc.php:238 ../banana/misc.inc.php:38
+msgid "Organisation"
+msgstr "Organization"
+
+#: ../banana/banana.inc.php:239 ../banana/post.inc.php:111
+msgid "Corps"
+msgstr "Body"
+
+#: ../banana/banana.inc.php:275
+msgid "Impossible de poster le message"
+msgstr "Impossible to post that message"
+
+#: ../banana/groups.inc.php:87
+msgid "Total"
+msgstr "Total"
+
+#: ../banana/groups.inc.php:89
+msgid "Abo."
+msgstr "Sub."
+
+#: ../banana/groups.inc.php:91
+msgid "Nouveaux"
+msgstr "New"
+
+#: ../banana/groups.inc.php:93
+msgid "Description"
+msgstr "Description"
+
+#: ../banana/misc.inc.php:33
+msgid "De"
+msgstr "From"
+
+#: ../banana/misc.inc.php:36
+msgid "Suivi-à"
+msgstr "Followup To"
+
+#: ../banana/misc.inc.php:37 ../banana/spool.inc.php:359
+msgid "Date"
+msgstr "Date"
+
+#: ../banana/misc.inc.php:39
+msgid "Références"
+msgstr "References"
+
+#: ../banana/misc.inc.php:40
+msgid "Image"
+msgstr "Image"
+
+#: ../banana/misc.inc.php:115
+msgid "hier"
+msgstr "yesterday"
+
+#: ../banana/misc.inc.php:148
+msgid "Liste des forums"
+msgstr "Newsgroups list"
+
+#: ../banana/misc.inc.php:171
+msgid "Répondre"
+msgstr "Answer"
+
+#: ../banana/misc.inc.php:174
+msgid "Annuler ce message"
+msgstr "Cancel post"
+
+#: ../banana/post.inc.php:114
+msgid "apercu"
+msgstr "preview"
+
+#: ../banana/spool.inc.php:361
+msgid "Auteur"
+msgstr "Author"
+
+#: ../banana/spool.inc.php:372
+msgid "Aucun message dans ce forum"
+msgstr "No post in this newsgroup"
