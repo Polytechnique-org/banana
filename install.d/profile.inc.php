@@ -11,9 +11,8 @@
  * @param $_headers OBJECT headers of message to cancel
  * @return BOOLEAN true if user has right to cancel message
  */
-
 function checkcancel($_headers) {
-  return ($_headers->from == $_SESSION['name']." <".$_SESSION['mail'].">");
+    return ($_headers->from == $_SESSION['name']." <".$_SESSION['mail'].">");
 }
 
 /** getprofile : sets profile variables
@@ -23,16 +22,15 @@ function checkcancel($_headers) {
  */
 
 function getprofile() {
-  $array['name'] = $_SESSION['name']." <"
-    .htmlentities($_SESSION['mail']).">";
-  $array['sig'] = $_SESSION['sig'];
-  $array['org']  = $_SESSION['org'];
-  $array['customhdr'] = "";
-  $array['display'] = $_SESSION['displaytype'];
-  $array['lastnews'] = time()-86400;
-  $array['locale'] = "locales/fr.inc.php";
-  $array['subscribe'] = array();
-  $array['dropsig'] = true;
-  return $array;
+    $array['name']      = $_SESSION['name']." <".htmlentities($_SESSION['mail']).">";
+    $array['sig']       = $_SESSION['sig'];
+    $array['org']       = $_SESSION['org'];
+    $array['customhdr'] = "";
+    $array['display']   = $_SESSION['displaytype'];
+    $array['lastnews']  = time()-86400;
+    $array['locale']    = "locales/fr.inc.php";
+    $array['subscribe'] = array();
+    $array['dropsig']   = true;
+    return $array;
 }
 ?>
