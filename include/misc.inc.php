@@ -7,7 +7,7 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-function _b_($str) { return dgettext('banana', $str); }
+function _b_($str) { return utf8_decode(dgettext('banana', utf8_encode($str))); }
 
 function _headerdecode($charset, $c, $str) {
     $s = ($c == 'Q') ? quoted_printable_decode($str) : base64_decode($str);
