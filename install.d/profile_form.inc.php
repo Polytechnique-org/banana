@@ -48,7 +48,7 @@
         <?php echo $locale['profile']['signature'];?>
       </td>
       <td>
-        <textarea name="profile_sig" rows="72" cols="7"></textarea>
+        <textarea name="profile_sig" rows="7" cols="50"></textarea>
       </td>
     </tr>
     <tr class="pair">
