@@ -70,12 +70,13 @@ class spool {
    
   function spool(&$_nntp,$_group,$_display=0,$_since=""){
 	global $news;
+    $prefix_path=(preg_match("/\/scripts\/?$/",getcwd())?"..":".");    
     $groupinfo = $_nntp->group($_group);
     if (!$groupinfo) {
       $this = false;
       return false;
     }
-	$spoolfile=realpath("./spool/spool-$_group.dat");
+	$spoolfile=realpath("$prefix_path/spool/spool-$_group.dat");
     if (file_exists($spoolfile)) {
       $f = fopen($spoolfile,"r");
       $this = unserialize(fread($f,filesize($spoolfile)));
@@ -143,7 +144,7 @@ class spool {
         $this->overview[$id] = $msg;
       }
       uasort($this->overview,"spoolcompare");
-      $f = fopen("spool/spool-$_group.dat","w");
+      $f = fopen("$prefix_path/spool/spool-$_group.dat","w");
       fputs($f,serialize($this));
       fclose($f);
     }
@@ -240,7 +241,7 @@ class spool {
       $ids = array_flip($this->ids);
       unset($ids[$_id]);
       $this->ids = array_flip($ids);
-      $f = fopen("spool/spool-{$this->group}.dat","w");
+      $f = fopen("$prefix_path/spool/spool-{$this->group}.dat","w");
       fputs($f,serialize($this));
       fclose($f);
     }
