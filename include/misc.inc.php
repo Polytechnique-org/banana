@@ -1,13 +1,22 @@
 <?php
 /********************************************************************************
-* include/misc.inc.php : Misc functions
-* -------------------------
-*
-* This file is part of the banana distribution
-* Copyright: See COPYING files that comes with this distribution
-********************************************************************************/
+ * include/misc.inc.php : Misc functions
+ * -------------------------
+ *
+ * This file is part of the banana distribution
+ * Copyright: See COPYING files that comes with this distribution
+ ********************************************************************************/
+
+/********************************************************************************
+ *  I18N
+ */
+
 
 function _b_($str) { return utf8_decode(dgettext('banana', utf8_encode($str))); }
+
+/********************************************************************************
+ *  HEADER STUFF
+ */
 
 function _headerdecode($charset, $c, $str) {
     $s = ($c == 'Q') ? quoted_printable_decode($str) : base64_decode($str);
@@ -34,6 +43,10 @@ function header_translate($hdr) {
             return $hdr;
     }
 }
+
+/********************************************************************************
+ *  FORMATTING STUFF
+ */
 
 function formatDate($_text) {
     return strftime("%A %d %B %Y, %H:%M (fuseau serveur)", strtotime($_text));
