@@ -192,9 +192,10 @@ class spool
             if (sizeof($newpostsids)>0) {
                 switch ($_display) {
                     case 1:
-                        foreach ($this->roots as $i) {
+                        foreach ($this->roots as $k=>$i) {
                             if ($this->overview[$i]->descunread==0) {
                                 $this->killdesc($i);
+                                unset($this->roots[$k]);
                             }
                         }
                         break;
@@ -203,10 +204,6 @@ class spool
         }
         
         return true;
-    }
-
-    function cmp($a, $b) {
-        return $this->overview[$a]->date < $this->overview[$b]->date;
     }
 
     function save($file)
@@ -234,8 +231,6 @@ class spool
                 $this->killdesc($c);
             }
         }
-        $pos = array_search($_id, $this->roots);
-        unset($this->roots[$pos]);
         unset($this->overview[$_id]);
         $msgid = array_search($_id, $this->ids);
         if ($msgid) {
