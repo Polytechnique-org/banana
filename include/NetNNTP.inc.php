@@ -58,7 +58,7 @@ class nntp
 
     function gline()
     {
-        return trim(fgets($this->ns, 1200));
+        return rtrim(fgets($this->ns, 1200));
     }
 
     /** puts a line on server
@@ -316,6 +316,7 @@ class nntp
         $this->pline("LIST\r\n");
         if (substr($this->gline(), 0, 1)!="2") return false;
         $result = $this->gline();
+        $array = Array();
         while ($result != ".") {
             preg_match("/([^ ]+) (\d+) (\d+) (.)/", $result, $regs);
             $array[$regs[1]] = array(intval($regs[2]), intval($regs[3]), intval($regs[4]));
@@ -367,10 +368,8 @@ class nntp
         if (substr($this->gline(), 0, 1)!="2") {
             return false;
         }
-        $result = $this->gline();
-        while ($result != ".") {
-            $array[] =  $result;
-            $result  = $this->gline();
+        while (($result = $this->gline()) != ".") {
+            $array[] = $result;
         }
         return $array;
     }

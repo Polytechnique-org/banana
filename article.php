@@ -17,21 +17,8 @@ if (isset($_REQUEST['id'])) {
     $id = htmlentities(strtolower($_REQUEST['id']));
 }
 
-$banana->newSpool($group, $banana->profile['display'], $banana->profile['lastnews']);
-$banana->newPost($id);
-if (!$banana->post) {
-    if ($banana->nntp->lasterrorcode == "423") {
-        $banana->spool->delid($id);
-    }
-    error("nntpart");
-}
+echo $banana->action_showArticle($group, $id);
 
-$ndx = $banana->spool->getndx($id);
-
-?>
-<h1><?php echo _b_('Message'); ?></h1>
-
-<?php
 if (isset($_GET['type']) && $_GET['type']=='cancel' && $banana->post->checkcancel()) {
 ?>
 <p class="<?php echo $css['error']?>">
@@ -45,55 +32,6 @@ if (isset($_GET['type']) && $_GET['type']=='cancel' && $banana->post->checkcance
 </form>
 <?
 }
-
-displayshortcuts();
-?>
-
-<table class="<?php echo $css['bicol']?>" cellpadding="0" cellspacing="0" 
-summary="<?php echo _b_('Contenu du message'); ?>">
-  <tr>
-    <th colspan="2">
-      <?php echo _b_('En-têtes'); ?>
-    </th>
-  </tr>
-<?php
-    foreach ($banana->show_hdr as $hdr) {
-        if (isset($banana->post->headers[$hdr])) {
-            $res = formatdisplayheader($hdr, $banana->post->headers[$hdr]);
-            if ($res)
-                echo "<tr><td class=\"{$css['bicoltitre']}\">".header_translate($hdr)."</td>"
-                    ."<td>$res</td></tr>\n";
-        }
-    }
-?>
-  <tr>
-    <th colspan="2">
-      <?php echo _b_('Corps'); ?>
-    </th>
-  </tr> 
-  <tr>
-    <td colspan="2">
-      <pre><?php echo formatbody($banana->post->body); ?></pre>
-    </td>
-  </tr>
-  <tr>
-    <th colspan="2">
-      <?php echo _b_('Aperçu'); ?>
-    </th>
-  </tr> 
-  <tr>
-    <td class="<?php echo $css['nopadd']?>" colspan="2">
-      <table class="<?php echo $css['overview']?>" cellpadding="0" 
-      cellspacing="0" summary="overview">
-<?php
-$banana->spool->disp($ndx-$banana->tbefore,$ndx+$banana->tafter,$ndx);
-?>
-      </table>
-    </td>
-  </tr>
-</table>
-<?php
-displayshortcuts();
 
 require_once("include/footer.inc.php");
 ?>

@@ -6,133 +6,30 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-body {
-    color: black;
-    background-color: white;
-    width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-}
+div.banana_scuts { text-align: left; padding: 0.5em 0em; }
 
-a:link    { color: blue; background: inherit; }
-a:visited { color: blue; background: inherit; }
-a:hover   { color: blue; background: inherit; text-decoration: underline; }
+/** GROUP LIST **/
 
-h1 {
-  font-size: 200%;
-  text-align: center;
-  padding-bottom: 1em;
-}
+table.banana_group td.new { text-align: center; }
+table.banana_group td.all { text-align: center; }
+table.banana_group td.grp { text-align: left; }
+table.banana_group td.dsc { text-align: left; }
 
-div.bloc {
-  width: 100%;
-}
+/** THREAD VIEW **/
 
-p.footer {
-  border-top: 1px #DDDDDD solid;
-}
+table.banana_thread td { white-space: nowrap; height: 100%; vertical-align: middle; }
 
-div.shortcuts {
-  text-align: left;
-  padding-bottom: 1em;
-  padding-top: 1em;
-}
+table.banana_thread tr.new { font-weight: bold; }
 
-div.tree {
-  float: left;
-  padding-right: 0.3em;
-}
+table.banana_thread td.date { text-align: center; }
+table.banana_thread td.subj { text-align: left; overflow: hidden; }
+table.banana_thread td.from { text-align: left; }
 
-span.isref {
-  font-style: italic;
-}
+table.banana_thread div.tree { float: left; padding-right: 0.3em; }
+table.banana_thread span.cur { font-style: italic; font-size: 90%; }
 
-table.bicol {
-  background-color: #eeeeee;
-  color: inherit;
-  border: 1px solid #336699;
-  border-collapse: collapse;
-  width: 100%;
-}
+/** MESSAGE VIEW **/
 
-table.bicol tr.impair {}
-
-table.bicol tr.pair {
-  background-color: #eeeed0;
-  color: inherit;
-}
-
-table.bicol th {
-  background-color: #336699;
-  color: #FFFFFF;
-  font-weight: bold;
-  text-align: center;
-  vertical-align: middle;
-}
-
-table.bicol td {
-  color: #000000;
-  background-color: inherit;
-  padding-left: 0.4em;
-  padding-right: 0.4em;
-}
-
-table.bicol td.nopadd {
-  padding-left: 0em;
-  padding-right: 0em;
-}
-
-table.bicol td.total,td.unread,td.date {
-  text-align: center;
-  padding-left: 0.1em;
-  padding-right: 0.1em;
-}
-
-table.bicol td.subject,td.group,td.from,td.description {
-  text-align: left;
-}
-
-table.bicol td.bicoltitre,span.bicoltitre {
-  color: #000000;
-  background-color: inherit;
-  font-weight: bold;
-}
-
-table.bicol td.bouton {
-  text-align: right;
-}
-
-table.overview {
-  background-color: #eeeeee;
-  color: inherit;
-  width: 100%;
-}
-
-table.overview tr.impair {}
-
-table.overview tr.pair {
-  background-color: #eeeed0;
-  color: inherit;
-}
-
-table.overview th {
-  background-color: #336699;
-  color: #FFFFFF;
-  font-weight: bold;
-  text-align: center;
-  vertical-align: middle;
-}
-
-table.overview td {
-  color: #000000;
-  background-color: inherit;
-  padding-left: 0.4em;
-  padding-right: 0.4em;
-}
-
-table.overview td.subject,td.group,td.from,td.description {
-  text-align: left;
-}
-
-table.overview .new { font-weight: bold; }
+table.banana_msg td.thrd { padding: 0px; }
+table.banana_msg table { border: 0px; padding: 0px; margin: 0px; width: 100%; }
 

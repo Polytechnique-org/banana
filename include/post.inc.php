@@ -80,13 +80,39 @@ class BananaPost
         $this->name = trim($this->name);
     }
 
-    function checkcancel() {
+    function checkcancel()
+    {
         if (function_exists('hook_checkcancel')) {
             return hook_checkcancel($this->headers);
         }
         return ($this->headers['from'] == $_SESSION['name']." <".$_SESSION['mail'].">");
     }
 
+    function to_html()
+    {
+        global $banana;
+
+        $res  = '<table class="bicol banana_msg" cellpadding="0" cellspacing="0">';
+        $res .= '<tr><th colspan="2">'._b_('En-têtes').'</th></tr>';
+
+        foreach ($banana->show_hdr as $hdr) {
+            if (isset($this->headers[$hdr])) {
+                $res2 = formatdisplayheader($hdr, $this->headers[$hdr]);
+                if ($res2) {
+                    $res .= '<tr><td class="hdr">'.header_translate($hdr)."</td><td class='val'>$res2</td></tr>\n";
+                }
+            }
+        }
+
+        $res .= '<tr><th colspan="2">'._b_('Corps').'</th></tr>';
+        $res .= '<tr><td colspan="2"><pre>'.formatbody($this->body).'</pre></td></tr>';
+        
+        $res .= '<tr><th colspan="2">'._b_('apercu').'</th></tr>';
+        $ndx  = $banana->spool->getndx($this->id);
+        $res .= '<tr><td class="thrd" colspan="2">'.$banana->spool->to_html($ndx-$banana->tbefore, $ndx+$banana->tafter, $ndx).'</td></tr>';
+
+        return $res.'</table>';
+    }
 }
 
 ?>

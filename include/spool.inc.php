@@ -286,9 +286,8 @@ class BananaSpool
      * @param $_head BOOLEAN true if first post in thread
      */
 
-    function _disp_desc($_id, $_index, $_first=0, $_last=0, $_ref="", $_pfx_node="", $_pfx_end="", $_head=true)
+    function _to_html($_id, $_index, $_first=0, $_last=0, $_ref="", $_pfx_node="", $_pfx_end="", $_head=true)
     {
-        global $css;
         $spfx_f   = '<img src="img/k1.gif" height="21" width="9" alt="o" />'; 
         $spfx_n   = '<img src="img/k2.gif" height="21" width="9" alt="*" />'; 
         $spfx_Tnd = '<img src="img/T-direct.gif" height="21" width="12" alt="+" />';
@@ -304,43 +303,46 @@ class BananaSpool
             return;
         }
 
+        $res = '';
+
         if ($_index>=$_first) {
-            $us = ($_index == $_ref);
             $hc = empty($this->overview[$_id]->children);
 
-            echo '<tr class="'.($_index%2?$css["pair"]:$css["impair"]).($this->overview[$_id]->isread?'':' new')."\">\n";
-            echo "<td class=\"{$css['date']}\">".fancyDate($this->overview[$_id]->date)." </td>\n";
-            echo "<td class=\"{$css['subject']}\">"
-                ."<div class=\"{$css['tree']}\">$_pfx_node".($hc?($_head?$spfx_f:($this->overview[$_id]->parent_direct?$spfx_s:$spfx_snd)):$spfx_n)
+            $res .= '<tr class="'.($_index%2?'pair':'impair').($this->overview[$_id]->isread?'':' new')."\">\n";
+            $res .= "<td class='date'>".fancyDate($this->overview[$_id]->date)." </td>\n";
+            $res .= "<td class='subj'>"
+                ."<div class='tree'>$_pfx_node".($hc?($_head?$spfx_f:($this->overview[$_id]->parent_direct?$spfx_s:$spfx_snd)):$spfx_n)
                 ."</div>";
             if ($_index == $_ref) {
-                echo '<span class="isref">'.htmlentities($this->overview[$_id]->subject).'</span>';
+                $res .= '<span class="cur">'.htmlentities($this->overview[$_id]->subject).'</span>';
             } else {
-                echo "<a href='article.php?group={$this->group}&amp;id=$_id'>".htmlentities($this->overview[$_id]->subject).'</a>';
+                $res .= "<a href='article.php?group={$this->group}&amp;id=$_id'>".htmlentities($this->overview[$_id]->subject).'</a>';
             }
-            echo "</td>\n<td class=\"{$css['author']}\">".formatFrom($this->overview[$_id]->from)."</td>\n</tr>";
+            $res .= "</td>\n<td class='from'>".formatFrom($this->overview[$_id]->from)."</td>\n</tr>";
 
-            if ($hc) { return; }
+            if ($hc) { return $res; }
         } 
 
         $_index ++;
 
         $children = $this->overview[$_id]->children;
         while ($child = array_shift($children)) {
-            if ($_index > $_last) { return; }
+            if ($_index > $_last) { return $res; }
             if ($_index+$this->overview[$child]->desc >= $_first) {
                 if (sizeof($children)) {
-                    $this->_disp_desc($child, $_index, $_first, $_last, $_ref,
+                    $res .= $this->_to_html($child, $_index, $_first, $_last, $_ref,
                             $_pfx_end.($this->overview[$child]->parent_direct?$spfx_T:$spfx_Tnd),
                             $_pfx_end.$spfx_I, false);
                 } else {
-                    $this->_disp_desc($child, $_index, $_first, $_last, $_ref,
+                    $res .= $this->_to_html($child, $_index, $_first, $_last, $_ref,
                             $_pfx_end.($this->overview[$child]->parent_direct?$spfx_L:$spfx_Lnd),
                             $_pfx_end.$spfx_e, false);
                 }
             }
             $_index += $this->overview[$child]->desc;
         }
+
+        return $res;
     }
 
     /** Displays overview
@@ -349,23 +351,28 @@ class BananaSpool
      * @param $_ref STRING MSGNUM of current/selectionned post
      */
 
-    function disp($_first=0, $_last=0, $_ref="")
+    function to_html($_first=0, $_last=0, $_ref = null)
     {
-        global $css;
+        $res  = '<table class="bicol banana_thread" cellpadding="0" cellspacing="0">';
+       
+        if (is_null($_ref)) {
+            $res .= '<tr><th>'._b_('Date').'</th>';
+            $res .= '<th>'._b_('Sujet').'</th>';
+            $res .= '<th>'._b_('Auteur').'</th></tr>';
+        }
+
         $index = 1;
         if (sizeof($this->overview)) {
             foreach ($this->roots as $id) {
-                $this->_disp_desc($id, $index, $_first, $_last, $_ref);
+                $res   .= $this->_to_html($id, $index, $_first, $_last, $_ref);
                 $index += $this->overview[$id]->desc ;
                 if ($index > $_last) { break; }
             }
         } else {
-            echo "<tr class=\"{$css['pair']}\">\n";
-            echo "\t<td colspan=\"3\">\n";
-            echo "\t\tNo post in this newsgroup\n";
-            echo "\t</td>\n";
-            echo "</tr>\n";
+            $res .= '<tr><td colspan="3">'._b_('Aucun message dans ce forum').'</td></tr>';
         }
+
+        return $res .= '</table>';
     }
 
     /** computes linear post index

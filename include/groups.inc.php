@@ -10,24 +10,33 @@
 /** class for group lists
  */
 
+define ( 'BANANA_GROUP_ALL', 0 );
+define ( 'BANANA_GROUP_SUB', 1 );
+define ( 'BANANA_GROUP_NEW', 2 );
+ 
 class BananaGroups {
     /** group list */
-    var $overview;
+    var $overview = Array();
     /** last update */
     var $date;
+
+    var $type;
 
     /** constructor
      */
 
-    function BananaGroups($_type=0) {
+    function BananaGroups($_type = BANANA_GROUP_SUB) {
         global $banana;
-        $desc = $banana->nntp->xgtitle();
-        if ($_type==1) {
+
+        $this->type = $_type;
+        $desc       = $banana->nntp->xgtitle();
+        
+        if ($_type == BANANA_GROUP_NEW) {
             $list = $banana->nntp->newgroups($banana->profile['lastnews']);
         } else {
             $list = $banana->nntp->liste();
-            if ($_type == 0) {
-                $Mylist = Array();
+            if ($_type == BANANA_GROUP_SUB) {
+                $mylist = Array();
                 foreach ($banana->profile['subscribe'] as $g) {
                     if (isset($list[$g])) {
                         $mylist[$g] = $list[$g];
@@ -36,14 +45,15 @@ class BananaGroups {
                 $list = $mylist;
             }
         }
-        if (empty($list)) {
-            $this->overview=array();
-            return false;
-        }
 
         foreach ($list as $g=>$l) {
             $this->overview[$g][0] = isset($desc[$g]) ? $desc[$g] : '-';
             $this->overview[$g][1] = $l[0];
+        }
+        ksort($this->overview);
+
+        if (empty($this->overview) && $_type == BANANA_GROUP_SUB) {
+            $this = new BananaGroups(BANANA_GROUP_ALL);
         }
     }
 
@@ -64,6 +74,39 @@ class BananaGroups {
             $this->overview[$g][1]=$groupstat[0];
         }
         return true;
+    }
+
+    function to_html()
+    {
+        global $banana;
+        if (empty($this->overview)) {
+            return;
+        }
+
+        $html  = '<table class="bicol banana_group" cellspacing="0" cellpadding="2">'."\n";
+        $html .= '<tr><th>'._b_('Total').'</th><th>';
+        if ($this->type == BANANA_GROUP_SUB) {
+            $html .= _b_('Nouveaux').'</th><th>';
+        }
+        $html .= _b_('Nom').'</th><th>'._b_('Description').'</th></tr>'."\n";
+
+        $b = true;
+        foreach ($this->overview as $g => $d) {
+            $b     = !$b;
+            $ginfo = $banana->nntp->group($g);
+            $new   = count($banana->nntp->newnews($banana->profile['lastnews'],$g));
+
+            $html .= '<tr class="'.($b ? 'pair' : 'impair').'">'."\n";
+            $html .= "<td class='all'>{$ginfo[0]}</td>";
+            if ($this->type == BANANA_GROUP_SUB) {
+                $html .= '<td class="new">'.($new ? $new : '-').'</td>';
+            }
+            $html .= "<td class='grp'><a href='thread.php?group=$g'>$g</a></td><td class='dsc'>{$d[0]}</td></tr>";
+        }
+        
+        $html .= '</table>';
+
+        return $html;
     }
 }
 

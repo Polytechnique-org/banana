@@ -20,13 +20,7 @@ if (isset($_REQUEST['id'])) {
     $id=htmlentities(strtolower($_REQUEST['id']));
 }
 
-$banana->newSpool($group, $banana->profile['display'], $banana->profile['lastnews']);
-$max = $banana->tmax;
-if (isset($_REQUEST['first']) && ($_REQUEST['first']>sizeof($banana->spool->overview))) {
-    $_REQUEST['first'] = sizeof($banana->spool->overview);
-}
-$first = (isset($_REQUEST['first']) ? (floor($_REQUEST['first']/$max)*$max+1) : 1);
-$last  = (isset($_REQUEST['first']) ? (floor($_REQUEST['first']/$max+1)*$max) : $max);
+echo $banana->action_showThread($group, $_REQUEST['first'] ? $_REQUEST['first'] : 1);
 
 if (isset($_REQUEST['action']) && (isset($_REQUEST['type']))
         && (isset($_SESSION['bananapostok'])) && ($_SESSION['bananapostok']))
@@ -100,33 +94,6 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type']))
     $_SESSION['bananapostok']=false;
     $banana->newSpool($group, $banana->profile['display'], $banana->profile['lastnews']);
 }
-
-?>
-<h1><?php echo $group; ?></h1>
-<?php
-if (isset($text)) { echo $text; }
-displayshortcuts($first);
-
-?>
-
-<table class="<?php echo $css['bicol']?>" cellpadding="0" cellspacing="0" border="0">
-  <tr>
-    <th class="<?php echo $css['date']?>">
-      <?php echo _b_('Date'); ?>
-    </th>
-    <th class="<?php echo $css['subject']?>">
-      <?php echo _b_('Sujet'); ?>
-    </th>
-    <th class="<?php echo $css['from']?>">
-      <?php echo _b_('Auteur'); ?>
-    </th>
-  </tr>
-<?php
-$banana->spool->disp($first, $last);
-$banana->nntp->quit();
-echo "</table>";
-
-displayshortcuts($first);
 
 require_once("include/footer.inc.php");
 ?>
