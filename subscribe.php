@@ -30,7 +30,7 @@ displayshortcuts();
 ?>
 
 <form method="post" action="<?php echo $_SERVER['PHP_SELF'];?>">
-<table class="<?php echo $css["bicol"];?>" cellspacing="0" cellpadding="2">
+<table class="bicol" cellspacing="0" cellpadding="2">
   <tr>
     <th>
       <?php echo _b_('Total'); ?>
@@ -52,25 +52,25 @@ foreach ($groups->overview as $g => $d) {
   $groupinfo = $banana->nntp->group($g);
   $newarts = $banana->nntp->newnews($banana->profile['lastnews'], $g);
 ?>
-  <tr class="<?php echo ($pair?$css["pair"]:$css["impair"]);?>" >
-    <td class="<?php echo $css["total"]; ?>">
+  <tr class="<?php echo ($pair?"pair":"impair");?>" >
+    <td class="tot">
       <?php echo $groupinfo[0]; ?>
     </td>
-    <td class="<?php echo $css["unread"]; ?>">
+    <td class="new">
       <input type="checkbox" name="subscribe[]" value="<?php echo $g;?>"
       <?php if (in_array($g, $banana->profile['subscribe'])) echo 'checked="checked"'; ?> />
     </td>
-    <td class="<?php echo $css["group"]; ?>">
+    <td class="grp">
       <?php echo "<a href=\"thread.php?group=$g\">$g</a>";?>
     </td>
-    <td class="<?php echo $css["description"]; ?>">
+    <td class="dsc">
       <?php echo $d[0];?>
     </td>
   </tr>
 <?php
 }
 ?>
-  <tr class="<?php echo (!$pair?$css["pair"]:$css["impair"]); ?>">
+  <tr class="<?php echo (!$pair?"pair":"impair"); ?>">
     <td colspan="4" class="bouton">
       <input type="submit" name="action" value="OK" />
     </td>

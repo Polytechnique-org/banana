@@ -116,7 +116,6 @@ class Banana
     function newSpool($group, $disp=0, $since='') {
         require_once('include/spool.inc.php');
         $this->spool = new BananaSpool($group, $disp, $since);
-        if (!$this->spool) { error('nntpspool'); }
     }
 
     function newPost($id)
@@ -142,8 +141,6 @@ class Banana
     {
         if (function_exists('hook_getprofile')) {
             $this->profile = hook_getprofile();
-        } else {
-            session_start();
         }
         
         setlocale(LC_ALL,  $this->profile['locale']);
@@ -152,40 +149,4 @@ class Banana
 
 $banana = new Banana;
 
-switch (basename($_SERVER['SCRIPT_NAME'])) {
-    case "thread.php":
-        if (!isset($_SESSION['bananapostok'])) {
-            $_SESSION['bananapostok']=true;
-        }
-        break;
-
-    default:
-        $_SESSION['bananapostok']=true;
-        break;
-}
-
-if (empty($css)) {
-$css = array(
-        'bananashortcuts' => 'bananashortcuts',
-        'bicol' => 'bicol',
-        'bicoltitre' => 'bicoltitre',
-        'bicolvpadd' => 'bicolvpadd',
-        'pair' => 'pair',
-        'impair' => 'impair',
-        'bouton' => 'bouton',
-        'error' => 'error',
-        'normal' => 'normal',
-        'total' => 'total',
-        'unread' => 'unread',
-        'group' => 'group',
-        'description' => 'description',
-        'date' => 'date',
-        'subject' => 'subject',
-        'from' => 'from',
-        'author' => 'author',
-        'nopadd' => 'nopadd',
-        'overview' => 'overview',
-        'tree' => 'tree'
-        );
-}
 ?>

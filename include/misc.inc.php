@@ -147,7 +147,7 @@ function formatFrom($text) {
 }
 
 function displayshortcuts($first = -1) {
-    global $banana, $css;
+    global $banana;
     $sname = basename($_SERVER['SCRIPT_NAME']);
 
     $res = '<div class="banana_scuts">';

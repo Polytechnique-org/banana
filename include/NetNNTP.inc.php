@@ -179,10 +179,9 @@ class nntp
             $this->lasterrortext = substr($result, 4);
             return false;
         }
-        $result = $this->gline();
-        while ($result != ".") {
+        $array = Array();
+        while (($result = $this->gline()) != ".") {
             $array[] = $result;
-            $result  = $this->gline();
         }
         return $array;
     }

@@ -21,7 +21,7 @@ echo $banana->action_showArticle($group, $id);
 
 if (isset($_GET['type']) && $_GET['type']=='cancel' && $banana->post->checkcancel()) {
 ?>
-<p class="<?php echo $css['error']?>">
+<p class="error">
   <?php echo _b_('Voulez-vous vraiment annuler ce message ?'); ?>
 </p>
 <form action="thread.php" method="post">

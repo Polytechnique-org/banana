@@ -21,7 +21,7 @@ table.banana_thread td { white-space: nowrap; height: 100%; vertical-align: midd
 
 table.banana_thread tr.new { font-weight: bold; }
 
-table.banana_thread td.date { text-align: center; }
+table.banana_thread td.date { width: 15%; text-align: center; }
 table.banana_thread td.subj { text-align: left; overflow: hidden; }
 table.banana_thread td.from { text-align: left; }
 
@@ -29,6 +29,8 @@ table.banana_thread div.tree { float: left; padding-right: 0.3em; }
 table.banana_thread span.cur { font-style: italic; font-size: 90%; }
 
 /** MESSAGE VIEW **/
+
+table.banana_msg .hdr { width: 15%; text-align: right; font-weight: bold; padding-right: 1em; }
 
 table.banana_msg td.thrd { padding: 0px; }
 table.banana_msg table { border: 0px; padding: 0px; margin: 0px; width: 100%; }
