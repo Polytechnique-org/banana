@@ -35,7 +35,7 @@ $nntp = new nntp($news['server']);
 if (!$nntp) error("nntpsock");
 if ($news['user']!="anonymous") {
   $result = $nntp->authinfo($news["user"],$news["pass"]);
-  if (!$result) erro("nntpauth");
+  if (!$result) error("nntpauth");
 }
 $spool = new spool($nntp,$group,$profile['display'],$profile['lastnews']);
 if (!$spool) error("nntpspool");
