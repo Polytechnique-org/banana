@@ -38,8 +38,7 @@ if ($news['user']!="anonymous") {
   $result = $nntp->authinfo($news["user"],$news["pass"]);
   if (!$result) error("nntpauth");
 }
-$spool = new BananaSpool($nntp,$group,$profile['display'],
-  $profile['lastnews']);
+$spool = new BananaSpool($nntp,$group,$profile['display'], $profile['lastnews']);
 if (!$spool) error("nntpspool");
 $max = 50;
 if (isset($_REQUEST['first']) && ($_REQUEST['first']>sizeof($spool->overview)))
@@ -77,14 +76,13 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
       }
       break;
     case 'new':
-      $body = preg_replace("/\n\.[ \t\r]*\n/m","\n..\n",stripslashes($_REQUEST['body']));
+      $body = preg_replace("/\n\.[ \t\r]*\n/m","\n..\n",$_REQUEST['body']);
       $message = 'From: '.$profile['name']."\n"
-        ."Newsgroups: ".stripslashes(str_replace(" ","",
-          $_REQUEST['newsgroups']))."\n"
-        ."Subject: ".stripslashes($_REQUEST['subject'])."\n"
+        ."Newsgroups: ".str_replace(" ","", $_REQUEST['newsgroups'])."\n"
+        ."Subject: ".$_REQUEST['subject']."\n"
         .(isset($profile['org'])?"Organization: ".$profile['org']."\n":"")
         .($_REQUEST['followup']!=''?'Followup-To: '
-        .stripslashes($_REQUEST['followup'])."\n":"")
+        .$_REQUEST['followup']."\n":"")
         .$news['customhdr']
         ."\n"
         .wrap($body,"",$news['wrap']);
@@ -103,13 +101,13 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
                 $post->headers['references']." ":"").$post->headers['message-id'];
       }
     
-      $body = preg_replace("/\n\.[ \t\r]*\n/m","\n..\n",stripslashes($_REQUEST['body']));
+      $body = preg_replace("/\n\.[ \t\r]*\n/m","\n..\n",$_REQUEST['body']);
       $message = 'From: '.$profile['name']."\n"
-        ."Newsgroups: ".stripslashes($_REQUEST['newsgroups'])."\n"
-        ."Subject: ".stripslashes($_REQUEST['subject'])."\n"
+        ."Newsgroups: ".$_REQUEST['newsgroups']."\n"
+        ."Subject: ".$_REQUEST['subject']."\n"
         .(isset($profile['org'])?"Organization: ".$profile['org']."\n":"")
         .($_REQUEST['followup']!=''?'Followup-To: '
-        .stripslashes($_REQUEST['followup'])."\n":"")
+        .$_REQUEST['followup']."\n":"")
         ."References: $refs\n"
         .$news['customhdr']
         .$profile['customhdr']
@@ -124,8 +122,7 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
       break;
   }
   $_SESSION['bananapostok']=false;
-  $spool = new BananaSpool($nntp,$group,$profile['display'],
-    $profile['lastnews']);
+  $spool = new BananaSpool($nntp,$group,$profile['display'], $profile['lastnews']);
   if (!$spool) error("nntpspool");
 }
 

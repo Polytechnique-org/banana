@@ -8,7 +8,8 @@
 ********************************************************************************/
 
 if(!function_exists('_file_put_contents')) {
-    function file_put_contents($filename, $data) {
+    function file_put_contents($filename, $data)
+    {
         $fp = fopen($filename, 'w');
         if(!$fp) {
             trigger_error('file_put_contents cannot write in file '.$filename, E_USER_ERROR);
@@ -187,7 +188,8 @@ class BananaSpool
         }
     }
 
-    function _updateUnread(&$nntp, $since, $mode) {
+    function _updateUnread(&$nntp, $since, $mode)
+    {
         if (empty($since)) { return; }
 
         if (is_array($newpostsids = $nntp->newnews($since, $this->group))) {
@@ -283,7 +285,8 @@ class BananaSpool
      * @param $_head BOOLEAN true if first post in thread
      */
 
-    function _disp_desc($_id, $_index, $_first=0, $_last=0, $_ref="", $_pfx_node="", $_pfx_end="", $_head=true) {
+    function _disp_desc($_id, $_index, $_first=0, $_last=0, $_ref="", $_pfx_node="", $_pfx_end="", $_head=true)
+    {
         global $css;
         $spfx_f   = '<img src="img/k1.gif" height="21" width="9" alt="o" />'; 
         $spfx_n   = '<img src="img/k2.gif" height="21" width="9" alt="*" />'; 
@@ -345,7 +348,8 @@ class BananaSpool
      * @param $_ref STRING MSGNUM of current/selectionned post
      */
 
-    function disp($_first=0, $_last=0, $_ref="") {
+    function disp($_first=0, $_last=0, $_ref="")
+    {
         global $css;
         $index = 1;
         if (sizeof($this->overview)) {
@@ -368,7 +372,8 @@ class BananaSpool
      * @return INTEGER linear index of post
      */
 
-    function getndx($_id) {
+    function getndx($_id)
+    {
         $ndx    = 1;
         $id_cur = $_id;
         while (true) {
