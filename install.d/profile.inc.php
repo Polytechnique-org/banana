@@ -32,6 +32,7 @@ function getprofile() {
   $array['lastnews'] = time()-86400;
   $array['locale'] = "locales/fr.inc.php";
   $array['subscribe'] = array();
+  $array['dropsig'] = true;
   return $array;
 }
 ?>

@@ -48,7 +48,12 @@ if (isset($group) && isset($id) && isset($_REQUEST['type']) &&
   if ($post) {
     $subject = (preg_match("/^re:/i",$post->headers->subject)?"":"Re: ")
       .$post->headers->subject;
-    $body = $post->headers->name." wrote :\n".wrap($post->body, ">");
+	if ($profile['dropsig']) {
+	  $quotetext = preg_replace("/^(.*)\n-- \n.*$/m","\1",$post->body);
+	} else {
+	  $quotetext = $post->body;
+	}
+    $body = $post->headers->name." wrote :\n".wrap($quotetext, "> ");
     if (isset($post->headers->followup))
       $target=$post->headers->followup;
     else
