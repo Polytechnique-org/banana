@@ -77,7 +77,7 @@ displayshortcuts();
 
 ?>
 
-<form action="thread.php" method="POST">
+<form action="thread.php" method="post">
 <table class="<?php echo $css['bicol']?>" cellpadding="0" cellspacing="0" border="0">
   <tr>
     <th colspan="2">
@@ -133,9 +133,9 @@ displayshortcuts();
   </tr>
   <tr>
     <td class="<?php echo $css['bicolvpadd'];?>" colspan="2">
-      <textarea name="body" cols="90" rows="10"><?php echo 
-      (isset($body)?$body:"").($profile['sig']!=''?"\n\n-- \n"
-      .$profile['sig']:"");?></textarea>
+      <textarea name="body" cols="90" rows="16"><?php echo 
+      (isset($body)?htmlentities($body):"").
+      ($profile['sig']!=''?"\n\n-- \n".htmlentities($profile['sig']):"");?></textarea>
     </td>
   </tr>
   <tr>
@@ -156,6 +156,7 @@ if (isset($group) && isset($id) && isset($_REQUEST['type'])
 ?>
       <input type="submit" name="action" value="OK" />
     </td>
+  </tr>
 </table>
 </form>
 <?php
