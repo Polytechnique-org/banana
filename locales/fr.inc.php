@@ -50,9 +50,9 @@ $locale['thread'] = array(
 );
 
 $locale['post'] = array(
-  'badcancel' => "Imposible d'annuler le message",
+  'badcancel' => "Impossible d'annuler le message",
   'canceled' => "Message annulé",
-  'badpost' => "Imposible de poster le message",
+  'badpost' => "Impossible de poster le message",
   'posted' => "Message posté",
   'rghtcancel' => "Vous n'avez pas les permissions pour annuler ce message",
   'title' => "Nouveau message",
