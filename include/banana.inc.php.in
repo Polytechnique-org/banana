@@ -55,7 +55,7 @@ class Banana
 
     function action_listGroups()
     {
-        $this->newGroup(BANANA_GROUP_SUB);
+        $this->newGroup();
         
         $cuts = displayshortcuts();
         $res  = '<h1>'._b_('Les forums de Banana').'</h1>'.$cuts.$this->groups->to_html();
@@ -66,6 +66,18 @@ class Banana
 
         $this->nntp->quit();
         return $res.$cuts;
+    }
+
+    function action_listSubs()
+    {
+        require_once("include/groups.inc.php");
+        $this->groups = new BananaGroups(BANANA_GROUP_ALL);
+        
+        $cuts = displayshortcuts();
+        $res  = '<h1>'._b_('Abonnements').'</h1>'.$cuts.$this->groups->to_html(true).$cuts;
+
+        $this->nntp->quit();
+        return $res;
     }
 
     function action_showThread($group, $first)

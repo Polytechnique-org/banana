@@ -154,8 +154,6 @@ function displayshortcuts($first = -1) {
 
     if (function_exists('hook_displayshortcuts')) {
         $res .= hook_displayshortcuts($sname, $first);
-    } else {
-        $res .= '[<a href="disconnect.php">'._b_('Déconnexion').'</a>] ';
     }
 
     switch ($sname) {
