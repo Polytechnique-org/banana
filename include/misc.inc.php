@@ -120,7 +120,7 @@ function fancyDate($stamp) {
     } elseif ($today == 1 + $dday) {
         $format = _b_('hier')." %H:%M";
     } elseif ($today < 7 + $dday) {
-        $format = '%A %H:%M';
+        $format = '%a %H:%M';
     } else {
         $format = '%a %e %b';
     }

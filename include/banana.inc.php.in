@@ -30,7 +30,7 @@ class Banana
 
     var $host      = 'news://localhost:119/';
 
-    var $profile   = Array( 'name' => 'Anonymous <anonymouse@example.com', 'sig'  => '', 'org'  => '',
+    var $profile   = Array( 'name' => 'Anonymous <anonymouse@example.com>', 'sig'  => '', 'org'  => '',
             'customhdr' =>'', 'display' => 0, 'lastnews' => 0, 'locale'  => 'fr_FR', 'subscribe' => array());
     
     var $nntp;
@@ -119,6 +119,46 @@ class Banana
         $this->nntp->quit();
         
         return $res.$cuts;
+    }
+
+    function action_newFup($group, $id = -1)
+    {
+        $subject = $body = '';
+        $target  = $group;
+        
+        if ($id > 0) {
+            $this->nntp->group($group);
+            $this->newPost($id);
+            if ($this->post) {
+                $subject = preg_replace("/^re\s*:\s*/i", 'Re: ', $this->post->headers['subject']);
+                $body    = $this->post->name." "._b_("a écrit")." :\n".wrap($this->post->body, "> ");
+                $target  = isset($this->post->headers['followup-to']) ? $this->post->headers['followup-to'] : $this->post->headers['newsgroups'];
+            }
+        }
+
+        $this->nntp->quit();
+
+        $cuts  = displayshortcuts();
+        $html  = '<h1>'._b_('Nouveau message').'</h1>'.$cuts;
+        $html .= '<form action="?" method="post">';
+        $html .= '<table class="bicol" cellpadding="0" cellspacing="0">';
+        $html .= '<tr><th colspan="2">'._b_('En-têtes').'</th></tr>';
+        $html .= '<tr><td>'._b_('Nom').'</td><td>'.htmlentities($this->profile['name']).'</td></tr>';
+        $html .= '<tr><td>'._b_('Sujet').'</td><td><input type="text" name="subject" value="'.htmlentities($subject).'" size="60" /></td></tr>';
+        $html .= '<tr><td>'._b_('Forums').'</td><td><input type="text" name="newsgroups" value="'.htmlentities($target).'" size="60" /></td></tr>';
+        $html .= '<tr><td>'._b_('Suivi à').'</td><td><input type="text" name="newsgroups" value="" size="60" /></td></tr>';
+        $html .= '<tr><td>'._b_('Organisation').'</td><td>'.$this->profile['org'].'</td></tr>';
+        $html .= '<tr><th colspan="2">'._b_('Corps').'</th></tr>';
+        $html .= '<tr><td colspan="2"><textarea name="body" cols="74" rows="16">'
+            .htmlentities($body).($this->profile['sig'] ? "\n\n-- \n".htmlentities($this->profile['sig']) : '').'</textarea></td></th>';
+        $html .= '<tr><td colspan="2"><input type="hidden" name="group" value="'.$group.'" />';
+        if ($id > 0) {
+            $html .= '<input type="hidden" name="id" value="'.$id.'" />';
+        }
+        $html .= '<input type="submit" /></td></tr>';
+        $html .= '</table></form>';
+
+        return $html.$cuts;
     }
 
     /**************************************************************************/
