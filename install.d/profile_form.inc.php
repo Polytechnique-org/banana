@@ -8,7 +8,7 @@
 ********************************************************************************/
 ?>
 <div class="title">
-  <?php echo $locale['profile']['title'];?>
+  <?php echo _('Bienvenue sur Banana !'); ?>
 </div>
 
 <form action="<?php echo $_SERVER['REQUEST_URI']?>" method="POST">
@@ -16,12 +16,12 @@
   summary="Profile">
     <tr class="pair">
       <th colspan="2">
-        <?php echo $locale['profile']['define'];?>
+        <?php echo _('Définis tes paramètres'); ?>
       </th>
     </tr>
     <tr class="impair">
       <td>
-        <?php echo $locale['profile']['name'];?>
+        <?php echo _('Nom (par exemple Jean Dupont)'; ?>
       </td>
       <td>
         <input type="text" name="profile_name" value="">
@@ -29,7 +29,7 @@
     </tr>
     <tr class="pair">
       <td>
-        <?php echo $locale['profile']['mail'];?>
+        <?php echo _('Adresse mail'); ?>
       </td>
       <td>
         <input type="text" name="profile_mail" value="">
@@ -37,7 +37,7 @@
     </tr>
     <tr class="impair">
       <td>
-        <?php echo $locale['profile']['organization'];?>
+        <?php echo _('Organisation'); ?>
       </td>
       <td>
         <input type="text" name="profile_org" value="">
@@ -45,7 +45,7 @@
     </tr>
     <tr class="pair">
       <td>
-        <?php echo $locale['profile']['signature'];?>
+        <?php echo _('Signature'); ?>
       </td>
       <td>
         <textarea name="profile_sig" rows="7" cols="50"></textarea>
@@ -53,29 +53,29 @@
     </tr>
     <tr class="pair">
       <th colspan="2">
-        <?php echo $locale['profile']['display'];?>
+        <?php echo _('Affichage'); ?>
       </th>
     </tr>
     <tr class="impair">
       <td colspan="2">
         <input type="radio" name="displaytype" value="0" checked> 
-          <?php echo $locale['profile']['all'];?>
+          <?php echo _('Tous les messages'); ?>
       </td>
     </tr>
     <tr class="pair">
       <td colspan="2">
         <input type="radio" name="displaytype" value="1"> 
-          <?php echo $locale['profile']['new'];?>
+          <?php echo _('Seulement les fils de discussion comportant des messages non lus'); ?>
       </td>
     </tr>
     <tr class="pair">
       <th colspan="2">
-        <?php echo $locale['profile']['auth'];?>
+        <?php echo _('Authentification sur le serveur NNTP'); ?>
       </th>
     </tr>
     <tr class="impair">
       <td>
-        <?php echo $locale['profile']['login'];?>
+        <?php echo _('Login (laisser anonyme pour un login en anonyme)'); ?>
       </td>
       <td>
         <input type="text" name="profile_login" value="anonymous">
@@ -83,7 +83,7 @@
     </tr>
     <tr class="pair">
       <td>
-        <?php echo $locale['profile']['passwd'];?>
+        <?php echo _('Mot de passe'); ?>
       </td>
       <td>
         <input type="password" name="profile_passwd" value="">

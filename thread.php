@@ -19,8 +19,6 @@ require_once("include/profile.inc.php");
 require_once("include/error.inc.php");
 
 $profile=getprofile();
-require_once($profile['locale']);
-
 require_once("include/header.inc.php");
 
 if (isset($_REQUEST['group'])) {
@@ -70,15 +68,12 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
         $result = $nntp->post($message);
         if ($result) {
           $spool->delid($id);
-          $text="<p class=\"normal\">".$locale['post']['canceled']
-            ."</p>";
+          $text = "<p class=\"normal\">"._('Message annulé')."</p>";
         } else {
-          $text="<p class=\"error\">".$locale['post']['badcancel']
-            ."</p>";
+          $text = "<p class=\"error\">"._('Impossible d\'annuler le message')."</p>";
         }
       } else {
-        $text="<p class=\"error\">\n\t".$locale['post']['rghtcancel']
-          ."\n</p>";
+        $text="<p class=\"error\">\n\t"._('Vous n\'avez pas les permissions pour annuler ce message')."\n</p>";
       }
       break;
     case 'new':
@@ -95,9 +90,9 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
         .wrap($body,"",$news['wrap']);
       $result = $nntp->post($message);
       if ($result) {
-        $text="<p class=\"normal\">".$locale['post']['posted']."</p>";
+        $text="<p class=\"normal\">"._('Message posté')."</p>";
       } else {
-        $text="<p class=\"error\">".$locale['post']['badpost']."</p>";
+        $text="<p class=\"error\">"._('Impossible de poster le message')."</p>";
       }
       break;
     case 'followupok':
@@ -122,9 +117,9 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
         .wrap($body,"",$news['wrap']);
       $result = $nntp->post($message);
       if ($result) {
-        $text="<p class=\"normal\">".$locale['post']['posted']."</p>";
+        $text="<p class=\"normal\">"._('Message posté')."</p>";
       } else {
-        $text="<p class=\"error\">".$locale['post']['badpost']."</p>";
+        $text="<p class=\"error\">"._('Impossible de poster le message')."</p>";
       }
       break;
   }
@@ -137,8 +132,7 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
 
 ?>
 <h1>
-  <?php echo $locale['thread']['group_b'].$group
-    .$locale['thread']['group_a'];?>
+  <?php echo $group; ?>
 </h1>
 <?php
 if (isset($text)) {
@@ -148,17 +142,16 @@ displayshortcuts();
 
 ?>
 
-<table class="<?php echo $css['bicol']?>" cellpadding="0" cellspacing="0" border="0" 
-  summary="<?php echo $locale['thread']['summary'];?>">
+<table class="<?php echo $css['bicol']?>" cellpadding="0" cellspacing="0" border="0">
   <tr>
     <th class="<?php echo $css['date']?>">
-      <?php echo $locale['thread']['date'];?>
+      <?php echo _('Date'); ?>
     </th>
     <th class="<?php echo $css['subject']?>">
-      <?php echo $locale['thread']['subject'];?>
+      <?php echo _('Sujet'); ?>
     </th>
     <th class="<?php echo $css['from']?>">
-      <?php echo $locale['thread']['author'];?>
+      <?php echo _('Auteur'); ?>
     </th>
   </tr>
 <?php

@@ -17,8 +17,6 @@ require_once("include/profile.inc.php");
 require_once("include/error.inc.php");
 
 $profile=getprofile();
-require_once($profile['locale']);
-
 require_once("include/header.inc.php");
 
 $nntp = new nntp($news['server']);
@@ -34,7 +32,7 @@ $newgroups = new groups($nntp,1);
 ?>
 
 <h1>
-  <?php echo $locale['index']['title'];?>
+  <?php echo _('Les forums de Banana'); ?>
 </h1>
 
 <?php
@@ -43,20 +41,19 @@ if (!sizeof($groups->overview)) error("nntpgroups");
 displayshortcuts();
 ?>
 
-<table class="<?php echo $css["bicol"];?>" cellspacing="0" cellpadding="2" 
-  summary="<?php echo $locale['index']['summary'];?>">
+<table class="<?php echo $css["bicol"];?>" cellspacing="0" cellpadding="2">
   <tr>
     <th>
-      <?php echo $locale['index']['total'];?>
+      <?php echo _('Total'); ?>
     </th>
     <th>
-      <?php echo $locale['index']['unread'];?>
+      <?php echo _('Nouveaux'); ?>
     </th>
     <th>
-      <?php echo $locale['index']['name'];?>
+      <?php echo _('Nom'); ?>
     </th>
     <th>
-      <?php echo $locale['index']['description'];?>
+      <?php echo _('Description'); ?>
     </th>
   </tr>
 <?php
@@ -88,19 +85,18 @@ foreach ($groups->overview as $g => $d) {
 if (count($newgroups->overview) and count($profile['subscribe'])) {
 ?>
 <p class="normal">
-<?php echo $locale['index']['newgroupstext']; ?>
+<?php echo _('Les forums suivants ont été créés depuis ton dernier passage :'); ?>
 </p>
-<table class="<?php echo $css["bicol"];?>" cellspacing="0" cellpadding="2" 
-  summary="<?php echo $locale['index']['summary'];?>">
+<table class="<?php echo $css["bicol"];?>" cellspacing="0" cellpadding="2">
   <tr>
     <th>
-      <?php echo $locale['index']['total'];?>
+      <?php echo _('Total'); ?>
     </th>
     <th>
-      <?php echo $locale['index']['name'];?>
+      <?php echo _('Nom'); ?>
     </th>
     <th>
-      <?php echo $locale['index']['description'];?>
+      <?php echo _('Description'); ?>
     </th>
   </tr>
 <?php

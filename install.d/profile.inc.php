@@ -28,9 +28,12 @@ function getprofile() {
     $array['customhdr'] = "";
     $array['display']   = $_SESSION['displaytype'];
     $array['lastnews']  = time()-86400;
-    $array['locale']    = "locales/fr.inc.php";
+    $array['locale']    = 'fr';
     $array['subscribe'] = array();
     $array['dropsig']   = true;
+
+    setlocale(LC_MESSAGE, $array['locale']);
+    setlocale(LC_TIME, $array['locale']);
     return $array;
 }
 ?>

@@ -303,7 +303,7 @@ class spool
             $hc = empty($this->overview[$_id]->children);
 
             echo '<tr class="'.($_index%2?$css["pair"]:$css["impair"]).($this->overview[$_id]->isread?'':' new')."\">\n";
-            echo "<td class=\"{$css['date']}\">".locale_header_date($this->overview[$_id]->date)." </td>\n";
+            echo "<td class=\"{$css['date']}\">".fancyDate($this->overview[$_id]->date)." </td>\n";
             echo "<td class=\"{$css['subject']}\">"
                 ."<div class=\"{$css['tree']}\">$_pfx_node".($hc?($_head?$spfx_f:($this->overview[$_id]->parent_direct?$spfx_s:$spfx_snd)):$spfx_n)
                 ."</div>";

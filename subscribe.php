@@ -18,8 +18,6 @@ require_once("include/subscribe.inc.php");
 require_once("include/error.inc.php");
 
 $profile=getprofile();
-require_once($profile['locale']);
-
 require_once("include/header.inc.php");
 
 $nntp = new nntp($news['server']);
@@ -32,7 +30,7 @@ $groups = new groups($nntp,2);
 ?>
 
 <h1>
-  <?php echo $locale['subscribe']['title'];?>
+  <?php echo _('Abonnements'); ?>
 </h1>
 
 <?php
@@ -49,20 +47,19 @@ displayshortcuts();
 ?>
 
 <form method="post" action="<?php echo $_SERVER['PHP_SELF'];?>">
-<table class="<?php echo $css["bicol"];?>" cellspacing="0" cellpadding="2" 
-  summary="<?php echo $locale['subscribe']['summary'];?>">
+<table class="<?php echo $css["bicol"];?>" cellspacing="0" cellpadding="2">
   <tr>
     <th>
-      <?php echo $locale['subscribe']['total'];?>
+      <?php echo _('Total'); ?>
     </th>
     <th>
-      <?php echo $locale['subscribe']['subscribed'];?>
+      <?php echo _('Abonné'); ?>
     </th>
     <th>
-      <?php echo $locale['subscribe']['name'];?>
+      <?php echo _('Nom'); ?>
     </th>
     <th>
-      <?php echo $locale['subscribe']['description'];?>
+      <?php echo _('Description'); ?>
     </th>
   </tr>
 <?php

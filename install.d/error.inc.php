@@ -7,49 +7,45 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
- /** outputs HTML error page
-  * @param $_type STRING error type
-  */
-
+/** outputs HTML error page
+ * @param $_type STRING error type
+ */
 function error($_type) {
-  global $locale,$css,$group;
-  switch ($_type) {
-    case "nntpsock":
-      echo "<p class=\"error\">\n\t".$locale['error']['connect']."\n</p>";
-      require_once("include/footer.inc.php");
-      exit;
-      break;  
-    case "nntpauth":
-      echo "<p class=\"error\">\n\t".$locale['error']['credentials']
-        ."\n</p>";
-      require_once("include/footer.inc.php");
-      exit;
-      break;
-    case "nntpgroups":
-      echo "<p class=\"{$css['normal']}\">";
-      echo "\n".$locale['error']['nogroup']."\n";
-      echo "</p>\n";
-      require_once("include/footer.inc.php");
-      exit;
-      break;
-    case "nntpspool":
-      echo "<div class=\"{$css['bananashortcuts']}\">\n";
-      echo "[<a href=\"index.php\">Liste des forums</a>]\n";
-      echo "</div>\n";
-      echo "<p class=\"error\">\n\t".$locale['error']['group']."\n</p>";
-      require_once("footer.inc.php");
-      exit;
-      break;
-    case "nntpart":
-      echo "<div class=\"{$css['bananashortcuts']}\">\n";
-      echo "[<a href=\"index.php\">Liste des forums</a>] \n";
-      echo "[<a href=\"thread.php?group=$group\">$group</a>] \n";
-      echo "</div>\n";
-      echo "<p class=\"error\">\n\t".$locale['error']['post']."\n</p>";
-      require_once("footer.inc.php");
-      exit;
-      break;
-  }
+    global $css, $group;
+    switch ($_type) {
+        case "nntpsock":
+            echo '<p class="error">'._('Impossible de se connecter au serveur de forums').'</p>';
+            require_once("include/footer.inc.php");
+            exit;
+
+        case "nntpauth":
+            echo '<p class="error">'._('L\'authentification sur le serveur de forums a échoué').'</p>';
+            require_once("include/footer.inc.php");
+            exit;
+
+        case "nntpgroups":
+            echo "<p class=\"{$css['normal']}\">";
+            echo _('Il n\'y a pas de forum sur ce serveur').'</p>';
+            require_once("include/footer.inc.php");
+            exit;
+
+        case "nntpspool":
+            echo "<div class=\"{$css['bananashortcuts']}\">\n";
+            echo "[<a href=\"index.php\">Liste des forums</a>]\n";
+            echo "</div>\n";
+            echo '<p class="error">'._('Impossible d\'accéder au forum').'</p>';
+            require_once("footer.inc.php");
+            exit;
+
+        case "nntpart":
+            echo "<div class=\"{$css['bananashortcuts']}\">\n";
+            echo "[<a href=\"index.php\">Liste des forums</a>] \n";
+            echo "[<a href=\"thread.php?group=$group\">$group</a>] \n";
+            echo "</div>\n";
+            echo '<p class="error">'._('Impossible d\'accéder au message.  Le message a peut-être été annulé').'</p>';
+            require_once("footer.inc.php");
+            exit;
+    }
 }
 
 ?>

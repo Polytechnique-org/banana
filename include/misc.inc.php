@@ -18,6 +18,41 @@ function headerDecode($value) {
     return preg_replace('/=\?([^?]*)\?([BQ])\?([^?]*)\?=/e', '_headerdecode("\1", "\2", "\3")', $val);
 }
 
+function header_translate($hdr) {
+    switch (strtolower($hdr)) {
+        case 'from':            return _('De');
+        case 'subject':         return _('Sujet');
+        case 'newsgroups':      return _('Forums');
+        case 'followup':        return _('Suivi-à');
+        case 'date':            return _('Date');
+        case 'organization':    return _('Organisation');
+        case 'references':      return _('Références');
+        case 'xface':           return _('Image');
+        default:
+            return $hdr;
+    }
+}
+
+function formatDate($_text) {
+    return strftime("%A %d %B %Y, %H:%M (fuseau serveur)", strtotime($_text));
+}
+
+function fancyDate($stamp) {
+    $today  = intval(time() / (24*3600));
+    $dday   = intval($stamp / (24*3600));
+
+    if ($today == $dday) {
+        $format = "%H:%M";
+    } elseif ($today == 1 + $dday) {
+        $format = _('hier')." %H:%M";
+    } elseif ($today < 7 + $dday) {
+        $format = '%A %H:%M';
+    } else {
+        $format = '%a %e %b';
+    }
+    return strftime($format, $stamp);
+}
+
 function formatFrom($text) {
 #     From: mark@cbosgd.ATT.COM
 #     From: mark@cbosgd.ATT.COM (Mark Horton)

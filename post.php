@@ -19,8 +19,6 @@ require_once("include/profile.inc.php");
 require_once("include/error.inc.php");
 
 $profile = getprofile();
-require_once($profile['locale']);
-
 require_once("include/header.inc.php");
 if (isset($_REQUEST['group'])) {
   $group=htmlentities(strtolower($_REQUEST['group']));
@@ -68,7 +66,7 @@ if (isset($group) && isset($id) && isset($_REQUEST['type']) &&
 $nntp->quit();
 ?>
 <h1>
-  <?php echo $locale['post']['title'];?>
+  <?php echo _('Nouveau message'); ?>
 </h1>
 <?php
 
@@ -80,12 +78,12 @@ displayshortcuts();
 <table class="<?php echo $css['bicol']?>" cellpadding="0" cellspacing="0" border="0">
   <tr>
     <th colspan="2">
-      <?php echo $locale['post']['headers'];?>
+      <?php echo _('En-têtes'); ?>
     </th>
   </tr>
   <tr>
     <td class="<?php echo $css['bicoltitre'];?>">
-      <?php echo $locale['post']['name'];?>
+      <?php echo _('Nom'); ?>
     </td>
     <td>
       <?php echo htmlentities($profile['name']); ?>
@@ -93,7 +91,7 @@ displayshortcuts();
   </tr>
   <tr>
     <td class="<?php echo $css['bicoltitre'];?>">
-      <?php echo $locale['post']['subject'];?>
+      <?php echo _('Sujet'); ?>
     </td>
     <td>
       <input type="text" name="subject" value="<?php echo 
@@ -102,7 +100,7 @@ displayshortcuts();
   </tr>
   <tr>
     <td class="<?php echo $css['bicoltitre'];?>">
-      <?php echo $locale['post']['newsgroups'];?>
+      <?php echo _('Forums'); ?>
     </td>
     <td>
       <input type="text" name="newsgroups" value="<?php echo
@@ -111,7 +109,7 @@ displayshortcuts();
   </tr>
   <tr>
     <td class="<?php echo $css['bicoltitre'];?>">
-      <?php echo $locale['post']['fu2'];?>
+      <?php echo _('Suivi-à'); ?>
     </td>
     <td>
       <input type="text" name="followup" value="" />
@@ -119,7 +117,7 @@ displayshortcuts();
   </tr>
   <tr>
     <td class="<?php echo $css['bicoltitre'];?>">
-      <?php echo $locale['post']['organization'];?>
+      <?php echo _('Organisation'); ?>
     </td>
     <td>
       <?php echo $profile['org']; ?>
@@ -127,7 +125,7 @@ displayshortcuts();
   </tr>
   <tr>
     <th colspan="2">
-      <?php echo $locale['post']['body'];?>
+      <?php echo _('Corps'); ?>
     </th>
   </tr>
   <tr>

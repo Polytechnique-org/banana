@@ -25,7 +25,6 @@ if (!isset($_SESSION['profile']) && isset($_POST['action']) && $_POST['action']=
 if (!isset($_SESSION['profile'])) {
     require_once("include/profile.inc.php");
     $profile=getprofile();
-    require_once($profile['locale']);
     require_once("header.inc.php");
     require_once("profile_form.inc.php");
     require_once("footer.inc.php");

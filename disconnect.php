@@ -12,18 +12,16 @@ require_once("include/profile.inc.php");
 require_once("include/error.inc.php");
 
 $profile=getprofile();
-require_once($profile['locale']);
-
 $_SESSION=array();
 session_destroy();
 
 require_once("include/header.inc.php");
 ?>
 <div class="title">
-  <?php echo $locale['disconnect']['title'];?>
+  <?php echo _('Déconnexion effectuée !'); ?>
 </div>
 <p class="normal">
-  <?php echo $locale['disconnect']['back'];?>
+  <?php echo _('Retour au <a href="index.php">profil</a>'); ?>
 </p>
 <?php
 require_once("include/footer.inc.php");

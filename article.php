@@ -18,9 +18,7 @@ require_once("include/profile.inc.php");
 require_once("include/password.inc.php");
 require_once("include/error.inc.php");
 
-$profile=getprofile();
-require_once($profile['locale']);
-
+$profile = getprofile();
 require_once("include/header.inc.php");
 
 if (isset($_REQUEST['group'])) {
@@ -52,22 +50,21 @@ $ndx = $spool->getndx($id);
 
 ?>
 <h1>
-  <?php echo $locale['article']['message'];?>
+  <?php echo _('Message'); ?>
 </h1>
 
 <?php
 if (isset($_GET['type']) && ($_GET['type']=='cancel') && (checkcancel($post->headers))) {
 ?>
 <p class="<?php echo $css['error']?>">
-  <?php echo $locale['article']['cancel'];?>
+  <?php echo _('Voulez-vous vraiment annuler ce message ?'); ?>
 </p>
 <form action="thread.php" method="post">
   <input type="hidden" name="group" value="<?php echo $group;?>" />
   <input type="hidden" name="id" value="<?php 
     echo $id;?>" />
   <input type="hidden" name="type" value="cancel" />
-  <input type="submit" name="action" value="<?php echo 
-    $locale['article']['okbtn'];?>" />
+  <input type="submit" name="action" value="<?php echo _('OK'); ?>" />
 </form>
 <?
 }
@@ -76,23 +73,23 @@ displayshortcuts();
 ?>
 
 <table class="<?php echo $css['bicol']?>" cellpadding="0" cellspacing="0" 
-summary="<?php echo $locale['article']['summary'];?>">
+summary="<?php echo _('Contenu du message'); ?>">
   <tr>
     <th colspan="2">
-      <?php echo $locale['article']['headers'];?>
+      <?php echo _('En-têtes'); ?>
     </th>
   </tr>
 <?php
 foreach ($news['headdisp'] as $nick) {
   if (isset($post->headers->$nick)) 
-    echo "<tr><td class=\"{$css['bicoltitre']}\">{$locale['headers'][$nick]}</td>"
+    echo "<tr><td class=\"{$css['bicoltitre']}\">".header_translate($nick)."</td>"
     ."<td>".formatdisplayheader($nick,$post->headers->$nick,$spool)
     ."</td></tr>\n";
 }
 ?>
   <tr>
     <th colspan="2">
-      <?php echo $locale['article']['body'];?>
+      <?php echo _('Corps'); ?>
     </th>
   </tr> 
   <tr>
@@ -102,7 +99,7 @@ foreach ($news['headdisp'] as $nick) {
   </tr>
   <tr>
     <th colspan="2">
-      <?php echo $locale['article']['overview'];?>
+      <?php echo _('Aperçu'); ?>
     </th>
   </tr> 
   <tr>
