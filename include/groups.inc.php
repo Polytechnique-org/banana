@@ -51,7 +51,7 @@ class groups {
       }
     } else {
       foreach ($list as $g=>$l) {
-        if ((($_type==0) and (in_array($g,$profile['subscribe']) or !count($profile['subscribe'])))
+        if ((($_type==0) and (!count($profile['subscribe']) and in_array($g,$profile['subscribe'])))
           or (($_type==1) and in_array($g,array_keys($list)))
           or ($_type==2)) {
           $this->overview[$g][0]="-";
