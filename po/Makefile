@@ -3,11 +3,7 @@
 # $Horde: horde/po/Makefile,v 1.2.2.3 2002/05/20 17:36:22 jan Exp $
 #
 
-MSGFMT = msgfmt --statistics -c -v -o
-MSGFMTSOL = msgfmt -v -o
-MSGMERGE = msgmerge -U
 LANGS:=$(shell ls *.po|sed -e s/\.po$$//)
-APPLICATION = banana
 
 all: banana.pot ${LANGS:=.lang}
 
@@ -22,8 +18,10 @@ banana.pot: ../banana/*.php
 %.lang: banana.pot ../banana/*.php %.po
 	@echo Generating $(@:.lang=)
 	@echo -n '    '
-	@${MSGMERGE} $(@:.lang=) $< 2> /dev/null
-	@${MSGFMT} ../locale/$(@:.lang=)/LC_MESSAGES/banana.mo $(@:.lang=)
+	@mkdir -p ../locale/$(@:.lang=)/LC_MESSAGES/ 
+	@msgmerge -U $(@:.lang=).po $< 2> /dev/null
+	@msgfmt --statistics -c -v -o ../locale/$(@:.lang=)/LC_MESSAGES/banana.mo $(@:.lang=).po
 	@echo
 	@touch $@
+
 

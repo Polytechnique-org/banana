@@ -17,6 +17,7 @@ dist: clean pkg-dist
 
 clean:
 	rm -rf locale banana/include/banana.inc.php
+	make -C po clean
 
 %: %.in Makefile
 	sed -e 's,@VERSION@,$(VERSION),g' $< > $@
