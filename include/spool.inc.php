@@ -161,8 +161,8 @@ class spool {
           foreach ($newpostsids as $mid) {
             $this->overview[$this->ids[$mid]]->isread=false;
             $this->overview[$this->ids[$mid]]->descunread=1;
-            $parentmid = $this->overview[$this->ids[$mid]]->parent;
-            while (!is_null($parentmid)) {
+            $parentmid=$this->ids[$mid];
+            while (isset($this->overview[$parentmid]->parent)) {
               $this->overview[$parentmid]->descunread++;
               $parentmid = $this->overview[$parentmid]->parent;
             }
@@ -356,7 +356,7 @@ class spool {
     $index=1;
     if (sizeof($this->overview)) {
       foreach ($this->overview as $id=>$msg) {
-        if (!sizeof($msg->parent)) {
+        if (!isset($msg->parent)) {
           $this->disp_desc($id,$index,$_first,$_last,$_ref);
           $index += $msg->desc;
         }
