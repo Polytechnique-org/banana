@@ -71,13 +71,14 @@ $pair = true;
 foreach ($groups->overview as $g => $d) {
   $pair = !$pair;
   $groupinfo = $nntp->group($g);
+  $newarts = $nntp->newnews($profile['lastnews'],$g);
 ?>
   <tr class="<?php echo ($pair?"pair":"impair");?>" >
     <td class="total">
       <?php echo $groupinfo[0]; ?>
     </td>
     <td class="unread">
-      0
+      <?php echo sizeof($newarts); ?>
     </td>
     <td class="group">
       <?php echo "<a href=\"thread.php?group=$g\">$g</a>";?>
