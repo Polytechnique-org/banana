@@ -12,6 +12,8 @@ session_start();
 //sets sessions variables
 if (!isset($_SESSION['profile']) && (!isset($_POST['action']) || 
 (isset($_POST['action']) && ($_POST['action']!="OK")))) {
+  require("include/profile.inc.php");
+  $profile=getprofile();
   require("header.inc.php");
   require("profile_form.inc.php");
   require("footer.inc.php");
