@@ -22,8 +22,12 @@ $profile = getprofile();
 require($profile['locale']);
 
 require("include/header.inc.php");
-$group=htmlentities(strtolower($_REQUEST['group']));
-$id=htmlentities(strtolower($_REQUEST['id']));
+if (isset($_REQUEST['group'])) {
+  $group=htmlentities(strtolower($_REQUEST['group']));
+}
+if (isset($_REQUEST['id'])) {
+  $id=htmlentities(strtolower($_REQUEST['id']));
+}
 
 if (isset($group)) {
   $target = $group;
@@ -62,7 +66,7 @@ if (isset($group) && isset($id) && isset($_REQUEST['type']) &&
 
 $mynntp->quit();
 ?>
-<div class="title">
+<div class="<?php echo $css['title']?>">
   <?php echo $locale['post']['title'];?>
 </div>
 <?php
@@ -72,7 +76,7 @@ displayshortcuts();
 ?>
 
 <form action="thread.php" method="POST">
-<table class="bicol" cellpadding="0" cellspacing="0" border="0">
+<table class="<?php echo $css['bicol']?>" cellpadding="0" cellspacing="0" border="0">
   <tr>
     <th colspan="2">
       <?php echo $locale['post']['headers'];?>
@@ -133,14 +137,14 @@ displayshortcuts();
     </td>
   </tr>
   <tr>
-    <td class="bouton" colspan="2">
+    <td class="<?php echo $css['bouton']?>" colspan="2">
 <?php
 if (isset($group) && isset($id) && isset($_REQUEST['type']) 
   && ($_REQUEST['type']=='followup')) {
 ?>
       <input type="hidden" name="type" value="followupok" />
       <input type="hidden" name="group" value="<?php echo $group;?>" />
-      <input type="hidden" name="id" value="<?php echo $id;?> " />
+      <input type="hidden" name="id" value="<?php echo $id;?>" />
 <?php
 } else {
 ?>
