@@ -12,7 +12,7 @@
  * @return BOOLEAN true if user has right to cancel message
  */
 function checkcancel($_headers) {
-    return ($_headers->from == $_SESSION['name']." <".$_SESSION['mail'].">");
+    return ($_headers['from'] == $_SESSION['name']." <".$_SESSION['mail'].">");
 }
 
 /** getprofile : sets profile variables

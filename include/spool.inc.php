@@ -19,6 +19,8 @@ if(!function_exists('_file_put_contents')) {
     }
 }
 
+function spoolcompare($a,$b) { return ($b->date>=$a->date); }
+
 /** Class spoolhead
  *  class used in thread overviews
  */

@@ -81,9 +81,9 @@ summary="<?php echo _b_('Contenu du message'); ?>">
   </tr>
 <?php
 foreach ($news['headdisp'] as $nick) {
-  if (isset($post->headers->$nick)) 
+  if (isset($post->headers[$nick])) 
     echo "<tr><td class=\"{$css['bicoltitre']}\">".header_translate($nick)."</td>"
-    ."<td>".formatdisplayheader($nick,$post->headers->$nick,$spool)
+    ."<td>".formatdisplayheader($nick,$post->headers[$nick],$spool)
     ."</td></tr>\n";
 }
 ?>

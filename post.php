@@ -21,46 +21,45 @@ require_once("include/error.inc.php");
 $profile = getprofile();
 require_once("include/header.inc.php");
 if (isset($_REQUEST['group'])) {
-  $group=htmlentities(strtolower($_REQUEST['group']));
+    $group=htmlentities(strtolower($_REQUEST['group']));
 }
 if (isset($_REQUEST['id'])) {
-  $id=htmlentities(strtolower($_REQUEST['id']));
+    $id=htmlentities(strtolower($_REQUEST['id']));
 }
 
 if (isset($group)) {
-  $target = $group;
+    $target = $group;
 }
 
 $nntp = new nntp($news['server']);
 if (!$nntp) error("nntpsock");
 if ($news['user']!="anonymous") {
-  $result = $nntp->authinfo($news["user"],$news["pass"]);
-  if (!$result) error("nntpauth");
+    $result = $nntp->authinfo($news["user"],$news["pass"]);
+    if (!$result) error("nntpauth");
 }
 
 if (isset($group) && isset($id) && isset($_REQUEST['type']) && 
-  ($_REQUEST['type']=='followup')) {
-  $rq=$nntp->group($group);
-  $post = new NNTPPost($nntp,$id);
-  if ($post) {
-    $subject = (preg_match("/^re:/i",$post->headers->subject)?"":"Re: ")
-      .$post->headers->subject;
-	if ($profile['dropsig']) {
-      $cutoff=strpos($post->body,"\n-- \n");
-      if ($cutoff) {
-	    $quotetext = substr($post->body,0,strpos($post->body,"\n-- \n"));
-      } else {
-	    $quotetext = $post->body;
-      }
-	} else {
-	  $quotetext = $post->body;
-	}
-    $body = $post->headers->name." wrote :\n".wrap($quotetext, "> ");
-    if (isset($post->headers->followup))
-      $target=$post->headers->followup;
-    else
-      $target=$post->headers->newsgroups;
-  }
+        ($_REQUEST['type']=='followup')) {
+    $rq=$nntp->group($group);
+    $post = new NNTPPost($nntp,$id);
+    if ($post) {
+        $subject = (preg_match("/^re:/i",$post->headers['subject'])?"":"Re: ").$post->headers['subject'];
+        if ($profile['dropsig']) {
+            $cutoff=strpos($post->body,"\n-- \n");
+            if ($cutoff) {
+                $quotetext = substr($post->body,0,strpos($post->body,"\n-- \n"));
+            } else {
+                $quotetext = $post->body;
+            }
+        } else {
+            $quotetext = $post->body;
+        }
+        $body = $post->name." wrote :\n".wrap($quotetext, "> ");
+        if (isset($post->headers['followup-to']))
+            $target = $post->headers['followup-to'];
+        else
+            $target = $post->headers['newsgroups'];
+    }
 }
 
 $nntp->quit();

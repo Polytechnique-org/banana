@@ -99,8 +99,8 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
       $rq=$nntp->group($group);
       $post = new NNTPPost($nntp,$id);
       if ($post) {
-        $refs = (isset($post->headers->references)?
-                $post->headers->references." ":"").$post->headers->msgid;
+        $refs = (isset($post->headers['references'])?
+                $post->headers['references']." ":"").$post->headers['message-id'];
       }
     
       $body = preg_replace("/\n\.[ \t\r]*\n/m","\n..\n",stripslashes($_REQUEST['body']));
