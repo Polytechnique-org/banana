@@ -1,15 +1,37 @@
 <?php
 
-function locale_date($text) {
-  $date = getdate(strtotime($text));
+function locale_date($_text) {
+  $date = getdate(strtotime($_text));
   $days = array("Dimanche","Lundi","Mardi","Mercredi","Jeudi",
     "Vendredi","Samedi");
   $months = array("Janvier","Février","Mars","Avril","Mai","Juin",
     "Juillet","Août","Septembre","Octobre","Novembre","Décembre");
   $rtext = $days[$date["wday"]]." ".$date["mday"]." "
     .$months[$date["mon"]-1]." ".$date["year"].", "
-    .date("H:i",strtotime($text))." (heure serveur)";
+    .date("H:i",strtotime($_text))." (heure serveur)";
   return $rtext;
+}
+
+function locale_header_date($_text) {
+  $date = getdate($_text);
+  $now = time();
+  $days = array("dim","lun","mar","mer","jeu",
+    "ven","sam");
+  $months = array("janv.","fév.","mars","avr.","mai","juin",
+    "juil.","août","sept.","oct.","nov.","déc.");
+  if ($now-$_text < 86400) {
+    return date("H:i",$_text);
+  } elseif ($now-$_text < 2*86400) {
+    return "hier, ".date("H:i",$_text);
+  } elseif ($now-$_text < 604800) {
+    return $days[$date["wday"]]." ".date("H:i",$_text);
+  } else {
+    $day = $date["mday"];
+    if ($date["mday"]==1) {
+      $day.="<sup>er</sup>";
+    }
+    return "$day ".$months[$date["mon"]-1];
+  }
 }
 
 if (!isset($locale['error'])) $locale['error'] =array();
@@ -87,7 +109,6 @@ $locale['post'] = array_merge($locale['post'],array(
 ));
 
 $locale['format'] = array_merge(array(
-  'datefmt' => 'd/m/Y',
   'disconnection' => "Déconnexion",
   'grouplist' => "Liste des forums",
   'group_a' => "",
