@@ -76,7 +76,7 @@ class BananaGroups {
         return true;
     }
 
-    function to_html()
+    function to_html($show_form = false)
     {
         global $banana;
         if (empty($this->overview)) {
@@ -85,7 +85,9 @@ class BananaGroups {
 
         $html  = '<table class="bicol banana_group" cellspacing="0" cellpadding="2">'."\n";
         $html .= '<tr><th>'._b_('Total').'</th><th>';
-        if ($this->type == BANANA_GROUP_SUB) {
+        if ($show_form) {
+            $html .= _b_('Abo.').'</th><th>';
+        } elseif ($this->type == BANANA_GROUP_SUB) {
             $html .= _b_('Nouveaux').'</th><th>';
         }
         $html .= _b_('Nom').'</th><th>'._b_('Description').'</th></tr>'."\n";
@@ -98,14 +100,25 @@ class BananaGroups {
 
             $html .= '<tr class="'.($b ? 'pair' : 'impair').'">'."\n";
             $html .= "<td class='all'>{$ginfo[0]}</td>";
-            if ($this->type == BANANA_GROUP_SUB) {
+            if ($show_form) {
+                $html .= '<td class="new"><input type="checkbox" name="subscribe[]" value="'.$g.'"';
+                if (in_array($g, $banana->profile['subscribe'])) {
+                    $html .= ' checked="checked"';
+                }
+                $html .= ' /></td>';
+            } elseif ($this->type == BANANA_GROUP_SUB) {
                 $html .= '<td class="new">'.($new ? $new : '-').'</td>';
             }
             $html .= "<td class='grp'><a href='thread.php?group=$g'>$g</a></td><td class='dsc'>{$d[0]}</td></tr>";
         }
-        
+
         $html .= '</table>';
 
+        if ($show_form) {
+            return '<form method="post" action="'.$_SERVER['PHP_SELF'].'"><div class="center"><input type="submit" /></div>'
+                .$html.'<div class="center"><input type="submit" /></div></form>';
+        }
+        
         return $html;
     }
 }
