@@ -18,7 +18,6 @@ if (isset($_REQUEST['id'])) {
 }
 
 $banana->newSpool($group, $banana->profile['display'], $banana->profile['lastnews']);
-$banana->nntp->group($group);
 $banana->newPost($id);
 if (!$banana->post) {
     if ($banana->nntp->lasterrorcode == "423") {

@@ -22,7 +22,6 @@ if (isset($group)) {
 }
 
 if (isset($group) && isset($id) && isset($_REQUEST['type']) && ($_REQUEST['type']=='followup')) {
-    $rq   = $banana->nntp->group($group);
     $banana->newPost($id);
     $body = '';
     if ($banana->post) {

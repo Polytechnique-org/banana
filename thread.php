@@ -33,7 +33,6 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type']))
 {
     switch ($_REQUEST['type']) {  
         case 'cancel':
-            $banana->nntp->group($group);
             $mid  = array_search($id, $banana->spool->ids);
             $banana->newPost($id);
 
@@ -74,7 +73,6 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type']))
             break;
 
         case 'followupok':
-            $rq=$banana->nntp->group($group);
             $banana->newPost($id);
             if ($banana->post) {
                 $refs = (isset($banana->post->headers['references'])?
