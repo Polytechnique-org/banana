@@ -24,7 +24,7 @@ clean:
 
 # banana package targets
 
-pkg-build: banana/include/banana.inc.php
+pkg-build: banana/banana.inc.php
 	make -C po
 
 pkg-dist: pkg-build
