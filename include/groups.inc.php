@@ -41,7 +41,7 @@ class BananaGroups {
             return false;
         }
 
-        foreach ($mylist as $g=>$l) {
+        foreach ($list as $g=>$l) {
             $this->overview[$g][0] = isset($desc[$g]) ? $desc[$g] : '-';
             $this->overview[$g][1] = $l[0];
         }

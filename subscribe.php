@@ -58,7 +58,7 @@ foreach ($groups->overview as $g => $d) {
     </td>
     <td class="<?php echo $css["unread"]; ?>">
       <input type="checkbox" name="subscribe[]" value="<?php echo $g;?>"
-      <?php if (in_array($g,$banana->profile['subscribe']) echo 'checked="checked"'; ?> />
+      <?php if (in_array($g, $banana->profile['subscribe'])) echo 'checked="checked"'; ?> />
     </td>
     <td class="<?php echo $css["group"]; ?>">
       <?php echo "<a href=\"thread.php?group=$g\">$g</a>";?>
