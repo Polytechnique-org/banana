@@ -141,14 +141,23 @@ function dowrap($_mixed,$_maxls=72,$_maxld=72,$_prefix="") {
  */
 
 function wrap($_text,$_prefix="",$_length=72) {
-  $lines = split("\n",$_text);
-  $max = max(array_map("strlen",$lines));
-  $delig = deligne($_text);
-  $result = "";
+#  $lines = split("\n",$_text);
+#  $max = max(array_map("strlen",$lines));
+#  $delig = deligne($_text);
+#  $result = "";
 
-  foreach ($delig as $d) {
-    $result .= dowrap($d,$max,$_length,$_prefix);
+#  foreach ($delig as $d) {
+#    $result .= dowrap($d,$max,$_length,$_prefix);
+#  }
+  
+  $text = $_text;
+  if ($_prefix != "") {
+	$lines = split("\n",$_text);
+	$text = $_prefix.join($lines,"\n$_prefix");
   }
+  exec("echo ".escapeshellarg($text)." | perl -MText::Autoformat -e "
+   ."'{autoformat{ignore=>qr/^([a-zA-Z]+:|--)/};}'", $result);
+  $result=preg_replace("/\n--\n/","\n-- \n",join($result,"\n"));
 
   return $result;
 }
