@@ -31,6 +31,7 @@ function getprofile() {
   $array['display'] = $_SESSION['displaytype'];
   $array['lastnews'] = time()-86400;
   $array['locale'] = "locales/fr.inc.php";
+  $array['subscribe'] = array();
   return $array;
 }
 ?>
