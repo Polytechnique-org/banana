@@ -68,7 +68,6 @@ $news['customhdr'] = "Content-Type: text/plain; charset=iso-8859-15\n"
 
 $css = array(
  'bananashortcuts' => 'bananashortcuts',
- 'title' => 'title',
  'bicol' => 'bicol',
  'bicoltitre' => 'bicoltitre',
  'bicolvpadd' => 'bicolvpadd',

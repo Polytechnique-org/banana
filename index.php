@@ -33,9 +33,9 @@ if (!count($groups->overview)) $groups=new groups($nntp,2);
 $newgroups = new groups($nntp,1);
 ?>
 
-<div class="<?php echo $css["title"];?>">
+<h1>
   <?php echo $locale['index']['title'];?>
-</div>
+</h1>
 
 <?php
 if (!sizeof($groups->overview)) error("nntpgroups");

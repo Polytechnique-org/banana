@@ -68,9 +68,9 @@ if (isset($group) && isset($id) && isset($_REQUEST['type']) &&
 
 $nntp->quit();
 ?>
-<div class="<?php echo $css['title']?>">
+<h1>
   <?php echo $locale['post']['title'];?>
-</div>
+</h1>
 <?php
 
 displayshortcuts();

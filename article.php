@@ -52,9 +52,9 @@ if (!$post) {
 $ndx = $spool->getndx($id);
 
 ?>
-<div class="<?php echo $css['title']?>">
+<h1>
   <?php echo $locale['article']['message'];?>
-</div>
+</h1>
 
 <?php
 if (isset($_GET['type']) && ($_GET['type']=='cancel') && (checkcancel($post->headers))) {

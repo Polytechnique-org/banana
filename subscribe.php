@@ -31,9 +31,9 @@ if ($news['user']!="anonymous") {
 $groups = new groups($nntp,2);
 ?>
 
-<div class="<?php echo $css["title"];?>">
+<h1>
   <?php echo $locale['subscribe']['title'];?>
-</div>
+</h1>
 
 <?php
 

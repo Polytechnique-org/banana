@@ -18,7 +18,7 @@ a:link    { color: blue; background: inherit; }
 a:visited { color: blue; background: inherit; }
 a:hover   { color: blue; background: inherit; text-decoration: underline; }
 
-div.title {
+h1 {
   font-size: 200%;
   text-align: center;
   padding-bottom: 1em;

@@ -137,10 +137,10 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
 
 
 ?>
-<div class="<?php echo $css['title']?>">
+<h1>
   <?php echo $locale['thread']['group_b'].$group
     .$locale['thread']['group_a'];?>
-</div>
+</h1>
 <?php
 if (isset($text)) {
     echo $text;
