@@ -99,7 +99,7 @@ summary="<?php echo $locale['article']['summary'];?>">
     </th>
   </tr>
 <?php
-foreach ($news['head'] as $real => $nick) {
+foreach ($news['headdisp'] as $nick => $real) {
   if (isset($post->headers->$nick)) 
     echo "<tr><td class=\"{$css['bicoltitre']}\">$real</td>"
     ."<td>".formatdisplayheader($nick,$post->headers->$nick,$spool)
