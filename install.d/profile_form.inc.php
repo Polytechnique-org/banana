@@ -7,9 +7,6 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-
 <div class="title">
   <?php echo $locale['profile']['title'];?>
 </div>
@@ -51,7 +48,7 @@
         <?php echo $locale['profile']['signature'];?>
       </td>
       <td>
-        <textarea name="profile_sig"></textarea>
+        <textarea name="profile_sig" rows="72" cols="7"></textarea>
       </td>
     </tr>
     <tr class="pair">
