@@ -204,6 +204,10 @@ class spool {
       }
     }
     unset($this->overview[$_id]);
+    $msgid=array_search($this->ids,$_id);
+    if ($msgids) {
+      unset($this->ids[$msgid]);
+    }
 #    $flipid=array_flip($this->ids);
 #    unset($flipid[$id]);
 #    $this->ids=array_flip($flipid);
@@ -238,9 +242,13 @@ class spool {
         }
       }
       unset($this->overview[$_id]);
-      $ids = array_flip($this->ids);
-      unset($ids[$_id]);
-      $this->ids = array_flip($ids);
+      $msgid=array_search($this->ids,$_id);
+      if ($msgids) {
+        unset($this->ids[$msgid]);
+      }
+#      $ids = array_flip($this->ids);
+#      unset($ids[$_id]);
+#      $this->ids = array_flip($ids);
       $prefix_path=(preg_match("/\/scripts\/?$/",getcwd())?"..":".");    
       $f = fopen("$prefix_path/spool/spool-{$this->group}.dat","w");
       fputs($f,serialize($this));
