@@ -149,19 +149,19 @@ function wrap($_text,$_prefix="",$_length=72) {
 #  foreach ($delig as $d) {
 #    $result .= dowrap($d,$max,$_length,$_prefix);
 #  }
-  
   $text = $_text;
   if ($_prefix != "") {
 	$lines = split("\n",$_text);
-	$text = $_prefix.join($lines,"\n$_prefix");
+	$text = $_prefix.join("\n$_prefix",$lines);
   }
-  exec("echo ".escapeshellarg($text)." | perl -MText::Autoformat -e "
-   ."'{autoformat{ignore=>qr/^([a-zA-Z]+:|--)/};}'", $result);
-  $result=preg_replace("/\n--\n/","\n-- \n",join($result,"\n"));
+  $exec="echo ".escapeshellarg($text)." | perl -MText::Autoformat -e "
+   ."'autoformat {left=>1, right=>$_length, all=>1 };'";
+  exec($exec,$result);
+        
+  $result=join("\n",$result);
+  $result=preg_replace("/\n--\n/","\n-- \n",$result);
 
   return $result;
 }
 
 ?>
-
-
