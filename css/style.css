@@ -134,3 +134,5 @@ table.overview td.subject,td.group,td.from,td.description {
   text-align: left;
 }
 
+table.overview .new { font-weight: bold; }
+
