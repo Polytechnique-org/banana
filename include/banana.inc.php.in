@@ -40,22 +40,20 @@ class Banana
     function Banana()
     {
         require_once('include/NetNNTP.inc.php');
-        $this->_setupProfile();
+        setlocale(LC_ALL,  $this->profile['locale']);
         $this->nntp = new nntp($this->host);
-
-$this->profile['subscribe'][] = 'xorg.general';
-$this->profile['subscribe'][] = 'xorg.test';
-$this->profile['subscribe'][] = 'xorg.promo.x1970';
-$this->profile['lastnews'] = time() - 24*3600*7;
-
     }
 
-    function run()
+    function run($class = 'Banana')
     {
-        require_once("include/misc.inc.php");
         global $banana;
+        require_once("include/misc.inc.php");
+        $banana = new $class();
 
-        $banana = new Banana();
+        if (!$banana->nntp) {
+            return '<p class="error">'._b_('Impossible de contacter le serveur').'</p>';
+        }
+
         $group  = empty($_GET['group']) ? null : strtolower($_GET['group']);
         $artid  = empty($_GET['artid']) ? null : strtolower($_GET['artid']);
         $banana->state = Array ('group' => $group, 'artid' => $artid);
@@ -292,15 +290,6 @@ $this->profile['lastnews'] = time() - 24*3600*7;
         if ($this->groups->type == BANANA_GROUP_SUB) {
             $this->newgroups = new BananaGroups(BANANA_GROUP_NEW);
         }
-    }
-
-    function _setupProfile()
-    {
-        if (function_exists('hook_getprofile')) {
-            $this->profile = hook_getprofile();
-        }
-        
-        setlocale(LC_ALL,  $this->profile['locale']);
     }
 }
 

@@ -86,7 +86,6 @@ class BananaPost
 
     function checkcancel()
     {
-        return true;
         if (function_exists('hook_checkcancel')) {
             return hook_checkcancel($this->headers);
         }

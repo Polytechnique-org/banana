@@ -39,8 +39,9 @@ function header_translate($hdr) {
         case 'references':      return _b_('Références');
         case 'x-face':          return _b_('Image');
         default:
-            if (function_exists('hook_header_translate')) {
-                return hook_header_translate($hdr);
+            if (function_exists('hook_headerTranslate')
+                    && $res = hook_headerTranslate($hdr)) {
+                return $res;
             }
             return $hdr;
     }
@@ -87,8 +88,10 @@ function formatDisplayHeader($_header,$_text) {
             return '<img src="xface.php?face='.base64_encode($_text).'"  alt="x-face" />';
         
         default:
-            if (function_exists('hook_formatDisplayHeader')) {
-                return hook_formatDisplayHeader($_header, $_text);
+            if (function_exists('hook_formatDisplayHeader')
+                    && $res = hook_formatDisplayHeader($_header, $_text))
+            {
+                return $res;
             }
             return htmlentities($_text);
     }
@@ -139,15 +142,9 @@ function formatFrom($text) {
 
 function displayshortcuts($first = -1) {
     global $banana;
-
-    $res = '<div class="banana_scuts">';
-
-    if (function_exists('hook_displayshortcuts')) {
-        $res .= hook_displayshortcuts($sname, $first);
-    }
-
     extract($banana->state);
 
+    $res  = '<div class="banana_scuts">';
     $res .= '[<a href="?">'._b_('Liste des forums').'</a>] ';
     if (is_null($group)) {
         return $res.'</div>';
