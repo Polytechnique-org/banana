@@ -162,7 +162,7 @@ class spool {
             $this->overview[$this->ids[$mid]]->isread=false;
             $this->overview[$this->ids[$mid]]->descunread=1;
             $parentmid=$this->ids[$mid];
-            while (isset($this->overview[$parentmid]->parent)) {
+            while (isset($parentmid)) {
               $this->overview[$parentmid]->descunread++;
               $parentmid = $this->overview[$parentmid]->parent;
             }
