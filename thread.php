@@ -95,15 +95,17 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type']))) {
       }
       break;
     case 'new':
+      $body = preg_replace("/\n\.[ \t\r]*\n/m","\n..\n",stripslashes($_REQUEST['body']));
       $message = 'From: '.$profile['name']."\n"
         ."Newsgroups: ".stripslashes(str_replace(" ","",
           $_REQUEST['newsgroups']))."\n"
         ."Subject: ".stripslashes($_REQUEST['subject'])."\n"
+        .(isset($profile['org'])?"Organization: ".$profile['org']."\n":"")
         .($_REQUEST['followup']!=''?'Followup-To: '
         .stripslashes($_REQUEST['followup'])."\n":"")
         .$news['customhdr']
         ."\n"
-        .wrap(stripslashes($_REQUEST['body']),"",$news['wrap']);
+        .wrap($body,"",$news['wrap']);
       $result = $mynntp->post($message);
       if ($result) {
         $text="<p class=\"normal\">".$locale['post']['posted']."</p>";
@@ -115,18 +117,21 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type']))) {
       $rq=$mynntp->group($group);
       $post = new post($mynntp,$id);
       if ($post) {
-        $refs = $post->headers->references." ".$post->headers->msgid;
+        $refs = (isset($post->headers->references)?
+                $post->headers->references." ":"").$post->headers->msgid;
       }
     
+      $body = preg_replace("/\n\.[ \t\r]*\n/m","\n..\n",stripslashes($_REQUEST['body']));
       $message = 'From: '.$profile['name']."\n"
         ."Newsgroups: ".stripslashes($_REQUEST['newsgroups'])."\n"
         ."Subject: ".stripslashes($_REQUEST['subject'])."\n"
+        .(isset($profile['org'])?"Organization: ".$profile['org']."\n":"")
         .($_REQUEST['followup']!=''?'Followup-To: '
         .stripslashes($_REQUEST['followup'])."\n":"")
         ."References: $refs\n"
         .$news['customhdr']
         ."\n"
-        .wrap(stripslashes($_REQUEST['body']),"",$news['wrap']);
+        .wrap($body,"",$news['wrap']);
       $result = $mynntp->post($message);
       if ($result) {
         $text="<p class=\"normal\">".$locale['post']['posted']."</p>";
@@ -146,7 +151,7 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type']))) {
 
 
 ?>
-<div class="title">
+<div class="<?php echo $css['title']?>">
   <?php echo $locale['thread']['group_b'].$group
     .$locale['thread']['group_a'];?>
 </div>
@@ -158,16 +163,16 @@ displayshortcuts();
 
 ?>
 
-<table class="bicol" cellpadding="0" cellspacing="0" border="0" 
+<table class="<?php echo $css['bicol']?>" cellpadding="0" cellspacing="0" border="0" 
   summary="<?php echo $locale['thread']['summary'];?>">
   <tr>
-    <th class="date">
+    <th class="<?php echo $css['date']?>">
       <?php echo $locale['thread']['date'];?>
     </th>
-    <th class="subject">
+    <th class="<?php echo $css['subject']?>">
       <?php echo $locale['thread']['subject'];?>
     </th>
-    <th class="from">
+    <th class="<?php echo $css['from']?>">
       <?php echo $locale['thread']['author'];?>
     </th>
   </tr>
