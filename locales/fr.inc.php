@@ -106,4 +106,15 @@ $locale['disconnect'] = array(
   'back' => 'Retour au <a href="index.php">profil</a>'
 );
 
+$locale['headers'] = array(
+  'from' => 'De',
+  'subject' => 'Sujet',
+  'newsgroups' => 'Forums',
+  'followup' => 'Suivi-A',
+  'date' => 'Date',
+  'organization' => 'Organisation',
+  'references' => 'Références',
+  'xface' => 'Image'
+);
+
 ?>

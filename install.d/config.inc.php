@@ -24,10 +24,23 @@ $news['head'] = array(
   'Newsgroups' => 'newsgroups',
   'Followup-To' => 'followup',
   'Date' => 'date',
+  'Message-ID' => 'msgid',
   'Organization' => 'organization',
   'References' => 'references',
   'X-Face' => 'xface',
   );
+
+// headers in article.php
+$news['headdisp']=array(
+  'from',
+  'subject',
+  'newsgroups',
+  'followup',
+  'date',
+  'organization',
+  'references',
+  'xface'
+);
 
 // overview configuration in article.php
 $news['threadtop'] = 5;
@@ -46,4 +59,27 @@ $news['customhdr'] = "Content-Type: text/plain; charset=iso-8859-15\n"
   ."HTTP-Posting-Host: ".gethostbyname($_SERVER['REMOTE_ADDR'])."\n"
   ."User-Agent: Banana 0.7beta\n";
 
+$css = array(
+ 'bananashortcuts' => 'bananashortcuts',
+ 'title' => 'title',
+ 'bicol' => 'bicol',
+ 'bicoltitre' => 'bicoltitre',
+ 'bicolvpadd' => 'bicolvpadd',
+ 'pair' => 'pair',
+ 'impair' => 'impair',
+ 'bouton' => 'bouton',
+ 'error' => 'error',
+ 'normal' => 'normal',
+ 'total' => 'total',
+ 'unread' => 'unread',
+ 'group' => 'group',
+ 'description' => 'description',
+ 'date' => 'date',
+ 'subject' => 'subject',
+ 'from' => 'from',
+ 'author' => 'author',
+ 'nopadd' => 'nopadd',
+ 'overview' => 'overview',
+ 'tree' => 'tree'
+);
 ?>
