@@ -83,7 +83,7 @@ displayshortcuts();
     </th>
   </tr>
   <tr>
-    <td>
+    <td class="<?php echo $css['bicoltitre'];?>">
       <?php echo $locale['post']['name'];?>
     </td>
     <td>
@@ -91,7 +91,7 @@ displayshortcuts();
     </td>
   </tr>
   <tr>
-    <td>
+    <td class="<?php echo $css['bicoltitre'];?>">
       <?php echo $locale['post']['subject'];?>
     </td>
     <td>
@@ -100,7 +100,7 @@ displayshortcuts();
     </td>
   </tr>
   <tr>
-    <td>
+    <td class="<?php echo $css['bicoltitre'];?>">
       <?php echo $locale['post']['newsgroups'];?>
     </td>
     <td>
@@ -109,7 +109,7 @@ displayshortcuts();
     </td>
   </tr>
   <tr>
-    <td>
+    <td class="<?php echo $css['bicoltitre'];?>">
       <?php echo $locale['post']['fu2'];?>
     </td>
     <td>
@@ -117,7 +117,7 @@ displayshortcuts();
     </td>
   </tr>
   <tr>
-    <td>
+    <td class="<?php echo $css['bicoltitre'];?>">
       <?php echo $locale['post']['organization'];?>
     </td>
     <td>
@@ -130,7 +130,7 @@ displayshortcuts();
     </th>
   </tr>
   <tr>
-    <td colspan="2">
+    <td class="<?php echo $css['bicolvpadd'];?>" colspan="2">
       <textarea name="body" cols="90" rows="10"><?php echo 
       (isset($body)?$body:"").($profile['sig']!=''?"\n\n-- \n"
       .$profile['sig']:"");?></textarea>
