@@ -7,7 +7,6 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-require_once("include/session.inc.php");
 require_once("include/misc.inc.php");
 require_once("include/groups.inc.php");
 require_once("include/format.inc.php");
@@ -69,6 +68,18 @@ class Banana
 }
 
 $banana = new Banana;
+
+switch (basename($_SERVER['SCRIPT_NAME'])) {
+    case "thread.php":
+        if (!isset($_SESSION['bananapostok'])) {
+            $_SESSION['bananapostok']=true;
+        }
+        break;
+
+    default:
+        $_SESSION['bananapostok']=true;
+        break;
+}
 
 if (empty($css)) {
 $css = array(

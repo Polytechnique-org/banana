@@ -78,12 +78,13 @@ function formatDisplayHeader($_header,$_text) {
             $text    = preg_split("/[ \t]/",strtr($text,$banana->spool->ids));
             $parents = preg_grep("/^\d+$/",$text);
             $p       = array_pop($parents);
+            $par_ok  = Array();
             
             while ($p) {
-                $valid_parents[]=$p;
+                $par_ok[]=$p;
                 $p = $banana->spool->overview[$p]->parent;
             }
-            foreach (array_reverse($valid_parents) as $p) {
+            foreach (array_reverse($par_ok) as $p) {
                 $rsl .= "<a href=\"article.php?group={$banana->spool->group}&amp;id=$p\">$ndx</a> ";
                 $ndx++;
             }
