@@ -109,7 +109,7 @@ class BananaGroups {
             } elseif ($this->type == BANANA_GROUP_SUB) {
                 $html .= '<td class="new">'.($new ? $new : '-').'</td>';
             }
-            $html .= "<td class='grp'><a href='thread.php?group=$g'>$g</a></td><td class='dsc'>{$d[0]}</td></tr>";
+            $html .= "<td class='grp'><a href='?group=$g'>$g</a></td><td class='dsc'>{$d[0]}</td></tr>";
         }
 
         $html .= '</table>';

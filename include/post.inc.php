@@ -29,7 +29,11 @@ class BananaPost
         $this->id = $_id;
         $this->_header();
 
-        $this->body = join("\n", $banana->nntp->body($_id));
+        if ($body = $banana->nntp->body($_id)) {
+            $this->body = join("\n", $body);
+        } else {
+            return ($this = null);
+        }
         
         if (isset($this->headers['content-transfer-encoding'])) {
             if (preg_match("/base64/", $this->headers['content-transfer-encoding'])) {
@@ -82,6 +86,7 @@ class BananaPost
 
     function checkcancel()
     {
+        return true;
         if (function_exists('hook_checkcancel')) {
             return hook_checkcancel($this->headers);
         }

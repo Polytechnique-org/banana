@@ -316,7 +316,7 @@ class BananaSpool
             if ($_index == $_ref) {
                 $res .= '<span class="cur">'.htmlentities($this->overview[$_id]->subject).'</span>';
             } else {
-                $res .= "<a href='article.php?group={$this->group}&amp;id=$_id'>".htmlentities($this->overview[$_id]->subject).'</a>';
+                $res .= "<a href='?group={$this->group}&amp;artid=$_id'>".htmlentities($this->overview[$_id]->subject).'</a>';
             }
             $res .= "</td>\n<td class='from'>".formatFrom($this->overview[$_id]->from)."</td>\n</tr>";
 

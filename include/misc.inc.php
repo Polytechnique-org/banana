@@ -11,15 +11,6 @@
  *  MISC
  */
 
-function mtime() 
-{ 
-    global $time;
-    list($usec, $sec) = explode(" ", microtime()); 
-    $time[] = ((float)$usec + (float)$sec); 
-} 
-
-mtime();
-
 function _b_($str) { return utf8_decode(dgettext('banana', utf8_encode($str))); }
 
 /********************************************************************************
@@ -66,7 +57,7 @@ function formatDisplayHeader($_header,$_text) {
             $res = "";
             $groups = preg_split("/[\t ]*,[\t ]*/",$_text);
             foreach ($groups as $g) {
-                $res.="<a href='thread.php?group=$g'>$g</a>, ";
+                $res.="<a href='?group=$g'>$g</a>, ";
             }
             return substr($res,0, -2);
 
@@ -87,7 +78,7 @@ function formatDisplayHeader($_header,$_text) {
                 $p = $banana->spool->overview[$p]->parent;
             }
             foreach (array_reverse($par_ok) as $p) {
-                $rsl .= "<a href=\"article.php?group={$banana->spool->group}&amp;id=$p\">$ndx</a> ";
+                $rsl .= "<a href=\"?group={$banana->spool->group}&amp;artid=$p\">$ndx</a> ";
                 $ndx++;
             }
             return $rsl;
@@ -148,7 +139,6 @@ function formatFrom($text) {
 
 function displayshortcuts($first = -1) {
     global $banana;
-    $sname = basename($_SERVER['SCRIPT_NAME']);
 
     $res = '<div class="banana_scuts">';
 
@@ -156,40 +146,38 @@ function displayshortcuts($first = -1) {
         $res .= hook_displayshortcuts($sname, $first);
     }
 
-    switch ($sname) {
-        case 'thread.php' :
-            $res .= '[<a href="index.php">'._b_('Liste des forums').'</a>] ';
-            $res .= "[<a href=\"post.php?group={$banana->spool->group}\">"._b_('Nouveau message')."</a>] ";
-            if (sizeof($banana->spool->overview)>$banana->tmax) {
-                for ($ndx=1; $ndx<=sizeof($banana->spool->overview); $ndx += $banana->tmax) {
-                    if ($first==$ndx) {
-                        $res .= "[$ndx-".min($ndx+$banana->tmax-1,sizeof($banana->spool->overview))."] ";
-                    } else {
-                        $res .= "[<a href=\"?group={$banana->spool->group}&amp;first="
-                            ."$ndx\">$ndx-".min($ndx+$banana->tmax-1,sizeof($banana->spool->overview))
-                            ."</a>] ";
-                    }
-                }
-            }
-            break;
-        case 'article.php' :
-            $res .= '[<a href="index.php">'._b_('Liste des forums').'</a>] ';
-            $res .= "[<a href=\"thread.php?group={$banana->spool->group}\">{$banana->spool->group}</a>] ";
-            $res .= "[<a href=\"post.php?group={$banana->spool->group}&amp;id={$banana->post->id}&amp;type=followup\">"
-                ._b_('Répondre')."</a>] ";
-            if ($banana->post->checkcancel()) {
-                $res .= "[<a href=\"article.php?group={$banana->spool->group}&amp;id={$banana->post->id}&amp;type=cancel\">"
-                    ._b_('Annuler ce message')."</a>] ";
-            }
-            break;
-        case 'post.php' :
-            $res .= '[<a href="index.php">'._b_('Liste des forums').'</a>] ';
-            $res .= "[<a href=\"thread.php?group={$banana->spool->group}\">{$banana->spool->group}</a>]";
-            break;
-    }
-    $res .= '</div>';
+    extract($banana->state);
 
-    return $res;
+    $res .= '[<a href="?">'._b_('Liste des forums').'</a>] ';
+    if (is_null($group)) {
+        return $res.'</div>';
+    }
+   
+    $res .= "[<a href=\"?group=$group\">$group</a>] ";
+
+    if (is_null($artid)) {
+        $res .= "[<a href=\"?group=$group&amp;action=new\">"._b_('Nouveau message')."</a>] ";
+        if (sizeof($banana->spool->overview)>$banana->tmax) {
+            $res .= '<br />';
+            $n = intval(log(count($banana->spool->overview), 10))+1;
+            for ($ndx=1; $ndx <= sizeof($banana->spool->overview); $ndx += $banana->tmax) {
+                if ($first==$ndx) {
+                    $fmt = "[%0{$n}u-%0{$n}u] ";
+                } else {
+                    $fmt = "[<a href=\"?group=$group&amp;first=$ndx\">%0{$n}u-%0{$n}u</a>] ";
+                }
+                $res .= sprintf($fmt, $ndx, min($ndx+$banana->tmax-1,sizeof($banana->spool->overview)));
+            }
+        }
+    } else {
+        $res .= "[<a href=\"?group=$group&amp;artid=$artid&amp;action=new\">"
+            ._b_('Répondre')."</a>] ";
+        if ($banana->post->checkcancel()) {
+            $res .= "[<a href=\"?group=$group&amp;artid=$artid&amp;action=cancel\">"
+                ._b_('Annuler ce message')."</a>] ";
+        }
+    }
+    return $res.'</div>';
 }
 
 /********************************************************************************
