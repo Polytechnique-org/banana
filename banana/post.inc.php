@@ -44,7 +44,7 @@ class BananaPost
         }
 
         if (preg_match('!charset=([^;]*)\s*(;|$)!', $this->headers['content-type'], $matches)) {
-            $this->body = iconv($matches[1], 'iso-8859-1', $this->body);
+            $this->body = iconv($matches[1], 'iso-8859-15', $this->body);
         }
     }
 
