@@ -113,7 +113,7 @@ class BananaSpool
             $this->version = BANANA_SPOOL_VERSION;
         }
 
-        if ($first<$last && $groupinfo[0]) {
+        if ($first<=$last && $groupinfo[0]) {
             $do_save = true;
             $this->_updateSpool($_nntp, "$first-$last");
         }
