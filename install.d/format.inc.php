@@ -72,7 +72,7 @@ function formatDisplayHeader($_header,$_text,$_spool) {
     case "newsgroups":
       $res = "";
       $groups = preg_split("/(\t| )*,(\t| )*/",$_text);
-      foreach ($_groups as $g) {
+      foreach ($groups as $g) {
         $res.='<a href="thread.php?group='.$g.'">'.$g.'</a>, ';
       }
       return substr($res,0, -2);
@@ -99,8 +99,8 @@ function formatDisplayHeader($_header,$_text,$_spool) {
       $rsl = "";
       $ndx = 1;
       $text=str_replace("><","> <",$_text);
-      $text=preg_split("/( |\t)/",strtr($_text,$_spool->ids));
-      $parents=preg_grep("/^\d+$/",$_text);
+      $text=preg_split("/( |\t)/",strtr($text,$_spool->ids));
+      $parents=preg_grep("/^\d+$/",$text);
       $p=array_pop($parents);
       while ($p) {
         $rsl .= "<a href=\"article.php?group={$_spool->group}"

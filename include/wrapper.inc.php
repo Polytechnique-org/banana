@@ -122,7 +122,7 @@ function dowrap($_mixed,$_maxls=72,$_maxld=72,$_prefix="") {
 // adds prefix 
     $lines = split("\n",$preresult);
     foreach ($lines as $l) {
-      $result .= $prefix.(strlen($_prefix)>0?" ":"")."$l\n";
+      $result .= $_prefix.(strlen($_prefix)>0?" ":"")."$l\n";
     }
   //  $result = substr($result,0,-1);
   }

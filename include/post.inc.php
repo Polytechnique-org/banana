@@ -26,7 +26,7 @@ class Post {
       $this = false;
       return false;
     }
-    $this->body = join("\n",$nntp->body($_id));
+    $this->body = join("\n",$_nntp->body($_id));
       if ((isset($this->headers->contentencoding)) && 
       (preg_match("/base64/",$this->headers->contentencoding))) {
         $this->body = base64_decode($this->body);
