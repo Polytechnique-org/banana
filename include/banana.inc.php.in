@@ -8,8 +8,6 @@
 ********************************************************************************/
 
 require_once("include/misc.inc.php");
-require_once("include/groups.inc.php");
-require_once("include/format.inc.php");
 require_once("include/error.inc.php");
 
 class Banana
@@ -33,11 +31,13 @@ class Banana
     var $host      = 'news://localhost:119/';
 
     var $profile   = Array( 'name' => 'Anonymous <anonymouse@example.com', 'sig'  => '', 'org'  => '',
-            'customhdr' =>'', 'display' => 0, 'lastnews' => 0, 'lang'  => 'fr', 'subscribe' => array());
+            'customhdr' =>'', 'display' => 0, 'lastnews' => 0, 'locale'  => 'fr_FR', 'subscribe' => array());
     
     var $nntp;
-    var $spool;
+    var $groups;
+    var $newgroups;
     var $post;
+    var $spool;
 
     function Banana()
     {
@@ -48,6 +48,70 @@ class Banana
         require_once('include/NetNNTP.inc.php');
         $this->nntp = new nntp($this->host);
     }
+
+    /**************************************************************************/
+    /* actions                                                                */
+    /**************************************************************************/
+
+    function action_listGroups()
+    {
+        $this->newGroup(BANANA_GROUP_SUB);
+        
+        $cuts = displayshortcuts();
+        $res  = '<h1>'._b_('Les forums de Banana').'</h1>'.$cuts.$this->groups->to_html();
+        if (count($this->newgroups->overview)) {
+            $res .= '<p>'._b_('Les forums suivants ont été créés depuis ton dernier passage :').'</p>';
+            $res .= $this->newgroups->to_html();
+        }
+
+        $this->nntp->quit();
+        return $res.$cuts;
+    }
+
+    function action_showThread($group, $first)
+    {
+        $this->newSpool($group, $this->profile['display'], $this->profile['lastnews']);
+
+        if ($first > count($this->spool->overview)) {
+            $first = count($this->spool->overview);
+        }
+
+        $first = $first - ($first % $this->tmax) + 1;
+
+        $cuts = displayshortcuts($first);
+        
+        $res  = '<h1>'.$group.'</h1>'.$cuts;
+        $res  .= $this->spool->to_html($first, $first+$this->tmax);
+
+        $this->nntp->quit();
+        
+        return $res.$cuts;
+    }
+
+    function action_showArticle($group, $id)
+    {
+        $this->newSpool($group, $this->profile['display'], $this->profile['lastnews']);
+        $this->newPost($id);
+        if (!$this->post) {
+            if ($this->nntp->lasterrorcode == "423") {
+                $this->spool->delid($id);
+            }
+            $this->nntp->quit();
+            return displayshortcuts().'<p class="error">'._b_('Impossible d\'accéder au message.   Le message a peut-être été annulé').'</p>';
+        }
+
+        $cuts = displayshortcuts();
+        $res  = '<h1>'._b_('Message').'</h1>'.$cuts;
+        $res .= $this->post->to_html();
+
+        $this->nntp->quit();
+        
+        return $res.$cuts;
+    }
+
+    /**************************************************************************/
+    /*                                                                        */
+    /**************************************************************************/
 
     function newSpool($group, $disp=0, $since='') {
         require_once('include/spool.inc.php');
@@ -61,6 +125,19 @@ class Banana
         $this->post = new BananaPost($id);
     }
 
+    function newGroup()
+    {
+        require_once("include/groups.inc.php");
+        $this->groups = new BananaGroups(BANANA_GROUP_SUB);
+        if ($this->groups->type == BANANA_GROUP_SUB) {
+            $this->newgroups = new BananaGroups(BANANA_GROUP_NEW);
+        }
+    }
+
+    /**************************************************************************/
+    /*                                                                        */
+    /**************************************************************************/
+
     function _setupProfile()
     {
         if (function_exists('hook_getprofile')) {
@@ -69,7 +146,7 @@ class Banana
             session_start();
         }
         
-        setlocale(LC_ALL, $this->profile['locale']);
+        setlocale(LC_ALL,  $this->profile['locale']);
     }
 }
 
