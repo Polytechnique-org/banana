@@ -7,8 +7,13 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-require("locales/locales.inc.php");
 require("include/session.inc.php");
+require("include/profile.inc.php");
+require("include/error.inc.php");
+
+$profile=getprofile();
+require($profile['locale']);
+
 $_SESSION=array();
 session_destroy();
 
