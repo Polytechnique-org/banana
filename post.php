@@ -50,7 +50,7 @@ if (isset($group) && isset($id) && isset($_REQUEST['type']) &&
       .$post->headers->subject;
 	if ($profile['dropsig']) {
       $cutoff=strpos($post->body,"\n-- \n");
-      if ($cuttoff) {
+      if ($cutoff) {
 	    $quotetext = substr($post->body,0,strpos($post->body,"\n-- \n"));
       } else {
 	    $quotetext = $post->body;
