@@ -23,7 +23,7 @@ function locale_header_date($_text) {
   if ($now-$_text < 86400) {
     return date("H:i",$_text);
   } elseif (($now-$_text < 2*86400) and ((($date["yday"]-$dnow["yday"])%365)==1)) {
-    return "hier ".date("H:i",$_text)." ".$date["yday"]." ".$dnow["yday"];
+    return "hier ".date("H:i",$_text);
   } elseif ($now-$_text < 604800) {
     return $days[$date["wday"]]." ".date("H:i",$_text);
   } else {
