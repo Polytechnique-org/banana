@@ -7,62 +7,32 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-require_once("include/session.inc.php");
-require_once("include/misc.inc.php");
-require_once("include/format.inc.php");
-require_once("include/config.inc.php");
-require_once("include/NetNNTP.inc.php");
-require_once("include/post.inc.php");
-require_once("include/spool.inc.php");
-require_once("include/password.inc.php");
-require_once("include/profile.inc.php");
-require_once("include/error.inc.php");
-
-$profile = getprofile();
+require_once("include/banana.inc.php");
 require_once("include/header.inc.php");
+
 if (isset($_REQUEST['group'])) {
-    $group=htmlentities(strtolower($_REQUEST['group']));
+    $group = htmlentities(strtolower($_REQUEST['group']));
 }
 if (isset($_REQUEST['id'])) {
-    $id=htmlentities(strtolower($_REQUEST['id']));
+    $id = htmlentities(strtolower($_REQUEST['id']));
 }
 
 if (isset($group)) {
     $target = $group;
 }
 
-$nntp = new nntp($news['server']);
-if (!$nntp) error("nntpsock");
-if ($news['user']!="anonymous") {
-    $result = $nntp->authinfo($news["user"],$news["pass"]);
-    if (!$result) error("nntpauth");
-}
-
-if (isset($group) && isset($id) && isset($_REQUEST['type']) && 
-        ($_REQUEST['type']=='followup')) {
-    $rq=$nntp->group($group);
-    $post = new BananaPost($nntp,$id);
+if (isset($group) && isset($id) && isset($_REQUEST['type']) && ($_REQUEST['type']=='followup')) {
+    $rq   = $banana->nntp->group($group);
+    $post = new BananaPost($id);
+    $body = '';
     if ($post) {
-        $subject = (preg_match("/^re:/i",$post->headers['subject'])?"":"Re: ").$post->headers['subject'];
-        if ($profile['dropsig']) {
-            $cutoff=strpos($post->body,"\n-- \n");
-            if ($cutoff) {
-                $quotetext = substr($post->body,0,strpos($post->body,"\n-- \n"));
-            } else {
-                $quotetext = $post->body;
-            }
-        } else {
-            $quotetext = $post->body;
-        }
-        $body = $post->name." wrote :\n".wrap($quotetext, "> ");
-        if (isset($post->headers['followup-to']))
-            $target = $post->headers['followup-to'];
-        else
-            $target = $post->headers['newsgroups'];
+        $subject = (preg_match("/^re\s*:\s*/i", $post->headers['subject']) ? '' : 'Re: ').$post->headers['subject'];
+        $body    = $post->name." wrote :\n".wrap($post->body, "> ");
+        $target  = isset($post->headers['followup-to']) ? $post->headers['followup-to'] : $post->headers['newsgroups'];
     }
 }
 
-$nntp->quit();
+$banana->nntp->quit();
 ?>
 <h1>
   <?php echo _b_('Nouveau message'); ?>
@@ -85,7 +55,7 @@ displayshortcuts();
       <?php echo _b_('Nom'); ?>
     </td>
     <td>
-      <?php echo htmlentities($profile['name']); ?>
+      <?php echo htmlentities($banana->profile['name']); ?>
     </td>
   </tr>
   <tr>
@@ -93,8 +63,7 @@ displayshortcuts();
       <?php echo _b_('Sujet'); ?>
     </td>
     <td>
-      <input type="text" name="subject" value="<?php echo 
-        (isset($subject)?$subject:"");?>" />
+      <input type="text" name="subject" value="<?php if (isset($subject)) echo $subject; ?>" />
     </td>
   </tr>
   <tr>
@@ -102,8 +71,7 @@ displayshortcuts();
       <?php echo _b_('Forums'); ?>
     </td>
     <td>
-      <input type="text" name="newsgroups" value="<?php echo
-      (isset($target)?$target:"");?>" />
+      <input type="text" name="newsgroups" value="<?php if (isset($target)) echo $target; ?>" />
     </td>
   </tr>
   <tr>
@@ -119,7 +87,7 @@ displayshortcuts();
       <?php echo _b_('Organisation'); ?>
     </td>
     <td>
-      <?php echo $profile['org']; ?>
+      <?php echo $banana->profile['org']; ?>
     </td>
   </tr>
   <tr>
@@ -129,9 +97,10 @@ displayshortcuts();
   </tr>
   <tr>
     <td class="<?php echo $css['bicolvpadd'];?>" colspan="2">
-      <textarea name="body" cols="90" rows="16"><?php echo 
-      (isset($body)?htmlentities($body):"").
-      ($profile['sig']!=''?"\n\n-- \n".htmlentities($profile['sig']):"");?></textarea>
+      <textarea name="body" cols="90" rows="16"><?php
+      echo htmlentities($body);
+      if ($banana->profile['sig']) echo "\n\n-- \n".htmlentities($banana->profile['sig']);
+      ?></textarea>
     </td>
   </tr>
   <tr>

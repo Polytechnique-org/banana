@@ -19,29 +19,14 @@ require_once("include/spool.inc.php");
 require_once("include/password.inc.php");
 
 
-$nntp = new nntp($news['server']);
-if (!$nntp) {
-    print "cannot connect to server\n";
-    exit;
-}
-
-if ($news['user']!="anonymous") {
-    $result = $nntp->authinfo($news["user"],$news["pass"]);
-    if (!$result) {
-        print "authentication error\n";
-        exit;
-    }
-}
-unset($result);
-
-$groups = new BananaGroups($nntp,2);
+$groups = new BananaGroups(2);
 $list = array_keys($groups->overview);
 unset($groups);
 foreach ($list as $g) {
     print "Generating spool for $g : ";
-    $spool = new BananaSpool($nntp,$g);
+    $spool = new BananaSpool($g);
     print "done.\n";
     unset($spool);
 }
-$nntp->quit();
+$banana->nntp->quit();
 ?>

@@ -7,51 +7,31 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-require_once("include/session.inc.php");
-require_once("include/misc.inc.php");
-require_once("include/format.inc.php");
-require_once("include/config.inc.php");
-require_once("include/NetNNTP.inc.php");
-require_once("include/spool.inc.php");
-require_once("include/post.inc.php");
-require_once("include/profile.inc.php");
-require_once("include/password.inc.php");
-require_once("include/error.inc.php");
-
-$profile = getprofile();
+require_once("include/banana.inc.php");
 require_once("include/header.inc.php");
 
 if (isset($_REQUEST['group'])) {
-  $group=htmlentities(strtolower($_REQUEST['group']));
+    $group = htmlentities(strtolower($_REQUEST['group']));
 }
 if (isset($_REQUEST['id'])) {
-  $id=htmlentities(strtolower($_REQUEST['id']));
+    $id = htmlentities(strtolower($_REQUEST['id']));
 }
 
-$nntp = new nntp($news['server']);
-if (!$nntp) error("nntpsock");
-if ($news['user']!="anonymous") {
-  $result = $nntp->authinfo($news["user"],$news["pass"]);
-  if (!$result) error("nntpauth");
-}
-$spool = new BananaSpool($nntp,$group,$profile['display'],$profile['lastnews']);
-if (!$spool) error("nntpspool");
-$nntp->group($group);
+$banana->newSpool($group, $banana->profile['display'], $banana->profile['lastnews']);
+$banana->nntp->group($group);
 
-$post = new BananaPost($nntp,$id);
+$post = new BananaPost($id);
 if (!$post) {
-  if ($nntp->lasterrorcode == "423") {
-    $spool->delid($id);
-  }
-  error("nntpart");
+    if ($banana->nntp->lasterrorcode == "423") {
+        $banana->spool->delid($id);
+    }
+    error("nntpart");
 }
 
-$ndx = $spool->getndx($id);
+$ndx = $banana->spool->getndx($id);
 
 ?>
-<h1>
-  <?php echo _b_('Message'); ?>
-</h1>
+<h1><?php echo _b_('Message'); ?></h1>
 
 <?php
 if (isset($_GET['type']) && ($_GET['type']=='cancel') && (checkcancel($post->headers))) {
@@ -60,9 +40,8 @@ if (isset($_GET['type']) && ($_GET['type']=='cancel') && (checkcancel($post->hea
   <?php echo _b_('Voulez-vous vraiment annuler ce message ?'); ?>
 </p>
 <form action="thread.php" method="post">
-  <input type="hidden" name="group" value="<?php echo $group;?>" />
-  <input type="hidden" name="id" value="<?php 
-    echo $id;?>" />
+  <input type="hidden" name="group" value="<?php echo $group; ?>" />
+  <input type="hidden" name="id" value="<?php  echo $id; ?>" />
   <input type="hidden" name="type" value="cancel" />
   <input type="submit" name="action" value="<?php echo _b_('OK'); ?>" />
 </form>
@@ -80,11 +59,11 @@ summary="<?php echo _b_('Contenu du message'); ?>">
     </th>
   </tr>
 <?php
-    foreach ($news['headdisp'] as $nick) {
-        if (isset($post->headers[$nick])) {
-            $res = formatdisplayheader($nick,$post->headers[$nick],$spool);
+    foreach ($banana->show_hdr as $hdr) {
+        if (isset($post->headers[$hdr])) {
+            $res = formatdisplayheader($hdr, $post->headers[$hdr]);
             if ($res)
-                echo "<tr><td class=\"{$css['bicoltitre']}\">".header_translate($nick)."</td>"
+                echo "<tr><td class=\"{$css['bicoltitre']}\">".header_translate($hdr)."</td>"
                     ."<td>$res</td></tr>\n";
         }
     }
@@ -109,7 +88,7 @@ summary="<?php echo _b_('Contenu du message'); ?>">
       <table class="<?php echo $css['overview']?>" cellpadding="0" 
       cellspacing="0" summary="overview">
 <?php
-$spool->disp($ndx-$news['threadtop'],$ndx+$news['threadbottom'],$ndx);
+$banana->spool->disp($ndx-$banana->tbefore,$ndx+$banana->tafter,$ndx);
 ?>
       </table>
     </td>

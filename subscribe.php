@@ -7,27 +7,10 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-require_once("include/session.inc.php");
-require_once("include/misc.inc.php");
-require_once("include/password.inc.php");
-require_once("include/NetNNTP.inc.php");
-require_once("include/groups.inc.php");
-require_once("include/format.inc.php");
-require_once("include/config.inc.php");
-require_once("include/profile.inc.php");
-require_once("include/subscribe.inc.php");
-require_once("include/error.inc.php");
-
-$profile=getprofile();
+require_once("include/banana.inc.php");
 require_once("include/header.inc.php");
 
-$nntp = new nntp($news['server']);
-if (!$nntp) error("nntpsock");
-if ($news['user']!="anonymous") {
-  $result = $nntp->authinfo($news["user"],$news["pass"]);
-  if (!$result) error("nntpauth");
-}
-$groups = new BananaGroups($nntp,2);
+$groups = new BananaGroups(2);
 ?>
 
 <h1>
@@ -36,10 +19,9 @@ $groups = new BananaGroups($nntp,2);
 
 <?php
 
-if (isset($_POST['subscribe']) && isset($_POST['action']) 
-  && $_POST['action']=="OK") {
-  update_subscriptions($_POST['subscribe']);
-  $profile['subscribe']=$_POST['subscribe'];
+if (isset($_POST['subscribe']) && isset($_POST['action']) && $_POST['action']=="OK") {
+    update_subscriptions($_POST['subscribe']);
+    $banana->profile['subscribe']=$_POST['subscribe'];
 }
 
 if (!sizeof($groups->overview)) error("nntpgroups");
@@ -67,8 +49,8 @@ displayshortcuts();
 $pair = true;
 foreach ($groups->overview as $g => $d) {
   $pair = !$pair;
-  $groupinfo = $nntp->group($g);
-  $newarts = $nntp->newnews($profile['lastnews'],$g);
+  $groupinfo = $banana->nntp->group($g);
+  $newarts = $banana->nntp->newnews($banana->profile['lastnews'], $g);
 ?>
   <tr class="<?php echo ($pair?$css["pair"]:$css["impair"]);?>" >
     <td class="<?php echo $css["total"]; ?>">
@@ -76,8 +58,7 @@ foreach ($groups->overview as $g => $d) {
     </td>
     <td class="<?php echo $css["unread"]; ?>">
       <input type="checkbox" name="subscribe[]" value="<?php echo $g;?>"
-      <?php echo (in_array($g,$profile['subscribe'])?'checked="checked"'
-      :'');?> />
+      <?php if (in_array($g,$banana->profile['subscribe']) echo 'checked="checked"'; ?> />
     </td>
     <td class="<?php echo $css["group"]; ?>">
       <?php echo "<a href=\"thread.php?group=$g\">$g</a>";?>
@@ -100,6 +81,6 @@ foreach ($groups->overview as $g => $d) {
 
 displayshortcuts();
 
-$nntp->quit();
+$banana->nntp->quit();
 require_once("include/footer.inc.php");
 ?>

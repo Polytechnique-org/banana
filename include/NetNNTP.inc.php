@@ -14,14 +14,41 @@ class nntp
 {
     /** socket filehandle */
     var $ns;
-    /** debug mode */
-    var $debug;
     /** posting allowed */
     var $posting;
     /** last NNTP error code */
     var $lasterrorcode;
     /** last NNTP error text */
     var $lasterrortext;
+
+    /** constructor
+     * @param $_host STRING NNTP host
+     * @param $_timeout INTEGER socket timeout
+     * @param $_reader BOOLEAN sends a "MODE READER" at connection if true
+     */
+
+    function nntp($_url, $_timeout=120, $_reader=true)
+    {
+        $url['port'] = 119;
+        $url         = parse_url($_url);
+        $this->ns    = fsockopen($url['host'], $url['port'], $errno, $errstr, $_timeout);
+        if (!$this->ns) {
+            $this = false;
+            return false;
+        }
+
+        $result        = $this->gline(); 
+        $this->posting = (substr($result, 0, 3)=="200");
+        if ($_reader && ($result{0}=="2")) {
+            $this->pline("MODE READER\r\n");
+            $result        = $this->gline();
+            $this->posting = ($result{0}=="200");
+        }
+        if ($result{0}=="2" && $url['user'] && $url['user']!='anonymous') {
+            return $this->authinfo($url['user'], $url['pass']);
+        }
+        return ($result{0}=="2");
+    }
 
 # Socket functions
 
@@ -31,11 +58,6 @@ class nntp
 
     function gline()
     {
-        if ($this->debug) {
-            $line = trim(fgets($this->ns, 1200));
-            print "NNTP >>>> $line \n";
-            return $line;
-        }
         return trim(fgets($this->ns, 1200));
     }
 
@@ -45,47 +67,7 @@ class nntp
 
     function pline($_line)
     {
-        if ($this->debug) {
-            $dline = preg_replace("/\r\n$/", "", $_line);
-            $dline = preg_replace("/(\r|\n|\r\n)/", "\nNNTP <<<< ", $dline);
-            print "NNTP <<<< $dline \n";
-        }
         return fputs($this->ns, $_line, strlen($_line));
-    }
-
-    /** constructor
-     * @param $_host STRING NNTP host
-     * @param $_timeout INTEGER socket timeout
-     * @param $_debug BOOLEAN debug flag (generates verbose output if on)
-     * @param $_reader BOOLEAN sends a "MODE READER" at connection if true
-     */
-
-    function nntp($_host, $_timeout=120, $_debug=0, $_reader=true)
-    {
-        if (preg_match("/([^:]+):([^:]+)/", $_host, $regs)) {
-            $host = $regs[1];
-            $port = $regs[2];
-        } else {
-            $host = $_host;
-            $port = 119;
-        }
-        $this->ns    = fsockopen($host, $port, $errno, $errstr, $_timeout);
-        $this->debug = $_debug;
-        if (!$this->ns) {
-            if ($this->debug) {
-                echo "ERREUR: $errno - $errstr <br />\n";
-            }
-            $this = false;
-            return false;
-        }
-        $result        = $this->gline(); 
-        $this->posting = (substr($result, 0, 3)=="200");
-        if ($_reader && ($result{0}=="2")) {
-            $this->pline("MODE READER\r\n");
-            $result        = $this->gline();
-            $this->posting = ($result{0}=="200");
-        }
-        return ($result{0}=="2");
     }
 
 # strict NNTP Functions [RFC 977]
@@ -459,13 +441,13 @@ class nntp
 
     function xgtitle($_pattern="*")
     {
-        $pattern = preg_replace("/(\r|\n)/", "", $_pattern);
+        $pattern = preg_replace("/[\r\n]/", "", $_pattern);
         $this->pline("XGTITLE $pattern \r\n");
         if (substr($this->gline(), 0, 1)!="2") return false;
         $result = $this->gline();
         while ($result != ".") {
-            preg_match("/([^ \t]+)( |\t)+(.+)$/", $result, $regs);
-            $array[$regs[1]] = $regs[3];
+            preg_match("/([^ \t]+)[ \t]+(.+)$/", $result, $regs);
+            $array[$regs[1]] = $regs[2];
             $result          = $this->gline();
         }
         return $array;

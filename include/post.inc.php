@@ -21,15 +21,15 @@ class BananaPost
     var $name;
 
     /** constructor
-     * @param $_nntp RESOURCE handle to NNTP socket
      * @param $_id STRING MSGNUM or MSGID (a group should be selected in this case)  
      */
-    function BananaPost(&$_nntp, $_id)
+    function BananaPost($_id)
     {
+        global $banana;
         $this->nb = $_id;
-        $this->_header($_nntp);
+        $this->_header();
 
-        $this->body = join("\n", $_nntp->body($_id));
+        $this->body = join("\n", $banana->nntp->body($_id));
         
         if (isset($this->headers['content-transfer-encoding'])) {
             if (preg_match("/base64/", $this->headers['content-transfer-encoding'])) {
@@ -44,10 +44,10 @@ class BananaPost
         }
     }
 
-    function _header(&$_nntp)
+    function _header()
     {
-        global $news;
-        $hdrs = $_nntp->head($this->nb);
+        global $banana;
+        $hdrs = $banana->nntp->head($this->nb);
         if (!$hdrs) {
             $this = null;
             return false;
@@ -57,19 +57,19 @@ class BananaPost
         foreach ($hdrs as $line) {
             if (preg_match("/^[\t\r ]+/", $line)) {
                 $line = ($hdr=="X-Face"?"":" ").ltrim($line);
-                if (in_array($hdr, $news['head']))  {
+                if (in_array($hdr, $banana->parse_hdr))  {
                     $this->headers[$hdr] .= $line;
                 }
             } else {
                 list($hdr, $val) = split(":[ \t\r]*", $line, 2);
                 $hdr = strtolower($hdr);
-                if (in_array($hdr, $news['head'])) {
+                if (in_array($hdr, $banana->parse_hdr)) {
                     $this->headers[$hdr] = $val;
                 }
             }
         }
         // decode headers
-        foreach ($news['hdecode'] as $hdr) {
+        foreach ($banana->hdecode as $hdr) {
             if (isset($this->headers[$hdr])) {
                 $this->headers[$hdr] = headerDecode($this->headers[$hdr]);
             }

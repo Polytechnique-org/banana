@@ -8,11 +8,17 @@
  ********************************************************************************/
 
 /********************************************************************************
- *  I18N
+ *  MISC
  */
 
-
 function _b_($str) { return utf8_decode(dgettext('banana', utf8_encode($str))); }
+
+function checkcancel($_headers) {
+    if (function_exists('hook_checkcancel')) {
+        return hook_checkcancel($_headers);
+    }
+    return ($_headers['from'] == $_SESSION['name']." <".$_SESSION['mail'].">");
+}
 
 /********************************************************************************
  *  HEADER STUFF
@@ -40,7 +46,57 @@ function header_translate($hdr) {
         case 'references':      return _b_('Références');
         case 'x-face':          return _b_('Image');
         default:
+            if (function_exists('hook_header_translate')) {
+                return hook_header_translate($hdr);
+            }
             return $hdr;
+    }
+}
+
+function formatDisplayHeader($_header,$_text) {
+    global $banana;
+    switch ($_header) {
+        case "date": 
+            return formatDate($_text);
+        
+        case "followup-to":
+            case "newsgroups":
+            $res = "";
+            $groups = preg_split("/[\t ]*,[\t ]*/",$_text);
+            foreach ($groups as $g) {
+                $res.="<a href='thread.php?group=$g'>$g</a>, ";
+            }
+            return substr($res,0, -2);
+
+        case "from":
+            return formatFrom($_text);
+        
+        case "references":
+            $rsl     = "";
+            $ndx     = 1;
+            $text    = str_replace("><","> <",$_text);
+            $text    = preg_split("/[ \t]/",strtr($text,$banana->spool->ids));
+            $parents = preg_grep("/^\d+$/",$text);
+            $p       = array_pop($parents);
+            
+            while ($p) {
+                $valid_parents[]=$p;
+                $p = $banana->spool->overview[$p]->parent;
+            }
+            foreach (array_reverse($valid_parents) as $p) {
+                $rsl .= "<a href=\"article.php?group={$banana->spool->group}&amp;id=$p\">$ndx</a> ";
+                $ndx++;
+            }
+            return $rsl;
+
+        case "x-face":
+            return '<img src="xface.php?face='.base64_encode($_text).'"  alt="x-face" />';
+        
+        default:
+            if (function_exists('hook_formatDisplayHeader')) {
+                return hook_formatDisplayHeader($_header, $_text);
+            }
+            return htmlentities($_text);
     }
 }
 
@@ -87,7 +143,7 @@ function formatFrom($text) {
     return preg_replace("/\\\(\(|\))/","\\1",$result);
 }
 
-function wrap($text, $_prefix="", $_length=72)
+function wrap($text, $_prefix="")
 {
     $parts = preg_split("/\n-- ?\n/", $text);
     if (count($parts)  >1) {
@@ -97,16 +153,17 @@ function wrap($text, $_prefix="", $_length=72)
         $sign = '';
         $text = $text;
     }
-    
-    $cmd = "echo ".escapeshellarg($text)." | perl -MText::Autoformat -e 'autoformat {left=>1, right=>$_length, all=>1 };'";
+   
+    global $banana;
+    $length = $banana->wrap;
+    $cmd = "echo ".escapeshellarg($text)." | perl -MText::Autoformat -e 'autoformat {left=>1, right=>$length, all=>1 };'";
     exec($cmd, $result);
 
     return $_prefix.join("\n$_prefix", $result).($_prefix ? '' : $sign);
 }
 
 function formatbody($_text) {
-    global $news;
-    $res  = "\n\n" . htmlentities(wrap($_text, "", $news['wrap']))."\n\n";
+    $res  = "\n\n" . htmlentities(wrap($_text, ""))."\n\n";
     $res  = preg_replace("/(&lt;|&gt;|&quot;)/", " \\1 ", $res);
     $res  = preg_replace('/(["\[])?((https?|ftp|news):\/\/[a-z@0-9.~%$£µ&i#\-+=_\/\?]*)(["\]])?/i', "\\1<a href=\"\\2\">\\2</a>\\4", $res);
     $res  = preg_replace("/ (&lt;|&gt;|&quot;) /", "\\1", $res);

@@ -7,29 +7,16 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-require_once("include/session.inc.php");
-require_once("include/misc.inc.php");
-require_once("include/password.inc.php");
-require_once("include/NetNNTP.inc.php");
-require_once("include/groups.inc.php");
-require_once("include/format.inc.php");
-require_once("include/config.inc.php");
-require_once("include/profile.inc.php");
-require_once("include/error.inc.php");
-
-$profile=getprofile();
+require_once("include/banana.inc.php");
 require_once("include/header.inc.php");
 
-$nntp = new nntp($news['server']);
-if (!$nntp) error("nntpsock");
-if ($news['user']!="anonymous") {
-  $result = $nntp->authinfo($news["user"],$news["pass"]);
-  if (!$result) error("nntpauth");
+$groups = new BananaGroups(0);
+if (!count($groups->overview)) {
+    $groups = new BananaGroups(2);
+} else {
+    $newgroups = new BananaGroups(1);
 }
-$groups = new BananaGroups($nntp,0);
-if (!count($groups->overview)) $groups = new BananaGroups($nntp,2);
-    
-$newgroups = new BananaGroups($nntp,1);
+
 ?>
 
 <h1>
@@ -60,9 +47,9 @@ displayshortcuts();
 <?php
 $pair = true;
 foreach ($groups->overview as $g => $d) {
-  $pair = !$pair;
-  $groupinfo = $nntp->group($g);
-  $newarts = $nntp->newnews($profile['lastnews'],$g);
+    $pair = !$pair;
+    $groupinfo = $banana->nntp->group($g);
+    $newarts = $banana->nntp->newnews($banana->profile['lastnews'],$g);
 ?>
   <tr class="<?php echo ($pair?$css["pair"]:$css["impair"]);?>" >
     <td class="<?php echo $css["total"]; ?>">
@@ -83,7 +70,7 @@ foreach ($groups->overview as $g => $d) {
 ?>
 </table>
 <?php
-if (count($newgroups->overview) and count($profile['subscribe'])) {
+if (count($newgroups->overview) and count($banana->profile['subscribe'])) {
 ?>
 <p class="normal">
 <?php echo _b_('Les forums suivants ont été créés depuis ton dernier passage :'); ?>
@@ -101,10 +88,10 @@ if (count($newgroups->overview) and count($profile['subscribe'])) {
     </th>
   </tr>
 <?php
-  $pair = true;
-  foreach ($newgroups->overview as $g => $d) {
-    $pair = !$pair;
-    $groupinfo = $nntp->group($g);
+    $pair = true;
+    foreach ($newgroups->overview as $g => $d) {
+        $pair = !$pair;
+        $groupinfo = $banana->nntp->group($g);
 ?>
   <tr class="<?php echo ($pair?$css["pair"]:$css["impair"]);?>" >
     <td class="<?php echo $css["total"]; ?>">
@@ -118,7 +105,7 @@ if (count($newgroups->overview) and count($profile['subscribe'])) {
     </td>
   </tr>
 <?php
-  } //foreach
+    } //foreach
 ?>
 </table>
 <?php
@@ -126,6 +113,6 @@ if (count($newgroups->overview) and count($profile['subscribe'])) {
 
 displayshortcuts();
 
-$nntp->quit();
+$banana->nntp->quit();
 require_once("include/footer.inc.php");
 ?>

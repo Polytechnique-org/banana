@@ -85,22 +85,21 @@ class BananaSpool
     var $roots;
 
     /** constructor
-     * @param $_nntp RESOURCE NNTP socket filehandle
      * @param $_group STRING group name
      * @param $_display INTEGER 1 => all posts, 2 => only threads with new posts
      * @param $_since INTEGER time stamp (used for read/unread)
      */
-    function BananaSpool(&$_nntp, $_group, $_display=0, $_since="")
+    function BananaSpool($_group, $_display=0, $_since="")
     {
-        global $news;
+        global $banana;
         $this->group = $_group;
-        $groupinfo   = $_nntp->group($_group);
+        $groupinfo   = $banana->nntp->group($_group);
         if (!$groupinfo) { return ($this = null); }
 
         $this->_readFromFile();
 
         $do_save = false;
-        $first   = max($groupinfo[2]-$news['maxspool'], $groupinfo[1]);
+        $first   = $banana->maxspool ? max($groupinfo[2]-$banana->maxspool, $groupinfo[1]) : $groupinfo[1];
         $last    = $groupinfo[2];
         if ($this->version == BANANA_SPOOL_VERSION) {
             for ($id = min(array_keys($this->overview)); $id<$first; $id++) { 
@@ -115,12 +114,12 @@ class BananaSpool
 
         if ($first<=$last && $groupinfo[0]) {
             $do_save = true;
-            $this->_updateSpool($_nntp, "$first-$last");
+            $this->_updateSpool("$first-$last");
         }
 
         if ($do_save) { $this->_saveToFile(); }
 
-        $this->_updateUnread($_nntp, $_since, $_display);
+        $this->_updateUnread($_since, $_display);
     }
 
     function _readFromFile()
@@ -146,13 +145,14 @@ class BananaSpool
         file_put_contents($file, serialize($this));
     }
 
-    function _updateSpool(&$_nntp, $arg)
+    function _updateSpool($arg)
     {
-        $dates    = array_map(strtotime,    $_nntp->xhdr("Date",    $arg));
-        $subjects = array_map(headerdecode, $_nntp->xhdr("Subject", $arg));
-        $froms    = array_map(headerdecode, $_nntp->xhdr("From",    $arg));
-        $msgids   = $_nntp->xhdr("Message-ID", $arg);
-        $refs     = $_nntp->xhdr("References", $arg);
+        global $banana;
+        $dates    = array_map(strtotime,    $banana->nntp->xhdr("Date",    $arg));
+        $subjects = array_map(headerdecode, $banana->nntp->xhdr("Subject", $arg));
+        $froms    = array_map(headerdecode, $banana->nntp->xhdr("From",    $arg));
+        $msgids   = $banana->nntp->xhdr("Message-ID", $arg);
+        $refs     = $banana->nntp->xhdr("References", $arg);
 
         if (is_array($this->ids)) {
             $this->ids = array_merge($this->ids, array_flip($msgids));
@@ -188,11 +188,12 @@ class BananaSpool
         }
     }
 
-    function _updateUnread(&$nntp, $since, $mode)
+    function _updateUnread($since, $mode)
     {
+        global $banana;
         if (empty($since)) { return; }
 
-        if (is_array($newpostsids = $nntp->newnews($since, $this->group))) {
+        if (is_array($newpostsids = $banana->nntp->newnews($since, $this->group))) {
             $newpostsids = array_intersect($newpostsids, array_keys($this->ids));
             foreach ($newpostsids as $mid) {
                 $this->overview[$this->ids[$mid]]->isread     = false;

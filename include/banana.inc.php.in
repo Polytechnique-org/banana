@@ -1,0 +1,97 @@
+<?php
+/********************************************************************************
+* install.d/config.inc.php : configuration file
+* --------------------------
+*
+* This file is part of the banana distribution
+* Copyright: See COPYING files that comes with this distribution
+********************************************************************************/
+
+require_once("include/session.inc.php");
+require_once("include/misc.inc.php");
+require_once("include/groups.inc.php");
+require_once("include/format.inc.php");
+require_once("include/error.inc.php");
+require_once("include/post.inc.php");
+
+class Banana
+{
+    var $maxspool  = 3000;
+
+    var $hdecode   = array('from','name','organization','subject');
+    var $parse_hdr = array('content-transfer-encoding', 'content-type', 'date', 'followup-to', 'from',
+            'message-id', 'newsgroups', 'organization', 'references', 'subject', 'x-face');
+    var $show_hdr  = array('from', 'subject', 'newsgroups', 'followup', 'date', 'organization', 'references', 'x-face');
+
+
+    var $tbefore   = 5;
+    var $tafter    = 5;
+    var $tmax      = 50;
+
+    var $wrap      = 74;
+
+    var $custom    = "Content-Type: text/plain; charset=iso-8859-15\nMime-Version: 1.0\nContent-Transfer-Encoding: 8bit\nUser-Agent: Banana @VERSION@\n";
+
+    var $host      = 'news://localhost:119/';
+
+    var $profile   = Array( 'name' => 'Anonymous <anonymouse@example.com', 'sig'  => '', 'org'  => '',
+            'customhdr' =>'', 'display' => 0, 'lastnews' => 0, 'lang'  => 'fr', 'subscribe' => array());
+    
+    var $nntp;
+    var $spool;
+
+    function Banana()
+    {
+        if (function_exists('hook_banana')) {
+            hook_banana($this);
+        }
+        $this->_setupProfile();
+        require_once('include/NetNNTP.inc.php');
+        $this->nntp = new nntp($this->host);
+    }
+
+    function newSpool($group, $disp=0, $since='') {
+        require_once('include/spool.inc.php');
+        $this->spool = new BananaSpool($group, $disp, $since);
+        if (!$this->spool) { error('nntpspool'); }
+    }
+
+    function _setupProfile()
+    {
+        if (function_exists('hook_getprofile')) {
+            $this->profile = hook_getprofile();
+        } else {
+            session_start();
+        }
+        
+        setlocale(LC_ALL, $this->profile['locale']);
+    }
+}
+
+$banana = new Banana;
+
+if (empty($css)) {
+$css = array(
+        'bananashortcuts' => 'bananashortcuts',
+        'bicol' => 'bicol',
+        'bicoltitre' => 'bicoltitre',
+        'bicolvpadd' => 'bicolvpadd',
+        'pair' => 'pair',
+        'impair' => 'impair',
+        'bouton' => 'bouton',
+        'error' => 'error',
+        'normal' => 'normal',
+        'total' => 'total',
+        'unread' => 'unread',
+        'group' => 'group',
+        'description' => 'description',
+        'date' => 'date',
+        'subject' => 'subject',
+        'from' => 'from',
+        'author' => 'author',
+        'nopadd' => 'nopadd',
+        'overview' => 'overview',
+        'tree' => 'tree'
+        );
+}
+?>

@@ -7,12 +7,8 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-require_once("include/session.inc.php");
-require_once("include/misc.inc.php");
-require_once("include/profile.inc.php");
-require_once("include/error.inc.php");
+require_once("include/banana.inc.php");
 
-$profile=getprofile();
 $_SESSION=array();
 session_destroy();
 
