@@ -34,11 +34,11 @@ if ($news['user']!="anonymous") {
   $result = $nntp->authinfo($news["user"],$news["pass"]);
   if (!$result) error("nntpauth");
 }
-$spool = new spool($nntp,$group,$profile['display'],$profile['lastnews']);
+$spool = new BananaSpool($nntp,$group,$profile['display'],$profile['lastnews']);
 if (!$spool) error("nntpspool");
 $nntp->group($group);
 
-$post = new NNTPPost($nntp,$id);
+$post = new BananaPost($nntp,$id);
 if (!$post) {
   if ($nntp->lasterrorcode == "423") {
     $spool->delid($id);
@@ -80,12 +80,14 @@ summary="<?php echo _b_('Contenu du message'); ?>">
     </th>
   </tr>
 <?php
-foreach ($news['headdisp'] as $nick) {
-  if (isset($post->headers[$nick])) 
-    echo "<tr><td class=\"{$css['bicoltitre']}\">".header_translate($nick)."</td>"
-    ."<td>".formatdisplayheader($nick,$post->headers[$nick],$spool)
-    ."</td></tr>\n";
-}
+    foreach ($news['headdisp'] as $nick) {
+        if (isset($post->headers[$nick])) {
+            $res = formatdisplayheader($nick,$post->headers[$nick],$spool);
+            if ($res)
+                echo "<tr><td class=\"{$css['bicoltitre']}\">".header_translate($nick)."</td>"
+                    ."<td>$res</td></tr>\n";
+        }
+    }
 ?>
   <tr>
     <th colspan="2">

@@ -21,15 +21,15 @@ function headerDecode($value) {
 }
 
 function header_translate($hdr) {
-    switch (strtolower($hdr)) {
+    switch ($hdr) {
         case 'from':            return _b_('De');
         case 'subject':         return _b_('Sujet');
         case 'newsgroups':      return _b_('Forums');
-        case 'followup':        return _b_('Suivi-à');
+        case 'followup-to':     return _b_('Suivi-à');
         case 'date':            return _b_('Date');
         case 'organization':    return _b_('Organisation');
         case 'references':      return _b_('Références');
-        case 'xface':           return _b_('Image');
+        case 'x-face':          return _b_('Image');
         default:
             return $hdr;
     }

@@ -10,7 +10,8 @@
 /** class for posts
  */
 
-class NNTPPost {
+class BananaPost
+{
     var $nb;
     /** headers */
     var $headers;
@@ -23,7 +24,8 @@ class NNTPPost {
      * @param $_nntp RESOURCE handle to NNTP socket
      * @param $_id STRING MSGNUM or MSGID (a group should be selected in this case)  
      */
-    function NNTPPost(&$_nntp, $_id) {
+    function BananaPost(&$_nntp, $_id)
+    {
         $this->nb = $_id;
         $this->_header($_nntp);
 
@@ -51,7 +53,6 @@ class NNTPPost {
             return false;
         }
 
-        $this->nb = $_id;
         // parse headers
         foreach ($hdrs as $line) {
             if (preg_match("/^[\t\r ]+/", $line)) {

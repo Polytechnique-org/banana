@@ -34,12 +34,12 @@ if ($news['user']!="anonymous") {
 }
 unset($result);
 
-$groups = new groups($nntp,2);
+$groups = new BananaGroups($nntp,2);
 $list = array_keys($groups->overview);
 unset($groups);
 foreach ($list as $g) {
     print "Generating spool for $g : ";
-    $spool = new spool($nntp,$g);
+    $spool = new BananaSpool($nntp,$g);
     print "done.\n";
     unset($spool);
 }

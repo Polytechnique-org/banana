@@ -41,7 +41,7 @@ if ($news['user']!="anonymous") {
 if (isset($group) && isset($id) && isset($_REQUEST['type']) && 
         ($_REQUEST['type']=='followup')) {
     $rq=$nntp->group($group);
-    $post = new NNTPPost($nntp,$id);
+    $post = new BananaPost($nntp,$id);
     if ($post) {
         $subject = (preg_match("/^re:/i",$post->headers['subject'])?"":"Re: ").$post->headers['subject'];
         if ($profile['dropsig']) {

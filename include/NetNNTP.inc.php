@@ -10,7 +10,8 @@
 /** Class NNTP
  *  implements some basic functions for NNTP protocol
  */
-class nntp {
+class nntp
+{
     /** socket filehandle */
     var $ns;
     /** debug mode */
@@ -28,7 +29,8 @@ class nntp {
      * @return STRING 
      */
 
-    function gline() {
+    function gline()
+    {
         if ($this->debug) {
             $line = trim(fgets($this->ns, 1200));
             print "NNTP >>>> $line \n";
@@ -41,7 +43,8 @@ class nntp {
      * @param STRING $_line line to put
      */
 
-    function pline($_line) {
+    function pline($_line)
+    {
         if ($this->debug) {
             $dline = preg_replace("/\r\n$/", "", $_line);
             $dline = preg_replace("/(\r|\n|\r\n)/", "\nNNTP <<<< ", $dline);
@@ -57,7 +60,8 @@ class nntp {
      * @param $_reader BOOLEAN sends a "MODE READER" at connection if true
      */
 
-    function nntp($_host, $_timeout=120, $_debug=0, $_reader=true) {
+    function nntp($_host, $_timeout=120, $_debug=0, $_reader=true)
+    {
         if (preg_match("/([^:]+):([^:]+)/", $_host, $regs)) {
             $host = $regs[1];
             $port = $regs[2];
@@ -93,7 +97,8 @@ class nntp {
      * @return BOOLEAN true if authentication was successful
      */
 
-    function authinfo($_user, $_pass) {
+    function authinfo($_user, $_pass)
+    {
         $user = preg_replace("/(\r|\n)/", "", $_user);
         $pass = preg_replace("/(\r|\n)/", "", $_pass);
         $this->pline("AUTHINFO USER $user\r\n");
@@ -119,7 +124,8 @@ class nntp {
      * @see head
      */
 
-    function article($_msgid="") {
+    function article($_msgid="")
+    {
         $msgid = preg_replace("/(\r|\n)/", "", $_msgid);
         $this->pline("ARTICLE $msgid\r\n");
         $result = $this->gline();
@@ -142,7 +148,8 @@ class nntp {
      * @return STRING MSGID of article 
      */
 
-    function post($_message) {
+    function post($_message)
+    {
         if (is_array($_message)) {
             $message=join("\n", $_message);
         } else {
@@ -180,7 +187,8 @@ class nntp {
      * @see head
      */
 
-    function body($_msgid="") {
+    function body($_msgid="")
+    {
         $msgid = preg_replace("/(\r|\n)/", "", $_msgid);
         $this->pline("BODY $msgid\r\n");
         $result = $this->gline();
@@ -205,7 +213,8 @@ class nntp {
      * @see body
      */
 
-    function head($_msgid="") {
+    function head($_msgid="")
+    {
         $msgid = preg_replace("/(\r|\n)/", "", $_msgid);
         $this->pline("HEAD $msgid\r\n");
         $result = $this->gline();
@@ -227,7 +236,8 @@ class nntp {
      * @return ARRAY array : nb of articles in group, MSGNUM of first article, MSGNUM of last article, and group name
      */
 
-    function group($_group) {
+    function group($_group)
+    {
         $group = preg_replace("/(\r|\n)/", "", $_group);
         $this->pline("GROUP $group\r\n");
         $line = $this->gline();
@@ -247,7 +257,8 @@ class nntp {
      * @see next
      */
 
-    function last() {
+    function last()
+    {
         $this->pline("LAST \r\n");
         $line = $this->gline();
         if ($line{0}!="2") {
@@ -266,7 +277,8 @@ class nntp {
      * @see last
      */
 
-    function next() {
+    function next()
+    {
         $this->pline("NEXT \r\n");
         $line = $this->gline();
         if ($line{0}!="2") {
@@ -287,7 +299,8 @@ class nntp {
      * @see body
      */
 
-    function nntpstat($_msgid) {
+    function nntpstat($_msgid)
+    {
         $msgid = preg_replace("/(\r|\n)/", "", $_msgid);
         $this->pline("STAT $msgid\r\n");
         $line  = $this->gline();
@@ -306,7 +319,8 @@ class nntp {
      * @return BOOLEAN true if posting is allowed lines 
      */
 
-    function postok() {
+    function postok()
+    {
         return ($this->posting);
     }
 
@@ -315,7 +329,8 @@ class nntp {
      * @see newgroups
      */
 
-    function liste() {
+    function liste()
+    {
         $this->pline("LIST\r\n");
         if (substr($this->gline(), 0, 1)!="2") return false;
         $result = $this->gline();
@@ -335,7 +350,8 @@ class nntp {
      * @see liste
      */
 
-    function newgroups($_since, $_distributions="") {
+    function newgroups($_since, $_distributions="")
+    {
 #assume $_since is a unix timestamp
         $distributions = preg_replace("/(\r|\n)/", "", $_distributions);
         $this->pline("NEWGROUPS ".gmdate("ymd His", $_since)
@@ -359,7 +375,8 @@ class nntp {
      * @return ARRAY MSGID of new articles
      */
 
-    function newnews($_since, $_groups="*", $_distributions="") {
+    function newnews($_since, $_groups="*", $_distributions="")
+    {
         $distributions = preg_replace("/(\r|\n)/", "", $_distributions);
         $groups = preg_replace("/(\r|\n)/", "", $_groups);
         $array  = array();
@@ -380,7 +397,8 @@ class nntp {
      * @return BOOLEAN true if sucessful
      */
 
-    function slave() {
+    function slave()
+    {
         $this->pline("SLAVE \r\n");
         return (substr($this->gline(), 0, 1)=="2");
     }
@@ -391,7 +409,8 @@ class nntp {
      * @return BOOLEAN 
      */
 
-    function ihave($_msgid, $_message=false) {
+    function ihave($_msgid, $_message=false)
+    {
         $msgid = preg_replace("/(\r|\n)/", "", $_msgid);
         if (is_array($message)) {
             $message = join("\n", $_message);
@@ -410,7 +429,8 @@ class nntp {
     /** closes connection to server
      */
 
-    function quit() {
+    function quit()
+    {
         $this->pline("QUIT\r\n");
         $this->gline();
         fclose($this->ns);
@@ -422,7 +442,8 @@ class nntp {
      * @return INTEGER timestamp 
      */
 
-    function date() {
+    function date()
+    {
         $this->pline("DATE \r\n");
         $result = $this->gline();
         if (preg_match("/^111 (\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/", $result, $r)) {
@@ -436,7 +457,8 @@ class nntp {
      * @return ARRAY group name => description
      */
 
-    function xgtitle($_pattern="*") {
+    function xgtitle($_pattern="*")
+    {
         $pattern = preg_replace("/(\r|\n)/", "", $_pattern);
         $this->pline("XGTITLE $pattern \r\n");
         if (substr($this->gline(), 0, 1)!="2") return false;
@@ -455,7 +477,8 @@ class nntp {
      * @return ARRAY MSGNUM => header value
      */
 
-    function xhdr($_hdr, $_range="") {
+    function xhdr($_hdr, $_range="")
+    {
         $hdr    = preg_replace("/(\r|\n)/", "", $_hdr);
         $range  = preg_replace("/(\r|\n)/", "", $_range);
         $this->pline("XHDR $hdr $range \r\n");
@@ -478,7 +501,8 @@ class nntp {
      * @return ARRAY MSGNUM => header value
      */
 
-    function xpat($_hdr, $_range, $_pat) {
+    function xpat($_hdr, $_range, $_pat)
+    {
         $hdr   = preg_replace("/(\r|\n)/", "", $_hdr);
         $range = preg_replace("/(\r|\n)/", "", $_range);
         $pat   = preg_replace("/(\r|\n)/", "", $_pat);

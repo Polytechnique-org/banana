@@ -38,7 +38,7 @@ if ($news['user']!="anonymous") {
   $result = $nntp->authinfo($news["user"],$news["pass"]);
   if (!$result) error("nntpauth");
 }
-$spool = new spool($nntp,$group,$profile['display'],
+$spool = new BananaSpool($nntp,$group,$profile['display'],
   $profile['lastnews']);
 if (!$spool) error("nntpspool");
 $max = 50;
@@ -55,7 +55,7 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
     case 'cancel':
       $mid = array_search($id,$spool->ids);
       $nntp->group($group);
-      $post = new NNTPPost($nntp,$id);
+      $post = new BananaPost($nntp,$id);
       
       if (checkcancel($post->headers)) {
         $message = 'From: '.$profile['name']."\n"
@@ -97,7 +97,7 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
       break;
     case 'followupok':
       $rq=$nntp->group($group);
-      $post = new NNTPPost($nntp,$id);
+      $post = new BananaPost($nntp,$id);
       if ($post) {
         $refs = (isset($post->headers['references'])?
                 $post->headers['references']." ":"").$post->headers['message-id'];
@@ -124,7 +124,7 @@ if (isset($_REQUEST['action']) && (isset($_REQUEST['type'])) &&
       break;
   }
   $_SESSION['bananapostok']=false;
-  $spool = new spool($nntp,$group,$profile['display'],
+  $spool = new BananaSpool($nntp,$group,$profile['display'],
     $profile['lastnews']);
   if (!$spool) error("nntpspool");
 }

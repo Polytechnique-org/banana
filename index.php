@@ -26,10 +26,10 @@ if ($news['user']!="anonymous") {
   $result = $nntp->authinfo($news["user"],$news["pass"]);
   if (!$result) error("nntpauth");
 }
-$groups = new groups($nntp,0);
-if (!count($groups->overview)) $groups=new groups($nntp,2);
+$groups = new BananaGroups($nntp,0);
+if (!count($groups->overview)) $groups = new BananaGroups($nntp,2);
     
-$newgroups = new groups($nntp,1);
+$newgroups = new BananaGroups($nntp,1);
 ?>
 
 <h1>

@@ -19,12 +19,12 @@ if(!function_exists('_file_put_contents')) {
     }
 }
 
-function spoolcompare($a,$b) { return ($b->date>=$a->date); }
+function spoolCompare($a,$b) { return ($b->date>=$a->date); }
 
 /** Class spoolhead
  *  class used in thread overviews
  */
-class SpoolHead
+class BananaSpoolHead
 {
     /** date (timestamp) */
     var $date;
@@ -54,7 +54,7 @@ class SpoolHead
      * @param $_descunread INTEGER descunread value (0 for a new post)
      */
 
-    function SpoolHead($_date, $_subject, $_from, $_desc=1, $_read=true, $_descunread=0)
+    function BananaSpoolHead($_date, $_subject, $_from, $_desc=1, $_read=true, $_descunread=0)
     {
         $this->date       = $_date;
         $this->subject    = $_subject;
@@ -71,7 +71,7 @@ class SpoolHead
 
 define("BANANA_SPOOL_VERSION", '0.2');
 
-class spool
+class BananaSpool
 {
     var $version;
     /**  spool */
@@ -89,7 +89,7 @@ class spool
      * @param $_display INTEGER 1 => all posts, 2 => only threads with new posts
      * @param $_since INTEGER time stamp (used for read/unread)
      */
-    function spool(&$_nntp, $_group, $_display=0, $_since="")
+    function BananaSpool(&$_nntp, $_group, $_display=0, $_since="")
     {
         global $news;
         $this->group = $_group;
@@ -160,7 +160,7 @@ class spool
         }
 
         foreach ($msgids as $id=>$msgid) {
-            $msg                = new spoolhead($dates[$id], $subjects[$id], $froms[$id]);
+            $msg                = new BananaSpoolHead($dates[$id], $subjects[$id], $froms[$id]);
             $refs[$id]          = str_replace('><', '> <', $refs[$id]);
             $msgrefs            = preg_split("/[ \t]/", strtr($refs[$id], $this->ids));
             $parents            = preg_grep('/^\d+$/', $msgrefs);
@@ -175,7 +175,7 @@ class spool
 
             if ($p = $msg->parent) {
                 if (empty($this->overview[$p])) {
-                    $this->overview[$p] = new spoolhead($dates[$p], $subjects[$p], $froms[$p], 1);
+                    $this->overview[$p] = new BananaSpoolHead($dates[$p], $subjects[$p], $froms[$p], 1);
                 }
                 $this->overview[$p]->children[] = $id;
 
