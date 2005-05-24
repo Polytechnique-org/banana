@@ -206,7 +206,7 @@ function wrap($text, $_prefix="")
 }
 
 function formatbody($_text) {
-    $res  = "\n\n" . htmlentities(wrap($_text, ""))."\n\n";
+    $res  = "\n\n" . wrap($_text, "")."\n\n";
     $res  = preg_replace("/(&lt;|&gt;|&quot;)/", " \\1 ", $res);
     $res  = preg_replace('/(["\[])?((https?|ftp|news):\/\/[a-z@0-9.~%$£µ&i#\-+=_\/\?]*)(["\]])?/i', "\\1<a href=\"\\2\">\\2</a>\\4", $res);
     $res  = preg_replace("/ (&lt;|&gt;|&quot;) /", "\\1", $res);
