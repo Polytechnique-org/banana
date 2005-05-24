@@ -235,7 +235,7 @@ class Banana
         $html .= '<tr><td>'._b_('Sujet').'</td><td><input type="text" name="subject" value="'.htmlentities($subject).'" size="60" /></td></tr>';
         $html .= '<tr><td>'._b_('Forums').'</td><td><input type="text" name="newsgroups" value="'.htmlentities($target).'" size="60" /></td></tr>';
         $html .= '<tr><td>'._b_('Suivi à').'</td><td><input type="text" name="followup" value="" size="60" /></td></tr>';
-        $html .= '<tr><td>'._b_('Organisation').'</td><td>'.$this->profile['org']1.'</td></tr>';
+        $html .= '<tr><td>'._b_('Organisation').'</td><td>'.$this->profile['org'].'</td></tr>';
         $html .= '<tr><th colspan="2">'._b_('Corps').'</th></tr>';
         $html .= '<tr><td colspan="2"><textarea name="body" cols="74" rows="16">'
             .$body.($this->profile['sig'] ? "\n\n-- \n".htmlentities($this->profile['sig']) : '').'</textarea></td></th>';
