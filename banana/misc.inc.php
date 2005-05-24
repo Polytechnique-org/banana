@@ -13,9 +13,9 @@
 
 function _b_($str) { return utf8_decode(dgettext('banana', utf8_encode($str))); }
 
-function to_html($str, $charset) {
+function to_entities($str) {
     require_once 'banana/utf8.php';
-    return utf8entities(htmlentities(iconv($charset, 'utf8', $str), ENT_NOQUOTES, 'UTF-8'));
+    return utf8entities(htmlentities($str, ENT_NOQUOTES, 'UTF-8'));
 }
 
 /********************************************************************************
@@ -206,7 +206,7 @@ function wrap($text, $_prefix="")
 }
 
 function formatbody($_text) {
-    $res  = "\n\n" . wrap($_text, "")."\n\n";
+    $res  = "\n\n" . to_entities(wrap($_text, ""))."\n\n";
     $res  = preg_replace("/(&lt;|&gt;|&quot;)/", " \\1 ", $res);
     $res  = preg_replace('/(["\[])?((https?|ftp|news):\/\/[a-z@0-9.~%$£µ&i#\-+=_\/\?]*)(["\]])?/i', "\\1<a href=\"\\2\">\\2</a>\\4", $res);
     $res  = preg_replace("/ (&lt;|&gt;|&quot;) /", "\\1", $res);

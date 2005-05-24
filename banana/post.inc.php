@@ -44,8 +44,7 @@ class BananaPost
         }
 
         if (preg_match('!charset=([^;]*)\s*(;|$)!', $this->headers['content-type'], $matches)) {
-            require_once 'banana/misc.inc.php';
-            $this->body = to_html($this->body, $matches[1]);
+            $this->body = iconv($matches[1], 'utf-8', $this->body)
         }
     }
 

@@ -228,7 +228,7 @@ class Banana
 
         $cuts  = displayshortcuts();
         $html  = '<h1>'._b_('Nouveau message').'</h1>'.$cuts;
-        $html .= '<form action="?group='.$group.'" method="post" accept-charset="utf8">';
+        $html .= '<form action="?group='.$group.'" method="post" accept-charset="utf-8">';
         $html .= '<table class="bicol" cellpadding="0" cellspacing="0">';
         $html .= '<tr><th colspan="2">'._b_('En-têtes').'</th></tr>';
         $html .= '<tr><td>'._b_('Nom').'</td><td>'.htmlentities($this->profile['name']).'</td></tr>';
@@ -238,7 +238,7 @@ class Banana
         $html .= '<tr><td>'._b_('Organisation').'</td><td>'.$this->profile['org'].'</td></tr>';
         $html .= '<tr><th colspan="2">'._b_('Corps').'</th></tr>';
         $html .= '<tr><td colspan="2"><textarea name="body" cols="74" rows="16">'
-            .$body.($this->profile['sig'] ? "\n\n-- \n".htmlentities($this->profile['sig']) : '').'</textarea></td></th>';
+            .to_entities($body).($this->profile['sig'] ? "\n\n-- \n".htmlentities($this->profile['sig']) : '').'</textarea></td></th>';
         $html .= '<tr><td colspan="2">';
         if ($id > 0) {
             $html .= '<input type="hidden" name="artid" value="'.$id.'" />';
