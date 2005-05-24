@@ -202,6 +202,7 @@ class BananaSpool
         if (empty($since)) { return; }
 
         if (is_array($newpostsids = $banana->nntp->newnews($since, $this->group))) {
+            if (!is_array($this->ids)) { $this->ids = array(); }
             $newpostsids = array_intersect($newpostsids, array_keys($this->ids));
             foreach ($newpostsids as $mid) {
                 $this->overview[$this->ids[$mid]]->isread     = false;

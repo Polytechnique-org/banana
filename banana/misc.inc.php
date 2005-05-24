@@ -13,6 +13,11 @@
 
 function _b_($str) { return utf8_decode(dgettext('banana', utf8_encode($str))); }
 
+function to_html($str, $charset) {
+    require_once 'banana/utf8.php';
+    return utf8entities(htmlentities(iconv($charset, 'utf8', $str), ENT_NOQUOTES, 'UTF-8'));
+}
+
 /********************************************************************************
  *  HEADER STUFF
  */
