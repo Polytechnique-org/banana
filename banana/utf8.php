@@ -1,15 +1,12 @@
 <?php
+/********************************************************************************
+* banana/utf8.php : utf8 to html entities
+* ---------------
+*
+* This file is part of the banana distribution
+* Copyright: See COPYING files that comes with this distribution
+********************************************************************************/
 
-/**
- * Transforme une chaine encodée en UTF-8, et la convertit
- * en entitiées unicode &#xxx; pour que ça s'affiche correctement
- * dans les navigateurs, sans forcément tenir compte du meta
- * content-type charset...
- * @param String $source la chaine en UTF-8
- * @return String les entitées
- * @access public
- * @see http://www.php.net/utf8_decode
- */
 function utf8entities($source)
 {
    // array used to figure what number to decrement from character order value 

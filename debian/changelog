@@ -1,3 +1,9 @@
+banana (1.1-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Pierre Habouzit <madcoder@debian.org>  Tue, 24 May 2005 09:13:39 +0200
+
 banana (1.0-1) unstable; urgency=low
 
   * First upstream release.
