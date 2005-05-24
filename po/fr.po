@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fr\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-01-07 20:29+0100\n"
+"POT-Creation-Date: 2005-05-24 21:04+0200\n"
 "PO-Revision-Date: 2005-01-02 17:13+0100\n"
 "Last-Translator: Pierre Habouzit <pierre.habouzit@m4x.org>\n"
 "Language-Team:  <fr@li.org>\n"
@@ -89,7 +89,7 @@ msgstr "Organisation"
 msgid "Corps"
 msgstr "Corps"
 
-#: ../banana/banana.inc.php:275
+#: ../banana/banana.inc.php:275 ../banana/banana.inc.php:283
 msgid "Impossible de poster le message"
 msgstr "Impossible de poster le message"
 

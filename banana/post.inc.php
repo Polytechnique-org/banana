@@ -45,6 +45,8 @@ class BananaPost
 
         if (preg_match('!charset=([^;]*)\s*(;|$)!', $this->headers['content-type'], $matches)) {
             $this->body = iconv($matches[1], 'utf-8', $this->body);
+        } else {
+            $this->body = utf8_encode($this->body);
         }
     }
 

@@ -106,7 +106,11 @@ class BananaSpool
                 $this->delid($id, false);
                 $do_save = true;
             }
-            $first = max(array_keys($this->overview))+1;
+            if (!empty($this->overview)) {
+                $first = max(array_keys($this->overview))+1;
+            } else {
+                return;
+            }
         } else {
             unset($this->overview, $this->ids);
             $this->version = BANANA_SPOOL_VERSION;

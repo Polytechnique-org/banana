@@ -252,6 +252,14 @@ class Banana
 
     function action_doFup($group, $artid = -1)
     {
+        if ( ! ( is_utf8($_POST['subject']) && is_utf8($_POST['name'])
+                 && is_utf8($_POST['org']) && is_utf8($_POST['body']) )
+        ) {
+            foreach(array('subject', 'name', 'org', 'body') as $key) {
+                $_POST[$key] = utf8_encode($_POST[$key]);
+            }
+        }
+        
         $this->_newSpool($group, $this->profile['display'], $this->profile['lastnews']);
         $body = preg_replace("/\n\.[ \t\r]*\n/m", "\n..\n", $_POST['body']);
         $msg  = 'From: '.$this->profile['name']."\n"

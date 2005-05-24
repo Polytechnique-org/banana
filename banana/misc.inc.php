@@ -18,6 +18,8 @@ function to_entities($str) {
     return utf8entities(htmlentities($str, ENT_NOQUOTES, 'UTF-8'));
 }
 
+function is_utf8($s) { return iconv('utf-8', 'utf-8', $s) == $s; }
+
 /********************************************************************************
  *  HEADER STUFF
  */
