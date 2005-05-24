@@ -1,7 +1,7 @@
 Source: banana
 Section: web
 Priority: optional
-Maintainer: Pierre Habouzit <pierre.habouzit@m4x.org>
+Maintainer: Pierre Habouzit <madcoder@debian.org>
 Standards-Version: 3.6.1
 Build-Depends-Indep: cdbs, debhelper (>= 4.1.16)
 
@@ -9,8 +9,7 @@ Package: php-banana
 Architecture: all
 Depends: php4-cli
 Recommends: compface, imagemagick
-Description: foobar
- Foobar
+Description: php library aimed to write NNTP <-> Web gateways
  .
  Homepage: http://opensource.polytechnique.org/banana/
 
