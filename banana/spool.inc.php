@@ -101,7 +101,7 @@ class BananaSpool
         $do_save = false;
         $first   = $banana->maxspool ? max($groupinfo[2]-$banana->maxspool, $groupinfo[1]) : $groupinfo[1];
         $last    = $groupinfo[2];
-        if ($this->version == BANANA_SPOOL_VERSION) {
+        if ($this->version == BANANA_SPOOL_VERSION && is_array($this->overview)) {
             for ($id = min(array_keys($this->overview)); $id<$first; $id++) { 
                 $this->delid($id, false);
                 $do_save = true;
