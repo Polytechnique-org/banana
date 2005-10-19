@@ -37,7 +37,9 @@ function headerDecode($value) {
 
 function headerEncode($value, $trim = 0) {
     if ($trim) {
-        $value = substr($value, $trim) . "[...]";
+        if (strlen($value) > $trim) {
+            $value = substr($value, 0, $trim) . "[...]";
+        }
     }
     return "=?UTF-8?B?".base64_encode($value)."?=";
 }
