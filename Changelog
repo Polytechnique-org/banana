@@ -1,4 +1,12 @@
 ================================================================================
+VERSION 1.2
+
+Wed, 19 Oct 2005					Pierre Habouzit <pierre.habouzit@m4x.org>
+
+    * Fix a problem wrt responses (Re: in subject).
+	* Fix a problem with empty overviews.
+
+================================================================================
 VERSION 1.1
 
 Tue, 24 May 2005					Pierre Habouzit <pierre.habouzit@m4x.org>
