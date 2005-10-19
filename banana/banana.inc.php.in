@@ -218,7 +218,7 @@ class Banana
             $this->nntp->group($group);
             $this->_newPost($id);
             if ($this->post) {
-                $subject = preg_replace("/^re\s*:\s*/i", 'Re: ', 'Re: '.$this->post->headers['subject']);
+                $subject = preg_replace("/^re\s*:\s*/i", '', 'Re: '.$this->post->headers['subject']);
                 $body    = utf8_encode($this->post->name." "._b_("a écrit"))." :\n".wrap($this->post->body, "> ");
                 $target  = isset($this->post->headers['followup-to']) ? $this->post->headers['followup-to'] : $this->post->headers['newsgroups'];
             }
