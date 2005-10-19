@@ -5,6 +5,7 @@ Wed, 19 Oct 2005					Pierre Habouzit <pierre.habouzit@m4x.org>
 
     * Fix a problem wrt responses (Re: in subject).
 	* Fix a problem with empty overviews.
+	* Fix Header encoding problems.
 
 ================================================================================
 VERSION 1.1
