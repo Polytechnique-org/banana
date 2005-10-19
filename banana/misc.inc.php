@@ -35,6 +35,13 @@ function headerDecode($value) {
     return preg_replace('/=\?([^?]*)\?([BQ])\?([^?]*)\?=/e', '_headerdecode("\1", "\2", "\3")', $val);
 }
 
+function headerEncode($value, $trim = 0) {
+    if ($trim) {
+        $value = substr($value, $trim) . "[...]";
+    }
+    return "=?UTF-8?B?".base64_encode($value)."?=";
+}
+
 function header_translate($hdr) {
     switch ($hdr) {
         case 'from':            return _b_('De');

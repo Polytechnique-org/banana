@@ -262,9 +262,9 @@ class Banana
         
         $this->_newSpool($group, $this->profile['display'], $this->profile['lastnews']);
         $body = preg_replace("/\n\.[ \t\r]*\n/m", "\n..\n", $_POST['body']);
-        $msg  = 'From: '.$this->profile['name']."\n"
+        $msg  = 'From: '.headerEncode($this->profile['name'])."\n"
               . "Newsgroups: ".$_POST['newsgroups']."\n"
-              . "Subject: ".$_POST['subject']."\n"
+              . "Subject: ".headerEncode($_POST['subject'], 128)."\n"
               . (empty($this->profile['org']) ? '' : "Organization: {$this->profile['org']}\n")
               . (empty($_POST['followup'])    ? '' : 'Followup-To: '.$_POST['followup']."\n");
 
