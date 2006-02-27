@@ -23,7 +23,10 @@ class Banana
 
     var $wrap      = 74;
 
+    var $boundary  = "bananaBoundary42";
     var $custom    = "Content-Type: text/plain; charset=utf-8\nMime-Version: 1.0\nContent-Transfer-Encoding: 8bit\nUser-Agent: Banana @VERSION@\n";
+    var $custom_mp = "Content-Type: multipart/mixed; boundary=\"bananaBoundary42\"\nContent-Transfer-Encoding: 7bit\nUser-Agent: Banana @VERSION@\n";
+    var $custom_bd = "Content-Type: text/plain; charset=utf-8\nContent-Transfert-Encoding: 8bit";
 
     var $host      = 'news://localhost:119/';
 
@@ -69,7 +72,6 @@ class Banana
             return $banana->action_listGroups();
 
         } elseif (is_null($artid)) {
-            
             if (isset($_POST['action']) && $_POST['action'] == 'new') {
                 return $banana->action_doFup($group, isset($_POST['artid']) ? intval($_POST['artid']) : -1);
             } elseif (isset($_GET['action']) && $_GET['action'] == 'new') {
@@ -258,7 +260,7 @@ class Banana
 
         $cuts  = displayshortcuts();
         $html  = '<h1>'._b_('Nouveau message').'</h1>'.$cuts;
-        $html .= '<form action="?group='.$group.'" method="post" accept-charset="utf-8">';
+        $html .= '<form enctype="multipart/form-data" action="?group='.$group.'" method="post" accept-charset="utf-8">';
         $html .= '<table class="bicol" cellpadding="0" cellspacing="0">';
         $html .= '<tr><th colspan="2">'._b_('En-têtes').'</th></tr>';
         $html .= '<tr><td>'._b_('Nom').'</td><td>'.htmlentities($this->profile['name']).'</td></tr>';
@@ -269,12 +271,15 @@ class Banana
         $html .= '<tr><th colspan="2">'._b_('Corps').'</th></tr>';
         $html .= '<tr><td colspan="2"><textarea name="body" cols="74" rows="16">'
             .to_entities($body).($this->profile['sig'] ? "\n\n-- \n".htmlentities($this->profile['sig']) : '').'</textarea></td></th>';
-        $html .= '<tr><td colspan="2">';
+    	$html .= '<tr><th colspan="2">'._b_('Pièces jointes').'</th></tr>';
+        $html .= '<tr><td colspan="2"><input type="hidden" name="MAX_FILE_SIZE" value="100000" />';
+        $html .= '<input type="file" name="newpj" /></td></tr>';
+	    $html .= '<tr><th colspan="2">';
         if ($id > 0) {
             $html .= '<input type="hidden" name="artid" value="'.$id.'" />';
         }
         $html .= '<input type="hidden" name="action" value="new" />';
-        $html .= '<input type="submit" /></td></tr>';
+    	$html .= '<input type="submit" /></th></tr>';
         $html .= '</table></form>';
 
         return $html.$cuts;
@@ -305,7 +310,37 @@ class Banana
             $msg .= "References: $refs{$post->headers['message-id']}\n";
         }
 
-        $msg .= $this->custom.$this->profile['customhdr']."\n".wrap($body, "", $this->wrap);
+        $body = wrap($body, "", $this->wrap);
+
+        // include attachment in the body
+        if (isset($_FILES['newpj'])) {
+            $this->custom = $this->custom_mp;
+            $body    = "\n--".$this->boundary."\n".$this->custom_bd."\n\n".$body."\n--".$this->boundary."\n";
+            $tmpname = $_FILES['newpj']['tmp_name'];
+            $file    = basename($_FILES['newpj']['name']);
+            $mime    = shell_exec("file -bi $tmpname"); //Because mime_content_type don't work :(
+            if (preg_match("@([^ ]+/[^ ]+); (.*)@", $mime, $format)) {
+                $mime  = $format[1];
+                $encod = $format[2];
+            } else {
+                preg_match("@([^ ]+/[^ ]+)\r?\n@", $mime, $format);
+                $mime  = $format[1];
+                $encod = 'base64';
+            }
+                
+            $body   .= 'Content-Type: '.$mime.'; name="'.$file."\"\n";
+            $body   .= 'Content-Disposition: attachment; filename="'.$file."\"\n";
+            $body   .= 'Content-Transfer-Encoding: '.$encod."\n\n";
+            if ($encod == 'base64') {
+                $body   .= chunk_split(base64_encode(fread(fopen($tmpname, 'r'), filesize($tmpname))));
+            } else {
+                $body   .= fread(fopen($tmpname, 'r'), filesize($tmpname));
+            }
+            $body   .= '--'.$this->boundary.'--';
+        }    
+
+        // finalise and post the message
+        $msg .= $this->custom.$this->profile['customhdr']."\n".$body;
 
         if ($this->nntp->post($msg)) {
             header("Location: ?group=$group".($artid==-1 ? '' : "&first=$artid"));
