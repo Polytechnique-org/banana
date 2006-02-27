@@ -12,7 +12,7 @@ class Banana
     var $maxspool  = 3000;
 
     var $hdecode   = array('from','name','organization','subject');
-    var $parse_hdr = array('content-transfer-encoding', 'content-type', 'date', 'followup-to', 'from',
+    var $parse_hdr = array('content-disposition', 'content-transfer-encoding', 'content-type', 'date', 'followup-to', 'from',
             'message-id', 'newsgroups', 'organization', 'references', 'subject', 'x-face');
     var $show_hdr  = array('from', 'subject', 'newsgroups', 'followup', 'date', 'organization', 'references', 'x-face');
 
@@ -103,6 +103,15 @@ class Banana
                         return $banana->action_newFup($group, $artid);
                 }
             }
+
+            if (isset($_GET['pj'])) {
+                $action = false;
+                if (isset($_GET['action']) && $_GET['action'] == 'view') {
+                    $action = true;
+                }
+                return $banana->action_getAttachment($group, $artid, $_GET['pj'], $action);
+            }
+            
             return $res . $banana->action_showArticle($group, $artid);
         }
     }
@@ -182,6 +191,26 @@ class Banana
         $this->nntp->quit();
         
         return $res.$cuts;
+    }
+
+    function action_getAttachment($group, $id, $pjid, $action)
+    {
+        $this->_newSpool($group, $this->profile['display'], $this->profile['lastnews']);
+        $this->_newPost($id);
+        if (!$this->post) {
+            if ($this->nntp->lasterrorcode == "423") {
+                $this->spool->delid($id);
+            }
+            $this->nntp->quit();
+            return displayshortcuts().'<p class="error">'._b_('Impossible d\'accéder au message.   Le message a peut-être été annulé').'</p>';
+        }
+
+        $this->nntp->quit();
+        if ($this->post->get_attachment($pjid, $action)) {
+            return "";
+        } else {
+            return displayshortcuts().'<p calss="error">'._b_('Impossible d\'accéder à la pièce jointe.').'</p>';
+        }
     }
 
     function action_cancelArticle($group, $id)
