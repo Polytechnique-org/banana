@@ -56,6 +56,7 @@ class Banana
 
         $group  = empty($_GET['group']) ? null : strtolower($_GET['group']);
         $artid  = empty($_GET['artid']) ? null : strtolower($_GET['artid']);
+        $partid = empty($_GET['part']) ? 0 : $_GET['part'];
         $banana->state = Array ('group' => $group, 'artid' => $artid);
 
         if (is_null($group)) {
@@ -88,7 +89,7 @@ class Banana
             if (isset($_GET['action'])) {
                 switch ($_GET['action']) {
                     case 'cancel':
-                        $res .= $banana->action_showArticle($group, $artid);
+                        $res .= $banana->action_showArticle($group, $artid, $partid);
                         if ($banana->post->checkcancel()) {
                             $form = '<p class="error">'._b_('Voulez-vous vraiment annuler ce message ?').'</p>'
                                   . "<form action=\"?group=$group&amp;artid=$artid\" method='post'><p>"
@@ -112,7 +113,7 @@ class Banana
                 return $banana->action_getAttachment($group, $artid, $_GET['pj'], $action);
             }
             
-            return $res . $banana->action_showArticle($group, $artid);
+            return $res . $banana->action_showArticle($group, $artid, $partid);
         }
     }
 
@@ -172,7 +173,7 @@ class Banana
         return $res.$cuts;
     }
 
-    function action_showArticle($group, $id)
+    function action_showArticle($group, $id, $part)
     {
         $this->_newSpool($group, $this->profile['display'], $this->profile['lastnews']);
         $this->_newPost($id);
@@ -186,7 +187,7 @@ class Banana
 
         $cuts = displayshortcuts();
         $res  = '<h1>'._b_('Message').'</h1>'.$cuts;
-        $res .= $this->post->to_html();
+        $res .= $this->post->to_html($part);
 
         $this->nntp->quit();
         

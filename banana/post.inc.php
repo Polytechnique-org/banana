@@ -17,6 +17,8 @@ class BananaPost
     var $headers;
     /** body */
     var $body;
+    /** formating */
+    var $messages;
     /** attachment */
     var $pj;
     /** poster name */
@@ -28,8 +30,9 @@ class BananaPost
     function BananaPost($_id)
     {
         global $banana;
-        $this->id = $_id;
-        $this->pj = array();
+        $this->id       = $_id;
+        $this->pj       = array();
+        $this->messages = array();
         $this->_header();
 
         if ($body = $banana->nntp->body($_id)) {
@@ -64,8 +67,6 @@ class BananaPost
      */
     function split_multipart($type, $boundary)
     {
-        global $banana;
-        
         $parts = preg_split("/\n--$boundary(--|\n)/", $this->body);
         foreach ($parts as $part) {
             $part = $this->get_part($part);
@@ -73,21 +74,20 @@ class BananaPost
             $local_body = $part['body'];
             if (isset($local_header['content-disposition']) && preg_match("/attachment/", $local_header['content-disposition'])) {
                 $this->add_attachment($part);
-            } else if (isset($local_header['content-type']) && preg_match("@text/@", $local_header['content-type'])) {
-                $this->body = $local_body;
-                foreach ($banana->parse_hdr as $hdr) {
-                    if (isset($local_header[$hdr])) {
-                        $this->headers[$hdr] = $local_header[$hdr];
-                    }
-                }
-            }
+            } else if (isset($local_header['content-type']) && preg_match("@text/([^;]+);@", $local_header['content-type'], $format)) {
+    	        array_push($this->messages, $part);
+	        }
+        }
+        if (count($this->messages) > 0) {
+            $this->set_body_to_part(0);
         }
     }
 
     /** extract new headers from the part
      * @param $part STRING part of a multipart message
      */
-    function get_part($part) {
+    function get_part($part)
+    {
         global $banana;
 
         $lines = split("\n", $part);
@@ -103,16 +103,18 @@ class BananaPost
                 break;
             }
         }
-        #        echo join("\n", $lines)."<br/>------------------------------------<br/>";
         return Array('headers' => $local_headers, 'body' => join("\n", $lines)); 
     }
 
-    function add_attachment($part) {
+    /** add an attachment
+     */
+    function add_attachment($part)
+    {
         $local_header = $part['headers'];
         $local_body = $part['body'];
 
         if (!isset($local_header['content-transfer-encoding'])) {
-            return;
+            return false;
         }
 
         if (isset($local_header['content-disposition'])) {
@@ -131,20 +133,22 @@ class BananaPost
             }
         }
         if (!isset($mimetype)) {
-            return;
+            return false;
         }
 
         array_push($this->pj, Array('MIME' => $mimetype,
                                     'filename' => $filename,
                                     'encoding' => strtolower($local_header['content-transfer-encoding']),
                                     'data' => $local_body));
+        return true;
     }
 
     /** decode an attachment
      * @param pjid INT id of the attachment to decode
      * @param action BOOL action to execute : true=view, false=download
      */
-    function get_attachment($pjid, $action = false) {
+    function get_attachment($pjid, $action = false)
+    {
         if ($pjid >= count($this->pj)) {
             return false;
         } else {
@@ -161,6 +165,27 @@ class BananaPost
             }
             return true;
         }
+    }
+
+    /** set body to represent the given part
+     * @param partid INT index of the part in messages
+     */
+    function set_body_to_part($partid)
+    {
+        global $banana;
+        
+        if (count($this->messages) == 0) {
+            return false;
+        }
+
+        $local_header = $this->messages[$partid]['headers'];
+        $this->body   = $this->messages[$partid]['body'];
+        foreach ($banana->parse_hdr as $hdr) {
+            if (isset($local_header[$hdr])) {
+                $this->headers[$hdr] = $local_header[$hdr];
+            }
+        }
+        return true;
     }
 
     function _header()
@@ -207,9 +232,16 @@ class BananaPost
         return ($this->headers['from'] == $_SESSION['name']." <".$_SESSION['mail'].">");
     }
 
-    function to_html()
+    /** convert message to html
+     * @param partid INT id of the multipart message that must be displaid
+     */
+    function to_html($partid = 0)
     {
         global $banana;
+
+        if ($partid != 0) {
+            $this->set_body_to_part($partid);
+        }
 
         $res  = '<table class="bicol banana_msg" cellpadding="0" cellspacing="0">';
         $res .= '<tr><th colspan="2">'._b_('En-têtes').'</th></tr>';
@@ -223,8 +255,34 @@ class BananaPost
             }
         }
 
-        $res .= '<tr><th colspan="2">'._b_('Corps').'</th></tr>';
-        $res .= '<tr><td colspan="2"><pre>'.formatbody($this->body).'</pre></td></tr>';
+        $res .= '<tr><th colspan="2">'._b_('Corps');
+        if (count($this->messages) > 1) {
+            for ($i = 0 ; $i < count($this->messages) ; $i++) {
+                if ($i == 0) {
+                    $res .= ' : ';
+                } else {
+                    $res .= ' . ';
+                }
+                preg_match("@text/([^;]+);@", $this->messages[$i]['headers']['content-type'], $format);
+                $format = textFormat_translate($format[1]);
+                if ($i != $partid) {
+                    $res .= '<a href="?group='.$banana->state['group'].'&artid='.$this->id.'&part='.$i.'">'.$format.'</a>';
+                } else {
+                    $res .= $format;
+                }
+            }
+        }
+        $res .= '</th></tr>';
+ 
+        preg_match("@text/([^;]+);@", $this->headers['content-type'], $format);
+        $format = $format[1];
+        $res .= '<tr><td colspan="2">';
+        if ($format == 'html') {
+            $res .= formatbody($this->body, $format); 
+        } else {
+            $res .= '<pre>'.formatbody($this->body).'</pre>';
+        }
+        $res .= '</td></tr>';
 
         if (count($this->pj) > 0) {
             $res .= '<tr><th colspan="2">'._b_('Pièces jointes').'</th></tr>';
