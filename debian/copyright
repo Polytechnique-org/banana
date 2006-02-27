@@ -1,0 +1,15 @@
+This package was debianized by Pierre Habouzit <pierre.habouzit@m4x.org> on
+Fri, 07 Jan 2005 22:40:08 +0100
+
+It was downloaded from http://opensource.polytechnique.org/banana/
+
+Upstream Author: David Bachelart
+
+* Banana is licensed under the terms of the GPL version 2  
+  or later and is copyright :
+  
+  (c) 2003-2004 David Bachelart.
+  (c) 2005      Pierre Habouzit.
+
+On Debian GNU/Linux systems, the complete text of the GNU General Public
+License may be found in `/usr/share/common-licenses/GPL'.

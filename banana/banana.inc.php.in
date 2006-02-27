@@ -1,0 +1,319 @@
+<?php
+/********************************************************************************
+* install.d/config.inc.php : configuration file
+* --------------------------
+*
+* This file is part of the banana distribution
+* Copyright: See COPYING files that comes with this distribution
+********************************************************************************/
+
+class Banana
+{
+    var $maxspool  = 3000;
+
+    var $hdecode   = array('from','name','organization','subject');
+    var $parse_hdr = array('content-transfer-encoding', 'content-type', 'date', 'followup-to', 'from',
+            'message-id', 'newsgroups', 'organization', 'references', 'subject', 'x-face');
+    var $show_hdr  = array('from', 'subject', 'newsgroups', 'followup', 'date', 'organization', 'references', 'x-face');
+
+
+    var $tbefore   = 5;
+    var $tafter    = 5;
+    var $tmax      = 50;
+
+    var $wrap      = 74;
+
+    var $custom    = "Content-Type: text/plain; charset=utf-8\nMime-Version: 1.0\nContent-Transfer-Encoding: 8bit\nUser-Agent: Banana @VERSION@\n";
+
+    var $host      = 'news://localhost:119/';
+
+    var $profile   = Array( 'name' => 'Anonymous <anonymouse@example.com>', 'sig'  => '', 'org'  => '',
+            'customhdr' =>'', 'display' => 0, 'lastnews' => 0, 'locale'  => 'fr_FR', 'subscribe' => array());
+    
+    var $state = Array('group' => null, 'artid' => null);
+    var $nntp;
+    var $groups;
+    var $newgroups;
+    var $post;
+    var $spool;
+
+    function Banana()
+    {
+        $this->_require('NetNNTP');
+        setlocale(LC_ALL,  $this->profile['locale']);
+        $this->nntp = new nntp($this->host);
+    }
+
+    function run($class = 'Banana')
+    {
+        global $banana;
+        Banana::_require('misc');
+        $banana = new $class();
+
+        if (!$banana->nntp) {
+            return '<p class="error">'._b_('Impossible de contacter le serveur').'</p>';
+        }
+
+        $group  = empty($_GET['group']) ? null : strtolower($_GET['group']);
+        $artid  = empty($_GET['artid']) ? null : strtolower($_GET['artid']);
+        $banana->state = Array ('group' => $group, 'artid' => $artid);
+
+        if (is_null($group)) {
+
+            if (isset($_GET['subscribe'])) {
+                return $banana->action_listSubs();
+            } elseif (isset($_POST['subscribe'])) {
+                $banana->action_saveSubs();
+            }
+            return $banana->action_listGroups();
+
+        } elseif (is_null($artid)) {
+            
+            if (isset($_POST['action']) && $_POST['action'] == 'new') {
+                return $banana->action_doFup($group, isset($_POST['artid']) ? intval($_POST['artid']) : -1);
+            } elseif (isset($_GET['action']) && $_GET['action'] == 'new') {
+                return $banana->action_newFup($group);
+            } else {
+                return $banana->action_showThread($group, isset($_GET['first']) ? intval($_GET['first']) : 1);
+            }
+
+        } else {
+
+            if (isset($_POST['action']) && $_POST['action']=='cancel') {
+                $res = $banana->action_cancelArticle($group, $artid);
+            } else {
+                $res = '';
+            }
+
+            if (isset($_GET['action'])) {
+                switch ($_GET['action']) {
+                    case 'cancel':
+                        $res .= $banana->action_showArticle($group, $artid);
+                        if ($banana->post->checkcancel()) {
+                            $form = '<p class="error">'._b_('Voulez-vous vraiment annuler ce message ?').'</p>'
+                                  . "<form action=\"?group=$group&amp;artid=$artid\" method='post'><p>"
+                                  . '<input type="hidden" name="action" value="cancel" />'
+                                  . '<input type="submit" value="Annuler !" />'
+                                  . '</p></form>';
+                            return $form.$res;
+                        }
+                        return $res;
+
+                    case 'new':
+                        return $banana->action_newFup($group, $artid);
+                }
+            }
+            return $res . $banana->action_showArticle($group, $artid);
+        }
+    }
+
+    /**************************************************************************/
+    /* actions                                                                */
+    /**************************************************************************/
+
+    function action_saveSubs()
+    {
+        return;
+    }
+
+    function action_listGroups()
+    {
+        $this->_newGroup();
+        
+        $cuts = displayshortcuts();
+        $res  = '<h1>'._b_('Les forums de Banana').'</h1>'.$cuts.$this->groups->to_html();
+        if (count($this->newgroups->overview)) {
+            $res .= '<p>'._b_('Les forums suivants ont été créés depuis ton dernier passage :').'</p>';
+            $res .= $this->newgroups->to_html();
+        }
+
+        $this->nntp->quit();
+        return $res.$cuts;
+    }
+
+    function action_listSubs()
+    {
+        $this->_require('groups');
+        $this->groups = new BananaGroups(BANANA_GROUP_ALL);
+        
+        $cuts = displayshortcuts();
+        $res  = '<h1>'._b_('Abonnements').'</h1>'.$cuts.$this->groups->to_html(true).$cuts;
+
+        $this->nntp->quit();
+        return $res;
+    }
+
+    function action_showThread($group, $first)
+    {
+        $this->_newSpool($group, $this->profile['display'], $this->profile['lastnews']);
+
+        if ($first > count($this->spool->overview)) {
+            $first = count($this->spool->overview);
+        }
+
+        $first = $first - ($first % $this->tmax) + 1;
+
+        $cuts = displayshortcuts($first);
+        
+        $res  = '<h1>'.$group.'</h1>'.$cuts;
+        $res  .= $this->spool->to_html($first, $first+$this->tmax);
+
+        $this->nntp->quit();
+        
+        return $res.$cuts;
+    }
+
+    function action_showArticle($group, $id)
+    {
+        $this->_newSpool($group, $this->profile['display'], $this->profile['lastnews']);
+        $this->_newPost($id);
+        if (!$this->post) {
+            if ($this->nntp->lasterrorcode == "423") {
+                $this->spool->delid($id);
+            }
+            $this->nntp->quit();
+            return displayshortcuts().'<p class="error">'._b_('Impossible d\'accéder au message.   Le message a peut-être été annulé').'</p>';
+        }
+
+        $cuts = displayshortcuts();
+        $res  = '<h1>'._b_('Message').'</h1>'.$cuts;
+        $res .= $this->post->to_html();
+
+        $this->nntp->quit();
+        
+        return $res.$cuts;
+    }
+
+    function action_cancelArticle($group, $id)
+    {
+        $this->_newSpool($group, $this->profile['display'], $this->profile['lastnews']);
+        $this->_newPost($id);
+        $mid  = array_search($id, $this->spool->ids);
+
+        if (!$this->post->checkcancel()) {
+            return '<p class="error">'._b_('Vous n\'avez pas les permissions pour annuler ce message').'</p>'; 
+        }
+        $msg = 'From: '.$this->profile['name']."\n"
+             . "Newsgroups: $group\n"
+             . "Subject: cmsg $mid\n"
+             . $this->custom
+             . "Control: cancel $mid\n"
+             . "\n"
+             . "Message canceled with Banana";
+        if ($this->nntp->post($msg)) {
+            $this->spool->delid($id);
+            $this->nntp->quit();
+            header("Location: ?group=$group&amp;first=$id");
+        } else {
+            return '<p class="error">'._b_('Impossible d\'annuler le message').'</p>';
+        }
+    }
+
+    function action_newFup($group, $id = -1)
+    {
+        $subject = $body = '';
+        $target  = $group;
+        
+        if ($id > 0) {
+            $this->nntp->group($group);
+            $this->_newPost($id);
+            if ($this->post) {
+                $subject = preg_replace("/^re\s*:\s*/i", '', 'Re: '.$this->post->headers['subject']);
+                $body    = utf8_encode($this->post->name." "._b_("a écrit"))." :\n".wrap($this->post->body, "> ");
+                $target  = isset($this->post->headers['followup-to']) ? $this->post->headers['followup-to'] : $this->post->headers['newsgroups'];
+            }
+        }
+
+        $this->nntp->quit();
+
+        $cuts  = displayshortcuts();
+        $html  = '<h1>'._b_('Nouveau message').'</h1>'.$cuts;
+        $html .= '<form action="?group='.$group.'" method="post" accept-charset="utf-8">';
+        $html .= '<table class="bicol" cellpadding="0" cellspacing="0">';
+        $html .= '<tr><th colspan="2">'._b_('En-têtes').'</th></tr>';
+        $html .= '<tr><td>'._b_('Nom').'</td><td>'.htmlentities($this->profile['name']).'</td></tr>';
+        $html .= '<tr><td>'._b_('Sujet').'</td><td><input type="text" name="subject" value="'.htmlentities($subject).'" size="60" /></td></tr>';
+        $html .= '<tr><td>'._b_('Forums').'</td><td><input type="text" name="newsgroups" value="'.htmlentities($target).'" size="60" /></td></tr>';
+        $html .= '<tr><td>'._b_('Suivi à').'</td><td><input type="text" name="followup" value="" size="60" /></td></tr>';
+        $html .= '<tr><td>'._b_('Organisation').'</td><td>'.$this->profile['org'].'</td></tr>';
+        $html .= '<tr><th colspan="2">'._b_('Corps').'</th></tr>';
+        $html .= '<tr><td colspan="2"><textarea name="body" cols="74" rows="16">'
+            .to_entities($body).($this->profile['sig'] ? "\n\n-- \n".htmlentities($this->profile['sig']) : '').'</textarea></td></th>';
+        $html .= '<tr><td colspan="2">';
+        if ($id > 0) {
+            $html .= '<input type="hidden" name="artid" value="'.$id.'" />';
+        }
+        $html .= '<input type="hidden" name="action" value="new" />';
+        $html .= '<input type="submit" /></td></tr>';
+        $html .= '</table></form>';
+
+        return $html.$cuts;
+    }
+
+    function action_doFup($group, $artid = -1)
+    {
+        if ( ! ( is_utf8($_POST['subject']) && is_utf8($_POST['name'])
+                 && is_utf8($_POST['org']) && is_utf8($_POST['body']) )
+        ) {
+            foreach(array('subject', 'name', 'org', 'body') as $key) {
+                $_POST[$key] = utf8_encode($_POST[$key]);
+            }
+        }
+        
+        $this->_newSpool($group, $this->profile['display'], $this->profile['lastnews']);
+        $body = preg_replace("/\n\.[ \t\r]*\n/m", "\n..\n", $_POST['body']);
+        $msg  = 'From: '.$this->profile['name']."\n"
+              . "Newsgroups: ".$_POST['newsgroups']."\n"
+              . "Subject: ".headerEncode($_POST['subject'], 128)."\n"
+              . (empty($this->profile['org']) ? '' : "Organization: {$this->profile['org']}\n")
+              . (empty($_POST['followup'])    ? '' : 'Followup-To: '.$_POST['followup']."\n");
+
+        if ($artid != -1) {
+            $this->_require('post');
+            $post = new BananaPost($artid);
+            $refs = ( isset($post->headers['references']) ? $post->headers['references']." " : "" );
+            $msg .= "References: $refs{$post->headers['message-id']}\n";
+        }
+
+        $msg .= $this->custom.$this->profile['customhdr']."\n".wrap($body, "", $this->wrap);
+
+        if ($this->nntp->post($msg)) {
+            header("Location: ?group=$group".($artid==-1 ? '' : "&first=$artid"));
+        } else {
+            return "<p class=\"error\">"._b_('Impossible de poster le message')."</p>".$this->action_showThread($group, $artid);
+        }
+    }
+
+    /**************************************************************************/
+    /* Private functions                                                      */
+    /**************************************************************************/
+
+    function _newSpool($group, $disp=0, $since='') {
+        $this->_require('spool');
+        if (!$this->spool || $this->spool->group != $group) {
+            $this->spool = new BananaSpool($group, $disp, $since);
+        }
+    }
+
+    function _newPost($id)
+    {
+        $this->_require('post');
+        $this->post = new BananaPost($id);
+    }
+
+    function _newGroup()
+    {
+        $this->_require('groups');
+        $this->groups = new BananaGroups(BANANA_GROUP_SUB);
+        if ($this->groups->type == BANANA_GROUP_SUB) {
+            $this->newgroups = new BananaGroups(BANANA_GROUP_NEW);
+        }
+    }
+
+    function _require($file)
+    {
+        require_once (dirname(__FILE__).'/'.$file.'.inc.php');
+    }
+}
+
+?>

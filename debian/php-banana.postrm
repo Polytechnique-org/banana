@@ -1,0 +1,16 @@
+#!/bin/sh -e
+
+ACTION=$1
+case "$ACTION" in
+    purge)
+        rm -rf /var/spool/banana
+        ;;
+
+    *)
+        ;;
+esac
+
+
+#DEBHELPER#
+
+exit 0

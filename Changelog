@@ -1,0 +1,67 @@
+================================================================================
+VERSION 1.2
+
+Wed, 19 Oct 2005					Pierre Habouzit <pierre.habouzit@m4x.org>
+
+    * Fix a problem wrt responses (Re: in subject).
+	* Fix a problem with empty overviews.
+	* Fix Header encoding problems.
+
+================================================================================
+VERSION 1.1
+
+Tue, 24 May 2005					Pierre Habouzit <pierre.habouzit@m4x.org>
+
+	* Fix one problem with $this->ids beeing empty in Spool.
+	* Fix encoding issues since iconv truncates strings sometimes.
+	* Make the post forms use utf-8.
+
+================================================================================
+VERSION 1.0
+
+Fri, 07 Jan 2005					Pierre Habouzit <pierre.habouzit@m4x.org>
+
+	* Banana is now a real standalone class.
+	* Clean hooks.
+	* Update the script spoolgen.php.
+
+Wed, 05 Jan 2005					Pierre Habouzit <pierre.habouzit@m4x.org>
+
+	* continue the work with post.php.
+
+Tue, 04 Jan 2005					Pierre Habouzit <pierre.habouzit@m4x.org>
+
+	* prepare Banana to be a library :
+		- delete a lot of echo's.
+		- use a lot of string passing.
+		- create more Banana:: functions.
+		=> API IS NOT STABLE ATM.
+
+Mon, 03 Jan 2005					Pierre Habouzit <pierre.habouzit@m4x.org>
+
+	* no more $news -> class Banana.
+	* continue include rework.
+	* hooks functions enters.
+	* $banana is now the only global variable we need.
+	* exit format.inc.php.
+
+Sun, 02 Jan 2005               		Pierre Habouzit <pierre.habouzit@m4x.org>
+
+	* _(..) -> _b_(..) that performs a dgettext('banana', ...).
+	* use gettext and no more $locales.
+	* rework includes.
+
+Sat, 01 Jan 2005					Pierre Habouzit <pierre.habouzit@m4x.org>
+
+	* rework headerDecode function (biggest bottleneck).
+	* rework includes.
+
+================================================================================
+VERSION 0.7.1
+
+Before Jan 2005						David Bachelart <david.bachelart@m4x.org>
+
+	* first version.
+
+================================================================================
+vim:set ts=4 sw=4:
