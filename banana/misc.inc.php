@@ -20,6 +20,45 @@ function to_entities($str) {
 
 function is_utf8($s) { return iconv('utf-8', 'utf-8', $s) == $s; }
 
+function textFormat_translate($format)
+{
+    switch (strtolower($format)) {
+        case 'plain':       return _b_('Texte brut');
+        case 'richtext':    return _b_('Texte enrichi');
+        case 'html':        return _b_('HTML');
+        default:            return $format;
+    }
+}
+
+/********************************************************************************
+ * HTML STUFF
+ * Taken from php.net
+ */
+
+ /**
+ * @return string
+ * @param string
+ * @desc Strip forbidden tags and delegate tag-source check to removeEvilAttributes()
+ */
+function removeEvilTags($source)
+{
+    $allowedTags = '<h1><b><i><a><ul><li><pre><hr><blockquote><img><br><font><p>';
+    $source = strip_tags($source, $allowedTags);
+    return preg_replace('/<(.*?)>/ie', "'<'.removeEvilAttributes('\\1').'>'", $source);
+}
+
+/**
+ * @return string
+ * @param string
+ * @desc Strip forbidden attributes from a tag
+ */
+function removeEvilAttributes($tagSource)
+{
+    $stripAttrib = 'javascript:|onclick|ondblclick|onmousedown|onmouseup|onmouseover|'.
+                   'onmousemove|onmouseout|onkeypress|onkeydown|onkeyup';
+    return stripslashes(preg_replace("/$stripAttrib/i", '', $tagSource));
+}
+
 /********************************************************************************
  *  HEADER STUFF
  */
@@ -216,12 +255,21 @@ function wrap($text, $_prefix="")
     return $_prefix.join("\n$_prefix", $result).($_prefix ? '' : $sign);
 }
 
-function formatbody($_text) {
-    $res  = "\n\n" . to_entities(wrap($_text, ""))."\n\n";
+function formatbody($_text, $format='plain')
+{
+    if ($format == 'html') {
+        $res = '<br/>'.removeEvilTags(html_entity_decode(to_entities($_text))).'<br/>';
+    } else {
+        $res  = "\n\n" . to_entities(wrap($_text, ""))."\n\n";
+    }
     $res  = preg_replace("/(&lt;|&gt;|&quot;)/", " \\1 ", $res);
     $res  = preg_replace('/(["\[])?((https?|ftp|news):\/\/[a-z@0-9.~%$£µ&i#\-+=_\/\?]*)(["\]])?/i', "\\1<a href=\"\\2\">\\2</a>\\4", $res);
     $res  = preg_replace("/ (&lt;|&gt;|&quot;) /", "\\1", $res);
-   
+
+    if ($format == 'html') {
+        return $res;
+    }
+
     $parts = preg_split("/\n-- ?\n/", $res);
 
     if (count($parts) > 1) {
