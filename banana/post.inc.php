@@ -310,9 +310,7 @@ class BananaPost
             foreach ($this->pj as $file) {
                 $res .= $file['filename'].' ('.$file['MIME'].') : ';
                 $res .= '<a href="pj.php?group='.$banana->state['group'].'&artid='.$this->id.'&pj='.$i.'">télécharger</a>';
-                if (preg_match("@(image|text)/@", $file['MIME'])) {
-                    $res .= ' . <a href="pj.php?group='.$banana->state['group'].'&artid='.$this->id.'&pj='.$i.'&action=view">aperçu</a>';
-                }
+                $res .= ' . <a href="pj.php?group='.$banana->state['group'].'&artid='.$this->id.'&pj='.$i.'&action=view" target="_blank">aperçu</a>';
                 $res .=  '<br/>';
                 $i++;
             }
