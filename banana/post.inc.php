@@ -52,12 +52,12 @@ class BananaPost
         if (preg_match("@multipart/([^;]+);@", $this->headers['content-type'], $mpart_type)) {
             preg_match("/boundary=\"?([^ \"]+)\"?/", $this->headers['content-type'], $mpart_boundary);
             $this->_split_multipart($mpart_type[1], $mpart_boundary[1]);
-        }
-        
-        if (preg_match('!charset=([^;]*)\s*(;|$)!', $this->headers['content-type'], $matches)) {
-            $this->body = iconv($matches[1], 'utf-8', $this->body);
         } else {
-            $this->body = utf8_encode($this->body);
+            if (preg_match('!charset=([^;]*)\s*(;|$)!', $this->headers['content-type'], $matches)) {
+                $this->body = iconv($matches[1], 'utf-8', $this->body);
+            } else {
+                $this->body = utf8_encode($this->body);
+            }
         }
     }
 
@@ -76,11 +76,9 @@ class BananaPost
                 $this->_add_attachment($part);
             } else if (isset($local_header['content-type']) && preg_match("@text/([^;]+);@", $local_header['content-type'], $format)) {
     	        array_push($this->messages, $part);
+            }
         }
-        }
-        if (count($this->messages) > 0) {
-            $this->set_body_to_part(0);
-        }
+        $this->set_body_to_part(0);
     }
 
     /** extract new headers from the part
@@ -204,6 +202,12 @@ class BananaPost
                 $this->headers[$hdr] = $local_header[$hdr];
             }
         }
+
+        if (preg_match('!charset=([^;]*)\s*(;|$)!', $this->headers['content-type'], $matches)) {
+            $this->body = iconv($matches[1], 'utf-8', $this->body);
+        } else {
+            $this->body = utf8_encode($this->body);
+        }                                                        
         return true;
     }
 
@@ -254,12 +258,33 @@ class BananaPost
     /** convert message to html
      * @param partid INT id of the multipart message that must be displaid
      */
-    function to_html($partid = 0)
+    function to_html($partid = -1)
     {
         global $banana;
 
-        if ($partid != 0) {
-            $this->set_body_to_part($partid);
+        if (count($this->messages) > 1) {
+            if ($partid != -1) {
+                $this->set_body_to_part($partid);
+            } else {
+                // Select prefered text-format
+                foreach ($banana->body_mime as $mime) {
+                    for ($id = 0 ; $id < count($this->messages) ; $id++) {
+                        if (preg_match("@$mime@", $this->messages[$id]['headers']['content-type'])) {
+                            $partid = $id;
+                            $this->set_body_to_part($partid);
+                            break;
+                        }
+                    }
+                    if ($partid != -1) {
+                        break;
+                    }
+                }
+                if ($partid == -1) {
+                    $partid = 0;
+                }
+            }
+        } else {
+            $partid = 0;
         }
 
         $res  = '<table class="bicol banana_msg" cellpadding="0" cellspacing="0">';
@@ -317,7 +342,7 @@ class BananaPost
             $res .= '</td></tr>';
         }
         
-        $res .= '<tr><th colspan="2">'._b_('apercu').'</th></tr>';
+        $res .= '<tr><th colspan="2">'._b_('Apercu').'</th></tr>';
         $ndx  = $banana->spool->getndx($this->id);
         $res .= '<tr><td class="thrd" colspan="2">'.$banana->spool->to_html($ndx-$banana->tbefore, $ndx+$banana->tafter, $ndx).'</td></tr>';
 

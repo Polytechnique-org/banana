@@ -17,6 +17,9 @@ class Banana
             'message-id', 'newsgroups', 'organization', 'references', 'subject', 'x-face');
     var $show_hdr    = array('from', 'subject', 'newsgroups', 'followup', 'date', 'organization', 'references', 'x-face');
 
+    /** Favorites MIMEtypes to use, by order for reading multipart messages
+     */
+    var $body_mime   = array('text/plain', 'text/html', 'text/richtext');
 
     var $tbefore     = 5;
     var $tafter      = 5;
@@ -60,7 +63,7 @@ class Banana
 
         $group  = empty($_GET['group']) ? null : strtolower($_GET['group']);
         $artid  = empty($_GET['artid']) ? null : strtolower($_GET['artid']);
-        $partid = empty($_GET['part']) ? 0 : $_GET['part'];
+        $partid = !isset($_GET['part']) ? -1 : $_GET['part'];
         $banana->state = Array ('group' => $group, 'artid' => $artid);
 
         if (is_null($group)) {
