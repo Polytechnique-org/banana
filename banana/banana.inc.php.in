@@ -9,31 +9,32 @@
 
 class Banana
 {
-    var $maxspool  = 3000;
+    var $maxspool    = 3000;
+    var $maxfilesize = 100000;
 
-    var $hdecode   = array('from','name','organization','subject');
-    var $parse_hdr = array('content-disposition', 'content-transfer-encoding', 'content-type', 'date', 'followup-to', 'from',
+    var $hdecode     = array('from','name','organization','subject');
+    var $parse_hdr   = array('content-disposition', 'content-transfer-encoding', 'content-type', 'date', 'followup-to', 'from',
             'message-id', 'newsgroups', 'organization', 'references', 'subject', 'x-face');
-    var $show_hdr  = array('from', 'subject', 'newsgroups', 'followup', 'date', 'organization', 'references', 'x-face');
+    var $show_hdr    = array('from', 'subject', 'newsgroups', 'followup', 'date', 'organization', 'references', 'x-face');
 
 
-    var $tbefore   = 5;
-    var $tafter    = 5;
-    var $tmax      = 50;
+    var $tbefore     = 5;
+    var $tafter      = 5;
+    var $tmax        = 50;
 
-    var $wrap      = 74;
+    var $wrap        = 74;
 
-    var $boundary  = "bananaBoundary42";
-    var $custom    = "Content-Type: text/plain; charset=utf-8\nMime-Version: 1.0\nContent-Transfer-Encoding: 8bit\nUser-Agent: Banana @VERSION@\n";
-    var $custom_mp = "Content-Type: multipart/mixed; boundary=\"bananaBoundary42\"\nContent-Transfer-Encoding: 7bit\nUser-Agent: Banana @VERSION@\n";
-    var $custom_bd = "Content-Type: text/plain; charset=utf-8\nContent-Transfert-Encoding: 8bit";
+    var $boundary    = "bananaBoundary42";
+    var $custom      = "Content-Type: text/plain; charset=utf-8\nMime-Version: 1.0\nContent-Transfer-Encoding: 8bit\nUser-Agent: Banana @VERSION@\n";
+    var $custom_mp   = "Content-Type: multipart/mixed; boundary=\"bananaBoundary42\"\nContent-Transfer-Encoding: 7bit\nUser-Agent: Banana @VERSION@\n";
+    var $custom_bd   = "Content-Type: text/plain; charset=utf-8\nContent-Transfert-Encoding: 8bit";
 
-    var $host      = 'news://localhost:119/';
+    var $host        = 'news://localhost:119/';
 
-    var $profile   = Array( 'name' => 'Anonymous <anonymouse@example.com>', 'sig'  => '', 'org'  => '',
+    var $profile     = Array( 'name' => 'Anonymous <anonymouse@example.com>', 'sig'  => '', 'org'  => '',
             'customhdr' =>'', 'display' => 0, 'lastnews' => 0, 'locale'  => 'fr_FR', 'subscribe' => array());
     
-    var $state = Array('group' => null, 'artid' => null);
+    var $state       = Array('group' => null, 'artid' => null);
     var $nntp;
     var $groups;
     var $newgroups;
@@ -272,7 +273,7 @@ class Banana
         $html .= '<tr><td colspan="2"><textarea name="body" cols="74" rows="16">'
             .to_entities($body).($this->profile['sig'] ? "\n\n-- \n".htmlentities($this->profile['sig']) : '').'</textarea></td></th>';
     	$html .= '<tr><th colspan="2">'._b_('Pièces jointes').'</th></tr>';
-        $html .= '<tr><td colspan="2"><input type="hidden" name="MAX_FILE_SIZE" value="100000" />';
+        $html .= '<tr><td colspan="2"><input type="hidden" name="MAX_FILE_SIZE" value="'.$this->maxfilesize.'" />';
         $html .= '<input type="file" name="newpj" /></td></tr>';
 	    $html .= '<tr><th colspan="2">';
         if ($id > 0) {
@@ -313,31 +314,18 @@ class Banana
         $body = wrap($body, "", $this->wrap);
 
         // include attachment in the body
-        if (isset($_FILES['newpj'])) {
+        $uploaded = $this->_upload('newpj');
+        if ($uploaded['error'] == 0) {
             $this->custom = $this->custom_mp;
             $body    = "\n--".$this->boundary."\n".$this->custom_bd."\n\n".$body."\n--".$this->boundary."\n";
-            $tmpname = $_FILES['newpj']['tmp_name'];
-            $file    = basename($_FILES['newpj']['name']);
-            $mime    = shell_exec("file -bi $tmpname"); //Because mime_content_type don't work :(
-            if (preg_match("@([^ ]+/[^ ]+); (.*)@", $mime, $format)) {
-                $mime  = $format[1];
-                $encod = $format[2];
-            } else {
-                preg_match("@([^ ]+/[^ ]+)\r?\n@", $mime, $format);
-                $mime  = $format[1];
-                $encod = 'base64';
-            }
-                
-            $body   .= 'Content-Type: '.$mime.'; name="'.$file."\"\n";
-            $body   .= 'Content-Disposition: attachment; filename="'.$file."\"\n";
-            $body   .= 'Content-Transfer-Encoding: '.$encod."\n\n";
-            if ($encod == 'base64') {
-                $body   .= chunk_split(base64_encode(fread(fopen($tmpname, 'r'), filesize($tmpname))));
-            } else {
-                $body   .= fread(fopen($tmpname, 'r'), filesize($tmpname));
-            }
+
+            $body   .= 'Content-Type: '.$uploaded['type'].'; name="'.$uploaded['name']."\"\n";
+            $body   .= 'Content-Disposition: attachment; filename="'.$uploaded['name']."\"\n";
+            $body   .= 'Content-Transfer-Encoding: '.$uploaded['encoding']."\n\n";
+            $body   .= $uploaded['data'];
             $body   .= '--'.$this->boundary.'--';
-        }    
+        }
+        #TODO:afficher les erreurs lorsque l'upload ne marche pas
 
         // finalise and post the message
         $msg .= $this->custom.$this->profile['customhdr']."\n".$body;
@@ -378,6 +366,43 @@ class Banana
     function _require($file)
     {
         require_once (dirname(__FILE__).'/'.$file.'.inc.php');
+    }
+
+    function _upload($file)
+    {
+        if ($_FILES[$file]['name'] == "") {
+            return Array( 'error' => -1 );
+        }
+
+        // upload
+        $_FILES[$file]['tmp_name'];
+
+        // test if upload is ok
+        $file    = $_FILES[$file];
+        if ($file['size'] == 0 || $file['error'] != 0) {
+            if ($file['error'] == 0) {
+                $file['error'] = -1;
+            }
+            return $file;
+        }
+
+        // adding custum data
+        $mime    = rtrim(shell_exec('file -bi '.$file['tmp_name'])); //Because mime_content_type don't work :(
+        $encod   = 'base64';
+        if (preg_match("@([^ ]+/[^ ]+); (.*)@", $mime, $format)) {
+            $mime  = $format[1];
+            $encod = $format[2];
+        }
+        $data = fread(fopen($file['tmp_name'], 'r'), $file['size']);
+        if ($encod == 'base64') {
+            $data = chunk_split(base64_encode($data));
+        }
+        $file['name']     = basename($file['name']);
+        $file['type']     = $mime;
+        $file['encoding'] = $encod;
+        $file['data']     = $data;
+
+        return $file;
     }
 }
 
