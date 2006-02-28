@@ -267,14 +267,23 @@ function formatbody($_text, $format='plain')
     $res  = preg_replace("/ (&lt;|&gt;|&quot;) /", "\\1", $res);
 
     if ($format == 'html') {
-        return $res;
+        $res = preg_replace("@(</p>)\n?-- \n?(<p[^>]*>|<br>)@", "\\1<br>-- \\2", $res);
+        $res = preg_replace("@<br>\n?-- \n?(<p[^>]*>)@", "<br>-- <br>\\2", $res);
+        $parts = preg_split("@(:?<p[^>]*>\n?-- \n?</p>|<br[^>]*>\n?-- \n?<br>)@", $res);
+    } else {
+        $parts = preg_split("/\n-- ?\n/", $res);
     }
 
-    $parts = preg_split("/\n-- ?\n/", $res);
-
     if (count($parts) > 1) {
-        $sign = "</pre><hr style='width: 100%; margin: 1em 0em; ' /><pre>" . array_pop($parts);
-        return join("\n-- \n", $parts).$sign;
+        $sign  = array_pop($parts);
+        if ($format == 'html') {
+            $res  = join('<br/>-- <br/>', $parts);
+            $sign = '<hr style="width: 100%; margin: 1em 0em; " />'.$sign;
+        } else {
+            $res  = join('\n-- \n', $parts);
+            $sign = '</pre><hr style="width: 100%; margin: 1em 0em; " /><pre>'.$sign;
+        }
+        return $res.$sign;
     } else {
         return $res;
     }
