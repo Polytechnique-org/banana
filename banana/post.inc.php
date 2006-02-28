@@ -51,7 +51,7 @@ class BananaPost
 
         if (preg_match("@multipart/([^;]+);@", $this->headers['content-type'], $mpart_type)) {
             preg_match("/boundary=\"?([^ \"]+)\"?/", $this->headers['content-type'], $mpart_boundary);
-            $this->split_multipart($mpart_type[1], $mpart_boundary[1]);
+            $this->_split_multipart($mpart_type[1], $mpart_boundary[1]);
         }
         
         if (preg_match('!charset=([^;]*)\s*(;|$)!', $this->headers['content-type'], $matches)) {
@@ -65,18 +65,18 @@ class BananaPost
      * @param $type STRING multipart type description
      * @param $boundary STRING multipart boundary identification string
      */
-    function split_multipart($type, $boundary)
+    function _split_multipart($type, $boundary)
     {
         $parts = preg_split("/\n--$boundary(--|\n)/", $this->body);
         foreach ($parts as $part) {
-            $part = $this->get_part($part);
+            $part = $this->_get_part($part);
             $local_header = $part['headers'];
             $local_body = $part['body'];
             if (isset($local_header['content-disposition']) && preg_match("/attachment/", $local_header['content-disposition'])) {
-                $this->add_attachment($part);
+                $this->_add_attachment($part);
             } else if (isset($local_header['content-type']) && preg_match("@text/([^;]+);@", $local_header['content-type'], $format)) {
     	        array_push($this->messages, $part);
-	        }
+        }
         }
         if (count($this->messages) > 0) {
             $this->set_body_to_part(0);
@@ -86,7 +86,7 @@ class BananaPost
     /** extract new headers from the part
      * @param $part STRING part of a multipart message
      */
-    function get_part($part)
+    function _get_part($part)
     {
         global $banana;
 
@@ -108,7 +108,7 @@ class BananaPost
 
     /** add an attachment
      */
-    function add_attachment($part)
+    function _add_attachment($part)
     {
         $local_header = $part['headers'];
         $local_body = $part['body'];
@@ -143,6 +143,23 @@ class BananaPost
         return true;
     }
 
+    /** return body in plain text (useful for messages without a text/plain part)
+     */
+    function get_body()
+    {
+        preg_match("@text/([^;]+);@", $this->headers['content-type'], $format);
+        if ($format[1] == 'plain') {
+            return $this->body;
+        }
+        $res = preg_replace("@<br[^>]>@", "@@@#@", $this->body);
+        $res = trim(html_entity_decode(strip_tags($res)));
+        $res = str_replace("@@@#@", "\n", $res);
+        if (!is_utf8($res)) {
+            $res = utf8_encode($res);
+        }
+        return $res;
+    }
+
     /** decode an attachment
      * @param pjid INT id of the attachment to decode
      * @param action BOOL action to execute : true=view, false=download
@@ -153,10 +170,12 @@ class BananaPost
             return false;
         } else {
             $file = $this->pj[$pjid];
-            header('Content-Type: '.$file['MIME']);
+            header('Content-Type: '.$file['MIME'].'; name="'.$file['filename'].'"');
             if (!$action) {
                 header('Content-Disposition: attachment; filename="'.$file['filename'].'"');
-            }
+            } else {
+                header('Content-Disposition: inline; filename="'.$file['filename'].'"');
+            }                
             if ($file['encoding'] == 'base64') {
                 echo base64_decode($file['data']);
             } else {
