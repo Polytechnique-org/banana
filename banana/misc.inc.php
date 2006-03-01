@@ -14,7 +14,7 @@
 function _b_($str) { return utf8_decode(dgettext('banana', utf8_encode($str))); }
 
 function to_entities($str) {
-    require_once 'banana/utf8.php';
+    require_once dirname(__FILE__).'/utf8.php';
     return utf8entities(htmlentities($str, ENT_NOQUOTES, 'UTF-8'));
 }
 
