@@ -274,7 +274,7 @@ class Banana
         $html .= '<tr><td>'._b_('Organisation').'</td><td>'.$this->profile['org'].'</td></tr>';
         $html .= '<tr><th colspan="2">'._b_('Corps').'</th></tr>';
         $html .= '<tr><td colspan="2"><textarea name="body" cols="74" rows="16">'
-            .to_entities($body).($this->profile['sig'] ? "\n\n-- \n".htmlentities($this->profile['sig']) : '').'</textarea></td></th>';
+            .to_entities($body).($this->profile['sig'] ? "\n\n-- \n".htmlentities($this->profile['sig']) : '').'</textarea></td></tr>';
     	$html .= '<tr><th colspan="2">'._b_('Pièces jointes').'</th></tr>';
         $html .= '<tr><td colspan="2"><input type="hidden" name="MAX_FILE_SIZE" value="'.$this->maxfilesize.'" />';
         $html .= '<input type="file" name="newpj" size="40"/></td></tr>';
