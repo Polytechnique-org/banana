@@ -305,6 +305,29 @@ class nntp
         return ($this->posting);
     }
 
+    /** retreive the group list
+     * @return ARRAY group name => (MSGNUM of first article, MSGNUM of last article, NNTP flags)
+     * @see newgroups, liste
+     */
+    function _grouplist()
+    {
+        global $banana;
+
+        if (substr($this->gline(), 0, 1)!="2") {
+            return false;
+        }
+        $result = $this->gline();
+        $array  = Array();
+        while ($result != ".") {
+            preg_match("/([^ ]+) (\d+) (\d+) (.)/", $result, $regs);
+            if (!isset($banana->grp_pattern) || preg_match('@'.$banana->grp_pattern.'@', $regs[1])) {
+                $array[$regs[1]] = array(intval($regs[2]), intval($regs[3]), intval($regs[4]));
+            }
+            $result = $this->gline();
+        }
+        return $array;                                                                                                                                        
+    }
+
     /** gets information about all active newsgroups
      * @return ARRAY group name => (MSGNUM of first article, MSGNUM of last article, NNTP flags)
      * @see newgroups
@@ -313,15 +336,7 @@ class nntp
     function liste()
     {
         $this->pline("LIST\r\n");
-        if (substr($this->gline(), 0, 1)!="2") return false;
-        $result = $this->gline();
-        $array = Array();
-        while ($result != ".") {
-            preg_match("/([^ ]+) (\d+) (\d+) (.)/", $result, $regs);
-            $array[$regs[1]] = array(intval($regs[2]), intval($regs[3]), intval($regs[4]));
-            $result          = $this->gline();
-        }
-        return $array;
+        return $this->_grouplist();
     }
 
     /** get information about recent newsgroups 
@@ -338,17 +353,7 @@ class nntp
         $distributions = preg_replace("/(\r|\n)/", "", $_distributions);
         $this->pline("NEWGROUPS ".gmdate("ymd His", $_since)
                 ." GMT $distributions\r\n");
-        if (substr($this->gline(), 0, 1)!="2") {
-            return false;
-        }
-        $result = $this->gline();
-        $array  = array();
-        while ($result != ".") {
-            preg_match("/([^ ]+) (\d+) (\d+) (.)/", $result, $regs);
-            $array[$regs[1]] = array(intval($regs[2]), intval($regs[3]), intval($regs[4]));
-            $result          = $this->gline();
-        }
-        return $array;
+        return $this->_grouplist();
     }
 
     /** gets a list of new articles

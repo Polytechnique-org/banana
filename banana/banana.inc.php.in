@@ -21,6 +21,11 @@ class Banana
      */
     var $body_mime   = array('text/plain', 'text/html', 'text/richtext');
 
+    /** Regexp for selecting newsgroups to show (if empty, match all newsgroups)
+     * ex : '^xorg\..*' for xorg.*
+     */
+    var $grp_pattern;
+
     var $tbefore     = 5;
     var $tafter      = 5;
     var $tmax        = 50;
