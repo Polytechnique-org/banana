@@ -42,7 +42,7 @@ function textFormat_translate($format)
  */
 function removeEvilTags($source)
 {
-    $allowedTags = '<h1><b><i><a><ul><li><pre><hr><blockquote><img><br><font><p><small><big><sup><sub><code>';
+    $allowedTags = '<h1><b><i><a><ul><li><pre><hr><blockquote><img><br><font><p><small><big><sup><sub><code><em>';
     $source = strip_tags($source, $allowedTags);
     return preg_replace('/<(.*?)>/ie', "'<'.removeEvilAttributes('\\1').'>'", $source);
 }
@@ -63,8 +63,8 @@ function removeEvilAttributes($tagSource)
  */
 function htmlToPlainText($res)
 {
-    $res = trim(html_entity_decode(strip_tags($res, '<br>')));
-    $res = preg_replace("@<br[^>]>@i", "\n", $res);
+    $res = trim(html_entity_decode(strip_tags($res, '<br><p>')));
+    $res = preg_replace("@</?(br|p)[^>]*>@i", "\n", $res);
     if (!is_utf8($res)) {
         $res = utf8_encode($res);
     }   
