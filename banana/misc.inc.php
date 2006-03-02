@@ -273,7 +273,7 @@ function displayshortcuts($first = -1) {
     } else {
         $res .= "[<a href=\"?group=$group&amp;artid=$artid&amp;action=new\">"
             ._b_('Répondre')."</a>] ";
-        if ($banana->post->checkcancel()) {
+        if ($banana->post && $banana->post->checkcancel()) {
             $res .= "[<a href=\"?group=$group&amp;artid=$artid&amp;action=cancel\">"
                 ._b_('Annuler ce message')."</a>] ";
         }
