@@ -53,10 +53,30 @@ class BananaPost
             preg_match("/boundary=\"?([^ \"]+)\"?/", $this->headers['content-type'], $mpart_boundary);
             $this->_split_multipart($mpart_type[1], $mpart_boundary[1]);
         } else {
+            $this->_find_uuencode();
             if (preg_match('!charset=([^;]*)\s*(;|$)!', $this->headers['content-type'], $matches)) {
                 $this->body = iconv($matches[1], 'utf-8', $this->body);
             } else {
                 $this->body = utf8_encode($this->body);
+            }
+        }
+    }
+
+    /** find and add uuencoded attachments
+     */
+    function _find_uuencode()
+    {
+        if (preg_match_all('@\n(begin \d+ ([^\r\n]+)\r?(?:\n(?!end)[^\n]*)*\nend)@', $this->body, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $mime = trim(exec('echo '.escapeshellarg($match[1]).' | uudecode -o /dev/stdout | file -bi -'));
+                if ($mime != 'application/x-empty') {
+                    $this->body = str_replace($match[0], '', $this->body);
+                    $body = $match[1];
+                    $header['content-type'] = $mime.'; name="'.$match[2].'"';
+                    $header['content-transfer-encoding'] = 'x-uuencode';
+                    $header['content-disposition'] = 'attachment; filename="'.$match[2].'"';
+                    $this->_add_attachment(Array('headers' => $header, 'body' => $body));
+                }
             }
         }
     }
@@ -174,6 +194,8 @@ class BananaPost
             }                
             if ($file['encoding'] == 'base64') {
                 echo base64_decode($file['data']);
+            } else if ($file['encoding'] == 'x-uuencode') {                
+                passthru('echo '.escapeshellarg($file['data']).' | uudecode -o /dev/stdout');
             } else {
                 header('Content-Transfer-Encoding: '.$file['encoding']);
                 echo $file['data'];
