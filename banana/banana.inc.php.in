@@ -10,7 +10,6 @@
 class Banana
 {
     var $maxspool    = 3000;
-    var $maxfilesize = 100000;
 
     var $hdecode     = array('from','name','organization','subject');
     var $parse_hdr   = array('content-disposition', 'content-transfer-encoding', 'content-type', 'date', 'followup-to', 'from',
@@ -20,6 +19,15 @@ class Banana
     /** Favorites MIMEtypes to use, by order for reading multipart messages
      */
     var $body_mime   = array('text/plain', 'text/html', 'text/richtext');
+    /** Indicate wether posting attachment is allowed
+     */
+    var $can_attach  = true;
+    /** Maximum allowed file size for attachment
+     */
+    var $maxfilesize = 100000;  
+    /** Indicate wether posting html messages is allowed
+     */
+    var $can_html    = false;
 
     /** Regexp for selecting newsgroups to show (if empty, match all newsgroups)
      * ex : '^xorg\..*' for xorg.*
@@ -32,13 +40,25 @@ class Banana
 
     var $wrap        = 74;
 
+    /** Boundary for multipart messages
+     */
     var $boundary    = "bananaBoundary42";
+    /** Global headers to use for text/plain messages
+     */
     var $custom      = "Content-Type: text/plain; charset=utf-8\nMime-Version: 1.0\nContent-Transfer-Encoding: 8bit\nUser-Agent: Banana @VERSION@\n";
+    /** Global headers to use from multipart messages
+     */
     var $custom_mp   = "Content-Type: multipart/mixed; boundary=\"bananaBoundary42\"\nContent-Transfer-Encoding: 7bit\nUser-Agent: Banana @VERSION@\n";
+    /** Body part headers to use from multipart messages
+     */
     var $custom_bd   = "Content-Type: text/plain; charset=utf-8\nContent-Transfert-Encoding: 8bit";
 
+    /** News serveur to use
+     */
     var $host        = 'news://localhost:119/';
 
+    /** User profile
+     */
     var $profile     = Array( 'name' => 'Anonymous <anonymouse@example.com>', 'sig'  => '', 'org'  => '',
             'customhdr' =>'', 'display' => 0, 'lastnews' => 0, 'locale'  => 'fr_FR', 'subscribe' => array());
     
@@ -122,7 +142,11 @@ class Banana
                 if (isset($_GET['action']) && $_GET['action'] == 'view') {
                     $action = true;
                 }
-                return $banana->action_getAttachment($group, $artid, $_GET['pj'], $action);
+                $att = $banana->action_getAttachment($group, $artid, $_GET['pj'], $action);
+                if ($att != "") {
+                    return $res.$att;
+                }
+                return "";
             }
             
             return $res . $banana->action_showArticle($group, $artid, $partid);
