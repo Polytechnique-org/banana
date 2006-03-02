@@ -324,17 +324,34 @@ class Banana
 
         // include attachment in the body
         $uploaded = $this->_upload('newpj');
-        if ($uploaded['error'] == 0) {
-            $this->custom = $this->custom_mp;
-            $body    = "\n--".$this->boundary."\n".$this->custom_bd."\n\n".$body."\n--".$this->boundary."\n";
+        switch ($uploaded['error']) {
+            case UPLOAD_ERR_OK:
+                $this->custom = $this->custom_mp;
+                $body    = "\n--".$this->boundary."\n".$this->custom_bd."\n\n".$body."\n--".$this->boundary."\n";
 
-            $body   .= 'Content-Type: '.$uploaded['type'].'; name="'.$uploaded['name']."\"\n";
-            $body   .= 'Content-Transfer-Encoding: '.$uploaded['encoding']."\n\n";
-            $body   .= 'Content-Disposition: attachment; filename="'.$uploaded['name']."\"\n";
-            $body   .= $uploaded['data'];
-            $body   .= '--'.$this->boundary.'--';
+                $body   .= 'Content-Type: '.$uploaded['type'].'; name="'.$uploaded['name']."\"\n";
+                $body   .= 'Content-Transfer-Encoding: '.$uploaded['encoding']."\n\n";
+                $body   .= 'Content-Disposition: attachment; filename="'.$uploaded['name']."\"\n";
+                $body   .= $uploaded['data'];
+                $body   .= '--'.$this->boundary.'--';
+                break;
+
+            case UPLOAD_ERR_INI_SIZE: case UPLOAD_ERR_FORM_SIZE:
+                return '<p class="error">'._b_('Fichier trop gros pour être envoyé : ')
+                        .$uploaded['name'].'</p>'.$this->action_showThread($group, $artid);
+
+            case UPLOAD_ERR_PARTIAL:
+                return '<p class="error">'._b_('Erreur lors de l\'upload de ')
+                        .$uploaded['name'].'</p>'.$this->action_showThread($group, $artid);
+
+            case UPLOAD_ERR_NO_FILE:
+                return '<p class="error">'._b_('Le fichier spécifié n\'existe pas : ')
+                        .$uploaded['name'].'</p>'.$this->action_showThread($group, $artid);
+
+            case UPLOAD_ERR_NO_TMP_DIR:
+                return '<p class="error">'._b_('Une erreur est survenue sur le serveur lors de l\'upload de ')
+                        .$uploaded['name'].'</p>'.$this->action_showThread($group, $artid);
         }
-        #TODO:afficher les erreurs lorsque l'upload ne marche pas
 
         // finalise and post the message
         $msg .= $this->custom.$this->profile['customhdr']."\n".$body;
