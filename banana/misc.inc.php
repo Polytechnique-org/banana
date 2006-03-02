@@ -65,6 +65,9 @@ function htmlToPlainText($res)
 {
     $res = trim(html_entity_decode(strip_tags($res, '<br>')));
     $res = preg_replace("@<br[^>]>@i", "\n", $res);
+    if (!is_utf8($res)) {
+        $res = utf8_encode($res);
+    }   
     return $res;
 }
 
@@ -304,9 +307,9 @@ function wrap($text, $_prefix="")
 function formatbody($_text, $format='plain')
 {
     if ($format == 'html') {
-        $res = '<br/>'.removeEvilTags(html_entity_decode(to_entities($_text))).'<br/>';
+        $res = '<br/>'.removeEvilTags($_text).'<br/>';
     } else if ($format == 'richtext') {
-        $res = '<br/>'.richtextToHtml(html_entity_decode(to_entities($_text))).'<br/>';
+        $res = '<br/>'.richtextToHtml($_text).'<br/>';
         $format = 'html';
     } else {
         $res  = "\n\n" . to_entities(wrap($_text, ""))."\n\n";
