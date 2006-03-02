@@ -318,11 +318,14 @@ class BananaPost
  
         preg_match("@text/([^;]+);@", $this->headers['content-type'], $format);
         $format = $format[1];
-        $res .= '<tr><td colspan="2">';
+        $res .= '<tr><td colspan="2"';
         if ($format == 'html') {
-            $res .= formatbody($this->body, $format); 
+            if (preg_match('@<body[^>]*bgcolor="?([#0-9a-f]+)"?[^>]*>@i', $this->body, $bgcolor)) {
+                $res .= ' bgcolor="'.$bgcolor[1].'"';
+            }
+            $res .= '>'.formatbody($this->body, $format); 
         } else {
-            $res .= '<pre>'.formatbody($this->body).'</pre>';
+            $res .= '><pre>'.formatbody($this->body).'</pre>';
         }
         $res .= '</td></tr>';
 
