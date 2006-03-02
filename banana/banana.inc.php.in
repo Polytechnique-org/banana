@@ -59,6 +59,7 @@ class Banana
     function run($class = 'Banana')
     {
         global $banana;
+
         Banana::_require('misc');
         $banana = new $class();
 

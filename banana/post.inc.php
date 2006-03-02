@@ -149,13 +149,11 @@ class BananaPost
         if ($format[1] == 'plain') {
             return $this->body;
         }
-        $res = preg_replace("@<br[^>]>@", "@@@#@", $this->body);
-        $res = trim(html_entity_decode(strip_tags($res)));
-        $res = str_replace("@@@#@", "\n", $res);
-        if (!is_utf8($res)) {
-            $res = utf8_encode($res);
+        if ($format[1] == 'richtext') {
+            return htmlToPlainText(richtextToHtml($this->body));
+        } else {
+            return htmlToPlainText($this->body);
         }
-        return $res;
     }
 
     /** decode an attachment

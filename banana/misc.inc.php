@@ -35,14 +35,14 @@ function textFormat_translate($format)
  * Taken from php.net
  */
 
- /**
+/**
  * @return string
  * @param string
  * @desc Strip forbidden tags and delegate tag-source check to removeEvilAttributes()
  */
 function removeEvilTags($source)
 {
-    $allowedTags = '<h1><b><i><a><ul><li><pre><hr><blockquote><img><br><font><p>';
+    $allowedTags = '<h1><b><i><a><ul><li><pre><hr><blockquote><img><br><font><p><small><big><sup><sub><code>';
     $source = strip_tags($source, $allowedTags);
     return preg_replace('/<(.*?)>/ie', "'<'.removeEvilAttributes('\\1').'>'", $source);
 }
@@ -57,6 +57,52 @@ function removeEvilAttributes($tagSource)
     $stripAttrib = 'javascript:|onclick|ondblclick|onmousedown|onmouseup|onmouseover|'.
                    'onmousemove|onmouseout|onkeypress|onkeydown|onkeyup';
     return stripslashes(preg_replace("/$stripAttrib/i", '', $tagSource));
+}
+
+/** Convert html to plain text
+ */
+function htmlToPlainText($res)
+{
+    $res = trim(html_entity_decode(strip_tags($res, '<br>')));
+    $res = preg_replace("@<br[^>]>@i", "\n", $res);
+    return $res;
+}
+
+/********************************************************************************
+ * RICHTEXT STUFF
+ */
+
+/** Convert richtext to html
+ */
+function richtextToHtml($source)
+{
+    $tags = Array('bold' => 'b',
+                  'italic' => 'i',
+                  'smaller' => 'small',
+                  'bigger' => 'big',
+                  'underline' => 'u',
+                  'subscript' => 'sub',
+                  'superscript' => 'sup',
+                  'excerpt' => 'blockquote',
+                  'paragraph' => 'p',
+                  'nl' => 'br'
+            );
+            
+    // clean unsupported tags
+    $protectedTags = '<signature><lt><comment><'.join('><', array_keys($tags)).'>';
+    $source = strip_tags($source, $protectedTags);
+    
+    // convert richtext tags to html
+    foreach (array_keys($tags) as $tag) {
+        $source = preg_replace('@(</?)'.$tag.'([^>]*>)@i', '\1'.$tags[$tag].'\2', $source);
+    }
+
+    // some special cases
+    $source = preg_replace('@<signature>@i', '<br>-- <br>', $source);
+    $source = preg_replace('@</signature>@i', '', $source);
+    $source = preg_replace('@<lt>@i', '&lt;', $source);
+    $source = preg_replace('@<comment[^>]*>((?:[^<]|<(?!/comment>))*)</comment>@i', '<!-- \1 -->', $source);
+    return removeEvilAttributes($source);
 }
 
 /********************************************************************************
@@ -259,6 +305,9 @@ function formatbody($_text, $format='plain')
 {
     if ($format == 'html') {
         $res = '<br/>'.removeEvilTags(html_entity_decode(to_entities($_text))).'<br/>';
+    } else if ($format == 'richtext') {
+        $res = '<br/>'.richtextToHtml(html_entity_decode(to_entities($_text))).'<br/>';
+        $format = 'html';
     } else {
         $res  = "\n\n" . to_entities(wrap($_text, ""))."\n\n";
     }
