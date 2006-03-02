@@ -70,7 +70,7 @@ class BananaPost
             foreach ($matches as $match) {
                 $mime = trim(exec('echo '.escapeshellarg($match[1]).' | uudecode -o /dev/stdout | file -bi -'));
                 if ($mime != 'application/x-empty') {
-                    $this->body = str_replace($match[0], '', $this->body);
+                    $this->body = trim(str_replace($match[0], '', $this->body));
                     $body = $match[1];
                     $header['content-type'] = $mime.'; name="'.$match[2].'"';
                     $header['content-transfer-encoding'] = 'x-uuencode';

@@ -25,9 +25,6 @@ class Banana
     /** Maximum allowed file size for attachment
      */
     var $maxfilesize = 100000;  
-    /** Indicate wether posting html messages is allowed
-     */
-    var $can_html    = false;
 
     /** Regexp for selecting newsgroups to show (if empty, match all newsgroups)
      * ex : '^xorg\..*' for xorg.*
@@ -42,16 +39,16 @@ class Banana
 
     /** Boundary for multipart messages
      */
-    var $boundary    = "bananaBoundary42";
-    /** Global headers to use for text/plain messages
+    var $boundary    = 'bananaBoundary42';
+    /** Global headers to use for messages
      */
-    var $custom      = "Content-Type: text/plain; charset=utf-8\nMime-Version: 1.0\nContent-Transfer-Encoding: 8bit\nUser-Agent: Banana @VERSION@\n";
+    var $custom      = "Mime-Version: 1.0\nUser-Agent: Banana @VERSION@\n";
     /** Global headers to use from multipart messages
      */
-    var $custom_mp   = "Content-Type: multipart/mixed; boundary=\"bananaBoundary42\"\nContent-Transfer-Encoding: 7bit\nUser-Agent: Banana @VERSION@\n";
-    /** Body part headers to use from multipart messages
+    var $custom_mp   = "Content-Type: multipart/mixed; boundary=\"bananaBoundary42\"\nContent-Transfer-Encoding: 7bit\n";
+    /** Body type when using plain text
      */
-    var $custom_bd   = "Content-Type: text/plain; charset=utf-8\nContent-Transfert-Encoding: 8bit";
+    var $custom_plain= "Content-Type: text/plain; charset=utf-8\nContent-Transfert-Encoding: 8bit\n"; 
 
     /** News serveur to use
      */
@@ -304,7 +301,7 @@ class Banana
         $html .= '<tr><td>'._b_('Organisation').'</td><td>'.$this->profile['org'].'</td></tr>';
         $html .= '<tr><th colspan="2">'._b_('Corps').'</th></tr>';
         $html .= '<tr><td colspan="2"><textarea name="body" cols="74" rows="16">'
-            .to_entities($body).($this->profile['sig'] ? "\n\n-- \n".htmlentities($this->profile['sig']) : '').'</textarea></td></tr>';
+              .  to_entities($body).($this->profile['sig'] ? "\n\n-- \n".htmlentities($this->profile['sig']) : '').'</textarea></td></tr>';
     	$html .= '<tr><th colspan="2">'._b_('Pièces jointes').'</th></tr>';
         $html .= '<tr><td colspan="2"><input type="hidden" name="MAX_FILE_SIZE" value="'.$this->maxfilesize.'" />';
         $html .= '<input type="file" name="newpj" size="40"/></td></tr>';
@@ -344,20 +341,20 @@ class Banana
             $msg .= "References: $refs{$post->headers['message-id']}\n";
         }
 
-        $body = wrap($body, "", $this->wrap);
+        $body_headers  = $this->custom_plain;
+        $body          = wrap($body, "", $this->wrap);
 
         // include attachment in the body
         $uploaded = $this->_upload('newpj');
         switch ($uploaded['error']) {
             case UPLOAD_ERR_OK:
-                $this->custom = $this->custom_mp;
-                $body    = "\n--".$this->boundary."\n".$this->custom_bd."\n\n".$body."\n--".$this->boundary."\n";
-
-                $body   .= 'Content-Type: '.$uploaded['type'].'; name="'.$uploaded['name']."\"\n";
-                $body   .= 'Content-Transfer-Encoding: '.$uploaded['encoding']."\n\n";
-                $body   .= 'Content-Disposition: attachment; filename="'.$uploaded['name']."\"\n";
-                $body   .= $uploaded['data'];
-                $body   .= '--'.$this->boundary.'--';
+                $this->custom = $this->custom_mp.$this->custom;
+                $body         = $this->_make_part($body_headers, $body);
+                $file_head    = 'Content-Type: '.$uploaded['type'].'; name="'.$uploaded['name']."\"\n"
+                              . 'Content-Transfer-Encoding: '.$uploaded['encoding']."\n"
+                              . 'Content-Disposition: attachment; filename="'.$uploaded['name']."\"\n";
+                $body        .= $this->_make_part($file_head, $uploaded['data']);
+                $body        .= "\n--".$this->boundary.'--';
                 break;
 
             case UPLOAD_ERR_INI_SIZE: case UPLOAD_ERR_FORM_SIZE:
@@ -375,6 +372,9 @@ class Banana
             case UPLOAD_ERR_NO_TMP_DIR:
                 return '<p class="error">'._b_('Une erreur est survenue sur le serveur lors de l\'upload de ')
                         .$uploaded['name'].'</p>'.$this->action_showThread($group, $artid);
+
+            default:
+                $this->custom = $body_headers.$this->custom;
         }
 
         // finalise and post the message
@@ -453,6 +453,11 @@ class Banana
         $file['data']     = $data;
 
         return $file;
+    }
+
+    function _make_part($headers, $body)
+    {
+        return "\n--".$this->boundary."\n".$headers."\n".$body;
     }
 }
 
