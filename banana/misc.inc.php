@@ -272,10 +272,10 @@ function displayshortcuts($first = -1) {
         }
     } else {
         $res .= "[<a href=\"?group=$group&amp;artid=$artid&amp;action=new\">"
-            ._b_('Répondre')."</a>] ";
+             ._b_('Répondre')."</a>] ";
         if ($banana->post && $banana->post->checkcancel()) {
             $res .= "[<a href=\"?group=$group&amp;artid=$artid&amp;action=cancel\">"
-                ._b_('Annuler ce message')."</a>] ";
+                 ._b_('Annuler ce message')."</a>] ";
         }
     }
     return $res.'</div>';
@@ -319,10 +319,16 @@ function formatbody($_text, $format='plain')
     $res  = preg_replace("/ (&lt;|&gt;|&quot;) /", "\\1", $res);
 
     if ($format == 'html') {
-        $res = preg_replace("@(</p>)\n?-- \n?(<p[^>]*>|<br>)@", "\\1<br>-- \\2", $res);
-        $res = preg_replace("@<br>\n?-- \n?(<p[^>]*>)@", "<br>-- <br>\\2", $res);
-        $parts = preg_split("@(:?<p[^>]*>\n?-- \n?</p>|<br[^>]*>\n?-- \n?<br>)@", $res);
+        $res = preg_replace("@(</p>)\n?-- \n?(<p[^>]*>|<br[^>]*>)@", "\\1<br/>-- \\2", $res);
+        $res = preg_replace("@<br[^>]*>\n?-- \n?(<p[^>]*>)@", "<br/>-- <br/>\\2", $res);
+        $parts = preg_split("@(:?<p[^>]*>\n?-- \n?</p>|<br[^>]*>\n?-- \n?<br[^>]*>)@", $res);
     } else {
+        while (preg_match("@(^|<blockquote[^>]*>|\n)&gt;@i", $res)) {
+            $res  = preg_replace("@(^|<blockquote[^>]*>|\n)((&gt;[^\n]*\n)+)@ie",
+            "'\\1<blockquote type=\'cite\'>'.preg_replace('@(^|<blockquote[^>]*>|\n)&gt;[ \\t\\r]*@i', '\\1', '\\2').'</blockquote>'",
+                    $res);
+        }
+        $res = preg_replace("@(<blockquote[^>]*>)\n@", '\1', $res);
         $parts = preg_split("/\n-- ?\n/", $res);
     }
 
@@ -330,7 +336,7 @@ function formatbody($_text, $format='plain')
         $sign  = array_pop($parts);
         if ($format == 'html') {
             $res  = join('<br/>-- <br/>', $parts);
-            $sign = '<hr style="width: 100%; margin: 1em 0em; " />'.$sign;
+            $sign = '<hr style="width: 100%; margin: 1em 0em; " />'.$sign.'<br/>';
         } else {
             $res  = join('\n-- \n', $parts);
             $sign = '</pre><hr style="width: 100%; margin: 1em 0em; " /><pre>'.$sign;
