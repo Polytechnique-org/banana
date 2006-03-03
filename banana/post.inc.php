@@ -49,10 +49,10 @@ class BananaPost
             }
         }
 
-        if (preg_match("@multipart/([^;]+);@", $this->headers['content-type'], $mpart_type)) {
-            preg_match("/boundary=\"?([^ \"]+)\"?/", $this->headers['content-type'], $mpart_boundary);
-            $this->_split_multipart($mpart_type[1], $mpart_boundary[1]);
+        if ($this->_split_multipart($this->headers, $this->body)) {
+            $this->set_body_to_part(0);
         } else {
+            $this->_split_multipart($mpart_type[1], $mpart_boundary[1]);
             $this->_find_uuencode();
             if (preg_match('!charset=([^;]*)\s*(;|$)!', $this->headers['content-type'], $matches)) {
                 $this->body = iconv($matches[1], 'utf-8', $this->body);
@@ -85,20 +85,45 @@ class BananaPost
      * @param $type STRING multipart type description
      * @param $boundary STRING multipart boundary identification string
      */
-    function _split_multipart($type, $boundary)
+    function _split_multipart($headers, $body)
     {
-        $parts = preg_split("/\n--$boundary(--|\n)/", $this->body);
+        if (!preg_match("@multipart/([^;]+);@", $headers['content-type'], $type)) {
+            return false;
+        }
+            
+        preg_match("/boundary=\"?([^ \"]+)\"?/", $headers['content-type'], $boundary);
+        $boundary = $boundary[1];
+        $type     = $type[1];
+        $parts    = preg_split("@\n--$boundary(--|\n)@", $body);
         foreach ($parts as $part) {
-            $part = $this->_get_part($part);
+            $part         = $this->_get_part($part);
             $local_header = $part['headers'];
-            $local_body = $part['body'];
-            if (isset($local_header['content-disposition']) && preg_match("/attachment/", $local_header['content-disposition'])) {
-                $this->_add_attachment($part);
-            } else if (isset($local_header['content-type']) && preg_match("@text/([^;]+);@", $local_header['content-type'], $format)) {
-    	        array_push($this->messages, $part);
+            $local_body   = $part['body'];
+            if (!$this->_split_multipart($local_header, $local_body)) {
+                $is_text = isset($local_header['content-type']) && preg_match("@text/([^;]+);@", $local_header['content-type'])
+                         && (!isset($local_header['content-disposition']) || !preg_match('@attachment@', $local_header['content-disposition'])); 
+
+                // alternative ==> multiple formats for messages
+                if ($type == 'alternative' && $is_text) {
+                    array_push($this->messages, $part);
+
+                // !alternative ==> une body, others are attachments
+                } else if ($is_text) {
+                    if (count($this->messages) == 0) {
+                        $this->body = $local_body;
+                        foreach (array_keys($local_header) as $key) {
+                            $this->header[$key] = $local_header[$key];
+                        }
+                        array_push($this->messages, $part);
+                    } else {
+                        $this->_add_attachment($part);
+                    }
+                } else {
+                    $this->_add_attachment($part);
+                }
             }
         }
-        $this->set_body_to_part(0);
+        return true;
     }
 
     /** extract new headers from the part
@@ -112,10 +137,14 @@ class BananaPost
         while (count($lines)) {
             $line = array_shift($lines);
             if ($line != "") {
-                list($hdr, $val) = split(":[ \t\r]*", $line, 2);
-                $hdr = strtolower($hdr);
-                if (in_array($hdr, $banana->parse_hdr)) {
-                    $local_headers[$hdr] = $val;
+                if (preg_match('@^[\t\r ]+@', $line) && isset($hdr)) {
+                    $local_headers[$hdr] .= ' '.trim($line);
+                } else {
+                    list($hdr, $val) = split(":[ \t\r]*", $line, 2);
+                    $hdr = strtolower($hdr);
+                    if (in_array($hdr, $banana->parse_hdr)) {
+                        $local_headers[$hdr] = $val;
+                    }
                 }
             } else {
                 break;
@@ -131,16 +160,10 @@ class BananaPost
         $local_header = $part['headers'];
         $local_body = $part['body'];
 
-        if (!isset($local_header['content-transfer-encoding'])) {
-            return false;
-        }
-
-        if (isset($local_header['content-disposition'])) {
-            if (preg_match("/attachment/", $local_header['content-disposition'])) {
-                preg_match("/filename=\"?([^\"]+)\"?/", $local_header['content-disposition'], $filename);
-                $filename = $filename[1];
-            }
-        }
+        if ((isset($local_header['content-disposition']) && preg_match("/filename=\"?([^\"]+)\"?/", $local_header['content-disposition'], $filename))
+            || (isset($local_header['content-type']) && preg_match("/name=\"?([^\"]+)\"?/", $local_header['content-type'], $filename))) {
+            $filename = $filename[1];
+        }           
         if (!isset($filename)) {
             $filename = "attachment".count($pj);
         }
