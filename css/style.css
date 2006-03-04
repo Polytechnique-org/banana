@@ -35,6 +35,15 @@ table.banana_msg .hdr { width: 15%; text-align: right; font-weight: bold; paddin
 table.banana_msg td.thrd { padding: 0px; }
 table.banana_msg table { border: 0px; padding: 0px; margin: 0px; width: 100%; }
 
+table.banana_msg blockquote {
+        color: green;
+        font-style: italic;
+        margin-left: 0;
+        padding-left: 1em;
+        border-left: solid 1px;
+        border-color: blue;
+}
+
 /** MISC **/
 
 div.center { text-align: center; padding: 1em; }
