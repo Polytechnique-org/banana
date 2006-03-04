@@ -315,7 +315,7 @@ function formatbody($_text, $format='plain')
         $res  = "\n\n" . to_entities(wrap($_text, ""))."\n\n";
     }
     $res  = preg_replace("/(&lt;|&gt;|&quot;)/", " \\1 ", $res);
-    $res  = preg_replace('/(["\[])?((https?|ftp|news):\/\/[a-z@0-9.~%$£µ&i#\-+=_\/\?]*)(["\]])?/i', "\\1<a href=\"\\2\">\\2</a>\\4", $res);
+    $res  = preg_replace('/(["\[])?((https?|ftp|news):\/\/[a-z@0-9.~%$£µ&i#\-+=_\/\?]*)(["\]])?/i', '\1<a href="\2">\2</a>\4', $res);
     $res  = preg_replace("/ (&lt;|&gt;|&quot;) /", "\\1", $res);
 
     if ($format == 'html') {
@@ -323,12 +323,15 @@ function formatbody($_text, $format='plain')
         $res = preg_replace("@<br[^>]*>\n?-- \n?(<p[^>]*>)@", "<br/>-- <br/>\\2", $res);
         $parts = preg_split("@(:?<p[^>]*>\n?-- \n?</p>|<br[^>]*>\n?-- \n?<br[^>]*>)@", $res);
     } else {
-        while (preg_match("@(^|<blockquote[^>]*>|\n)&gt;@i", $res)) {
-            $res  = preg_replace("@(^|<blockquote[^>]*>|\n)((&gt;[^\n]*\n)+)@ie",
-            "'\\1<blockquote type=\'cite\'>'.preg_replace('@(^|<blockquote[^>]*>|\n)&gt;[ \\t\\r]*@i', '\\1', '\\2').'</blockquote>'",
-                    $res);
+    	$i=0;
+        while (preg_match("@(^|<pre>|\n)&gt;@i", $res)) {
+            $res  = preg_replace("@(^|<pre>|\n)((&gt;[^\n]*\n)+)@ie",
+            	"'\\1</pre><blockquote style=\' margin-left: 0; padding-left: 1em; border-left: solid 1px; border-color: blue; \'><pre>'"
+		    .".stripslashes(preg_replace('@(^|<pre>|\n)&gt;[ \\t\\r]*@i', '\\1', '\\2'))"
+		    .".'</pre></blockquote><pre>'",
+	        $res);
         }
-        $res = preg_replace("@(<blockquote[^>]*>)\n@", '\1', $res);
+	$res = preg_replace("@<pre>-- ?\n@", "<pre>\n-- \n", $res);
         $parts = preg_split("/\n-- ?\n/", $res);
     }
 
