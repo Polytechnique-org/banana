@@ -294,13 +294,16 @@ function wrap($text, $_prefix="")
         $text = join("\n-- \n", $parts);
     } else {
         $sign = '';
-        $text = $text;
     }
    
     global $banana;
     $length = $banana->wrap;
     $cmd = "echo ".escapeshellarg($text)." | perl -MText::Autoformat -e 'autoformat {left=>1, right=>$length, all=>1 };'";
-    exec($cmd, $result);
+    $ret = 0;
+    exec($cmd, $result, $ret);
+    if ($ret != 0) {
+        $result = split("\n", $text);
+    }
 
     return $_prefix.join("\n$_prefix", $result).($_prefix ? '' : $sign);
 }
