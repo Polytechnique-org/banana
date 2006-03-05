@@ -150,7 +150,11 @@ class BananaPost
                 break;
             }
         }
-        return Array('headers' => $local_headers, 'body' => join("\n", $lines)); 
+        $local_body = join("\n", $lines);
+        if (preg_match("/quoted-printable/", $local_headers['content-transfer-encoding'])) {
+            $local_body = quoted_printable_decode($local_body);
+        }
+        return Array('headers' => $local_headers, 'body' => $local_body); 
     }
 
     /** add an attachment
@@ -250,7 +254,7 @@ class BananaPost
             $this->body = iconv($matches[1], 'utf-8', $this->body);
         } else {
             $this->body = utf8_encode($this->body);
-        }                                                        
+        }
         return true;
     }
 

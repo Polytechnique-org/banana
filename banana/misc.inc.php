@@ -43,6 +43,7 @@ function textFormat_translate($format)
 function removeEvilTags($source)
 {
     $allowedTags = '<h1><b><i><a><ul><li><pre><hr><blockquote><img><br><font><p><small><big><sup><sub><code><em>';
+    $source = preg_replace('|</div>|i', '<br />', $source);
     $source = strip_tags($source, $allowedTags);
     return preg_replace('/<(.*?)>/ie', "'<'.removeEvilAttributes('\\1').'>'", $source);
 }
@@ -63,8 +64,8 @@ function removeEvilAttributes($tagSource)
  */
 function htmlToPlainText($res)
 {
-    $res = trim(html_entity_decode(strip_tags($res, '<br><p>')));
-    $res = preg_replace("@</?(br|p)[^>]*>@i", "\n", $res);
+    $res = trim(html_entity_decode(strip_tags($res, '<div><br><p>')));
+    $res = preg_replace("@</?(br|p|div)[^>]*>@i", "\n", $res);
     if (!is_utf8($res)) {
         $res = utf8_encode($res);
     }   
@@ -307,9 +308,9 @@ function wrap($text, $_prefix="")
 function formatbody($_text, $format='plain')
 {
     if ($format == 'html') {
-        $res = '<br/>'.removeEvilTags($_text).'<br/>';
+        $res = '<br/>'.html_entity_decode(to_entities(removeEvilTags($_text))).'<br/>';
     } else if ($format == 'richtext') {
-        $res = '<br/>'.richtextToHtml($_text).'<br/>';
+        $res = '<br/>'.html_entity_decode(to_entities(richtextToHtml($_text))).'<br/>';
         $format = 'html';
     } else {
         $res  = "\n\n" . to_entities(wrap($_text, ""))."\n\n";
