@@ -36,7 +36,20 @@ class Banana
     var $tmax        = 50;
 
     var $wrap        = 74;
+    /** Match an url
+     * Should be included in a regexp delimited using ! (eg: "!$url_regexp!i")
+     * If it matches, return 3 main parts :
+     *  \\1 and \\3 are delimiters
+     *  \\2 is the url
+     *
+     * eg : preg_match("!$url_regexp!i", "[http://www.polytechnique.org]", $matches);
+     *   $matches[1] = "["
+     *   $matches[2] = "http://www.polytechnique.org"
+     *   $matches[3] = "]"
+     */
+    var $url_regexp  = '(["\[])?((?:https?|ftp|news)://(?:&amp;|[a-z@0-9.~%$£µ&i#\-+=_/\?])*)(["\]])?';
 
+    
     /** Boundary for multipart messages
      */
     var $boundary    = 'bananaBoundary42';

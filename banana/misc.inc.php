@@ -286,7 +286,7 @@ function displayshortcuts($first = -1) {
  *  FORMATTING STUFF : BODY
  */
 
-function wrap($text, $_prefix="")
+function wrap($text, $_prefix="", $_force=false)
 {
     $parts = preg_split("/\n-- ?\n/", $text);
     if (count($parts)  >1) {
@@ -297,31 +297,54 @@ function wrap($text, $_prefix="")
     }
    
     global $banana;
+    $url    = $banana->url_regexp;
     $length = $banana->wrap;
-    $cmd = "echo ".escapeshellarg($text)." | perl -MText::Autoformat -e 'autoformat {left=>1, right=>$length, all=>1 };'";
-    $ret = 0;
-    exec($cmd, $result, $ret);
+    $max    = $length + ($length/10);
+    $splits = split("\n", $text);
+    $ret    = -1;
+    foreach ($splits as $line) {
+        if ($_force || strlen($line) > $max) {
+            if (!preg_match("!^\\s*$url\\s*$!i", $line)) {
+                $cmd = "echo ".escapeshellarg($text)." | perl -MText::Autoformat -e 'autoformat {left=>1, right=>$length, all=>1 };'";
+                exec($cmd, $result, $ret);
+                break;
+            }
+        }
+    }
     if ($ret != 0) {
-        $result = split("\n", $text);
+        $result = $splits;
     }
 
     return $_prefix.join("\n$_prefix", $result).($_prefix ? '' : $sign);
 }
 
-function formatbody($_text, $format='plain')
+function cutlink($link)
+{
+    global $banana;
+    
+    if (strlen($link) > $banana->wrap) {
+        $link = substr($link, 0, $banana->wrap - 3)."...";
+    }
+    return $link;
+}
+
+function formatbody($_text, $format='plain', $flowed=false)
 {
     if ($format == 'html') {
         $res = '<br/>'.html_entity_decode(to_entities(removeEvilTags($_text))).'<br/>';
     } else if ($format == 'richtext') {
-        $res = '<br/>'.html_entity_decode(to_entities(richtextToHtml($_text))).'<br/>';
+        $res = '<br/>'.createlinks(html_entity_decode(to_entities(richtextToHtml($_text)))).'<br/>';
         $format = 'html';
     } else {
-        $res  = "\n\n" . to_entities(wrap($_text, ""))."\n\n";
+        $res  = "\n\n" . to_entities(wrap($_text, "", $flowed))."\n\n";
     }
-    $res  = preg_replace("/(&lt;|&gt;|&quot;)/", " \\1 ", $res);
-    $res  = preg_replace('/(["\[])?((https?|ftp|news):\/\/[a-z@0-9.~%$£µ&i#\-+=_\/\?]*)(["\]])?/i', '\1<a href="\2">\2</a>\4', $res);
-    $res  = preg_replace("/ (&lt;|&gt;|&quot;) /", "\\1", $res);
 
+    global $banana;
+    $url  = $banana->url_regexp;
+    $res  = preg_replace("/(&lt;|&gt;|&quot;)/", " \\1 ", $_text);
+    $res  = preg_replace("!$url!ie", "'\\1<a href=\"\\2\" title=\"\\2\">'.cutlink('\\2').'</a>\\3'", $res);
+    $res  = preg_replace("/ (&lt;|&gt;|&quot;) /", "\\1", $res);
+ 
     if ($format == 'html') {
         $res = preg_replace("@(</p>)\n?-- \n?(<p[^>]*>|<br[^>]*>)@", "\\1<br/>-- \\2", $res);
         $res = preg_replace("@<br[^>]*>\n?-- \n?(<p[^>]*>)@", "<br/>-- <br/>\\2", $res);
