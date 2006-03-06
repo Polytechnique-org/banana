@@ -341,7 +341,7 @@ function formatbody($_text, $format='plain', $flowed=false)
 
     global $banana;
     $url  = $banana->url_regexp;
-    $res  = preg_replace("/(&lt;|&gt;|&quot;)/", " \\1 ", $_text);
+    $res  = preg_replace("/(&lt;|&gt;|&quot;)/", " \\1 ", $res);
     $res  = preg_replace("!$url!ie", "'\\1<a href=\"\\2\" title=\"\\2\">'.cutlink('\\2').'</a>\\3'", $res);
     $res  = preg_replace("/ (&lt;|&gt;|&quot;) /", "\\1", $res);
  
