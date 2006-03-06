@@ -328,10 +328,14 @@ class BananaSpool
             $res .= "<td class='subj'>"
                 ."<div class='tree'>$_pfx_node".($hc?($_head?$spfx_f:($this->overview[$_id]->parent_direct?$spfx_s:$spfx_snd)):$spfx_n)
                 ."</div>";
+            $subject = $this->overview[$_id]->subject;
+            if (strlen($subject) == 0) {
+                $subject = _b_('(pas de sujet)');
+            }
             if ($_index == $_ref) {
-                $res .= '<span class="cur">'.htmlentities($this->overview[$_id]->subject).'</span>';
+                $res .= '<span class="cur">'.htmlentities($subject).'</span>';
             } else {
-                $res .= "<a href='?group={$this->group}&amp;artid=$_id'>".htmlentities($this->overview[$_id]->subject).'</a>';
+                $res .= "<a href='?group={$this->group}&amp;artid=$_id'>".htmlentities($subject).'</a>';
             }
             $res .= "</td>\n<td class='from'>".formatFrom($this->overview[$_id]->from)."</td>\n</tr>";
 
