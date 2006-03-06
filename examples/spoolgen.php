@@ -14,7 +14,7 @@ $opt = getopt('u:p:h');
 
 if(isset($opt['h'])) {
     echo <<<EOF
-usage: spoolgen.pgp [ -u user ] [ -p pass ]
+usage: spoolgen.php [ -u user ] [ -p pass ]
     create all spools, using user user and pass pass
 EOF;
     exit;
