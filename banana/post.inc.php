@@ -384,8 +384,8 @@ class BananaPost
             $i = 0;
             foreach ($this->pj as $file) {
                 $res .= $file['filename'].' ('.$file['MIME'].') : ';
-                $res .= '<a href="pj.php?group='.$banana->state['group'].'&artid='.$this->id.'&pj='.$i.'">télécharger</a>';
-                $res .= ' . <a href="pj.php?group='.$banana->state['group'].'&artid='.$this->id.'&pj='.$i.'&action=view" target="_blank">aperçu</a>';
+                $res .= '<a href="?group='.$banana->state['group'].'&artid='.$this->id.'&pj='.$i.'">télécharger</a>';
+                $res .= ' . <a href="?group='.$banana->state['group'].'&artid='.$this->id.'&pj='.$i.'&action=view" target="_blank">aperçu</a>';
                 $res .=  '<br/>';
                 $i++;
             }
