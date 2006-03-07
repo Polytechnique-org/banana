@@ -286,6 +286,19 @@ function displayshortcuts($first = -1) {
  *  FORMATTING STUFF : BODY
  */
 
+function autoformat($text)
+{
+    global $banana;
+    $length = $banana->wrap;
+        
+    $cmd = "echo ".escapeshellarg($text)." | perl -MText::Autoformat -e 'autoformat {left=>1, right=>$length, all=>1 };'";
+    exec($cmd, $result, $ret);
+    if ($ret != 0) {
+        $result = $split("\n", $text);
+    }
+    return $result;
+}                                
+
 function wrap($text, $_prefix="", $_force=false)
 {
     $parts = preg_split("/\n-- ?\n/", $text);
@@ -301,18 +314,46 @@ function wrap($text, $_prefix="", $_force=false)
     $length = $banana->wrap;
     $max    = $length + ($length/10);
     $splits = split("\n", $text);
-    $ret    = -1;
+    $result = array();
+    $next   = array();
+    $format = false;
     foreach ($splits as $line) {
         if ($_force || strlen($line) > $max) {
-            if (!preg_match("!^\\s*$url\\s*$!i", $line)) {
-                $cmd = "echo ".escapeshellarg($text)." | perl -MText::Autoformat -e 'autoformat {left=>1, right=>$length, all=>1 };'";
-                exec($cmd, $result, $ret);
-                break;
+            if (preg_match("!^(.*)($url)(.*)!i", $line, $matches) && strlen($matches[2]) > $length && strlen($matches) < 900) {
+                if (strlen($matches[1]) != 0) {
+                    array_push($next, rtrim($matches[1]));
+                    if (strlen($matches[1]) > $max) {
+                        $format = true;
+                    }
+                }
+                    
+                if ($format) {
+                    $result = array_merge($result, autoformat(join("\n", $next)));
+                } else {
+                    $result = array_merge($result, $next);
+                }
+                $format = false;
+                $next   = array();
+                array_push($result, $matches[2]);
+                    
+                if (strlen($matches[6]) != 0) {
+                    array_push($next, ltrim($matches[6]));
+                    if (strlen($matches[6]) > $max) {
+                        $format = true;
+                    }
+                }
+            } else {
+                $format = true;
+                array_push($next, $line);
             }
+        } else {
+            array_push($next, $line);
         }
     }
-    if ($ret != 0) {
-        $result = $splits;
+    if ($format) {
+        $result = array_merge($result, autoformat(join("\n", $next)));
+    } else {
+        $result = array_merge($result, $next);
     }
 
     return $_prefix.join("\n$_prefix", $result).($_prefix ? '' : $sign);
