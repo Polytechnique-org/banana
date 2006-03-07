@@ -374,18 +374,23 @@ function formatbody($_text, $format='plain', $flowed=false)
     if ($format == 'html') {
         $res = '<br/>'.html_entity_decode(to_entities(removeEvilTags($_text))).'<br/>';
     } else if ($format == 'richtext') {
-        $res = '<br/>'.createlinks(html_entity_decode(to_entities(richtextToHtml($_text)))).'<br/>';
-        $format = 'html';
+        $res = '<br/>'.html_entity_decode(to_entities(richtextToHtml($_text))).'<br/>';
     } else {
         $res  = "\n\n" . to_entities(wrap($_text, "", $flowed))."\n\n";
     }
 
-    global $banana;
-    $url  = $banana->url_regexp;
-    $res  = preg_replace("/(&lt;|&gt;|&quot;)/", " \\1 ", $res);
-    $res  = preg_replace("!$url!ie", "'\\1<a href=\"\\2\" title=\"\\2\">'.cutlink('\\2').'</a>\\3'", $res);
-    $res  = preg_replace('/(["\[])?(?:mailto:)?([a-z0-9.\-+_]+@[a-z0-9.\-+_]+)(["\]])?/i', '\1<a href="mailto:\2">\2</a>\3', $res);
-    $res  = preg_replace("/ (&lt;|&gt;|&quot;) /", "\\1", $res);
+    if ($format != 'html') {
+        global $banana;
+        $url  = $banana->url_regexp;
+        $res  = preg_replace("/(&lt;|&gt;|&quot;)/", " \\1 ", $res);
+        $res  = preg_replace("!$url!ie", "'\\1<a href=\"\\2\" title=\"\\2\">'.cutlink('\\2').'</a>\\3'", $res);
+        $res  = preg_replace('/(["\[])?(?:mailto:)?([a-z0-9.\-+_]+@[a-z0-9.\-+_]+)(["\]])?/i', '\1<a href="mailto:\2">\2</a>\3', $res);
+        $res  = preg_replace("/ (&lt;|&gt;|&quot;) /", "\\1", $res);
+
+        if ($format == 'richtext') {
+            $format = 'html';
+        }
+    }
  
     if ($format == 'html') {
         $res = preg_replace("@(</p>)\n?-- \n?(<p[^>]*>|<br[^>]*>)@", "\\1<br/>-- \\2", $res);
