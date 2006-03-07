@@ -294,7 +294,7 @@ function autoformat($text)
     $cmd = "echo ".escapeshellarg($text)." | perl -MText::Autoformat -e 'autoformat {left=>1, right=>$length, all=>1 };'";
     exec($cmd, $result, $ret);
     if ($ret != 0) {
-        $result = $split("\n", $text);
+        $result = split("\n", $text);
     }
     return $result;
 }                                
@@ -384,6 +384,7 @@ function formatbody($_text, $format='plain', $flowed=false)
     $url  = $banana->url_regexp;
     $res  = preg_replace("/(&lt;|&gt;|&quot;)/", " \\1 ", $res);
     $res  = preg_replace("!$url!ie", "'\\1<a href=\"\\2\" title=\"\\2\">'.cutlink('\\2').'</a>\\3'", $res);
+    $res  = preg_replace('/(["\[])?(?:mailto:)?([a-z0-9.\-+_]+@[a-z0-9.\-+_]+)(["\]])?/i', '\1<a href="mailto:\2">\2</a>\3', $res);
     $res  = preg_replace("/ (&lt;|&gt;|&quot;) /", "\\1", $res);
  
     if ($format == 'html') {
@@ -391,9 +392,9 @@ function formatbody($_text, $format='plain', $flowed=false)
         $res = preg_replace("@<br[^>]*>\n?-- \n?(<p[^>]*>)@", "<br/>-- <br/>\\2", $res);
         $parts = preg_split("@(:?<p[^>]*>\n?-- \n?</p>|<br[^>]*>\n?-- \n?<br[^>]*>)@", $res);
     } else {
-        for ($i = 1 ; preg_match("@(^|<pre>|\n)&gt;@i", $res) ; $i++) {
+        while (preg_match("@(^|<pre>|\n)&gt;@i", $res)) {
             $res  = preg_replace("@(^|<pre>|\n)((&gt;[^\n]*\n)+)@ie",
-                "'\\1</pre><blockquote class=\'level$i\'><pre>'"
+                "'\\1</pre><blockquote><pre>'"
     		    .".stripslashes(preg_replace('@(^|<pre>|\n)&gt;[ \\t\\r]*@i', '\\1', '\\2'))"
 	    	    .".'</pre></blockquote><pre>'",
 	            $res);
