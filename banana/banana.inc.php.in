@@ -103,7 +103,6 @@ class Banana
         $banana->state = Array ('group' => $group, 'artid' => $artid);
 
         if (is_null($group)) {
-
             if (isset($_GET['subscribe'])) {
                 return $banana->action_listSubs();
             } elseif (isset($_POST['subscribe'])) {
@@ -121,7 +120,6 @@ class Banana
             }
 
         } else {
-
             if (isset($_POST['action']) && $_POST['action']=='cancel') {
                 $res = $banana->action_cancelArticle($group, $artid);
             } else {
@@ -357,7 +355,7 @@ class Banana
         }
 
         $body_headers  = $this->custom_plain;
-        $body          = wrap($body, "", $this->wrap);
+        $body          = wrap($body, "");
 
         // include attachment in the body
         $uploaded = $this->_upload('newpj');
