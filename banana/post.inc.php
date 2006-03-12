@@ -336,15 +336,24 @@ class BananaPost
 
         $res  = '<table class="bicol banana_msg" cellpadding="0" cellspacing="0">';
         $res .= '<tr><th colspan="2">'._b_('En-têtes').'</th></tr>';
+        $res .= '<tr><td class="headers"><table cellpadding="0" cellspacing="0">';
 
         foreach ($banana->show_hdr as $hdr) {
             if (isset($this->headers[$hdr])) {
                 $res2 = formatdisplayheader($hdr, $this->headers[$hdr]);
-                if ($res2) {
+                if ($res2 && ($hdr != 'x-face' || !$banana->formatxface)) {
                     $res .= '<tr><td class="hdr">'.header_translate($hdr)."</td><td class='val'>$res2</td></tr>\n";
+                } else if ($res2) {
+                    $xface = $res2;
                 }
             }
         }
+        $res .= '</table></td><td class="xface">';
+
+        if ($xface) {
+            $res .= $xface;
+        }
+        $res .= '</td></tr>';
 
         $res .= '<tr><th colspan="2">'._b_('Corps');
         if (count($this->messages) > 1) {

@@ -30,7 +30,9 @@ table.banana_thread span.cur { font-style: italic; font-size: 90%; }
 
 /** MESSAGE VIEW **/
 
+table.banana_msg td.headers { width: 100%; }
 table.banana_msg .hdr { width: 15%; text-align: right; font-weight: bold; padding-right: 1em; }
+table.banana_msg td.xface { text-align: right; }
 
 table.banana_msg td.thrd { padding: 0px; }
 table.banana_msg table { border: 0px; padding: 0px; margin: 0px; width: 100%; }

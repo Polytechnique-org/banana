@@ -24,7 +24,10 @@ class Banana
     var $can_attach  = true;
     /** Maximum allowed file size for attachment
      */
-    var $maxfilesize = 100000;  
+    var $maxfilesize = 100000;
+    /** Indicate wether x-face should be skinned as specials data or not
+     */
+    var $formatxface = true;
 
     /** Regexp for selecting newsgroups to show (if empty, match all newsgroups)
      * ex : '^xorg\..*' for xorg.*
