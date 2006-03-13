@@ -369,6 +369,12 @@ function cutlink($link)
     return $link;
 }
 
+function cleanurl($url)
+{
+    $url = str_replace('@', '%40', $url);
+    return '<a href="'.$url.'" title="'.$url.'">'.cutlink($url).'</a>';
+}
+
 function formatbody($_text, $format='plain', $flowed=false)
 {
     if ($format == 'html') {
@@ -383,7 +389,7 @@ function formatbody($_text, $format='plain', $flowed=false)
         global $banana;
         $url  = $banana->url_regexp;
         $res  = preg_replace("/(&lt;|&gt;|&quot;)/", " \\1 ", $res);
-        $res  = preg_replace("!$url!ie", "'\\1<a href=\"\\2\" title=\"\\2\">'.cutlink('\\2').'</a>\\3'", $res);
+        $res  = preg_replace("!$url!ie", "'\\1'.cleanurl('\\2').'\\3'", $res);
         $res  = preg_replace('/(["\[])?(?:mailto:)?([a-z0-9.\-+_]+@[a-z0-9.\-+_]+)(["\]])?/i', '\1<a href="mailto:\2">\2</a>\3', $res);
         $res  = preg_replace("/ (&lt;|&gt;|&quot;) /", "\\1", $res);
 
