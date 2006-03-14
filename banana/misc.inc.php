@@ -399,9 +399,10 @@ function formatbody($_text, $format='plain', $flowed=false)
     }
  
     if ($format == 'html') {
-        $res = preg_replace("@(</p>)\n?-- \n?(<p[^>]*>|<br[^>]*>)@", "\\1<br/>-- \\2", $res);
-        $res = preg_replace("@<br[^>]*>\n?-- \n?(<p[^>]*>)@", "<br/>-- <br/>\\2", $res);
-        $parts = preg_split("@(:?<p[^>]*>\n?-- \n?</p>|<br[^>]*>\n?-- \n?<br[^>]*>)@", $res);
+        $res = preg_replace("@(</p>)\n?-- ?\n?(<p[^>]*>|<br[^>]*>)@", "\\1<br/>-- \\2", $res);
+        $res = preg_replace("@<br[^>]*>\n?-- ?\n?(<p[^>]*>)@", "<br/>-- <br/>\\2", $res);
+        $res = preg_replace("@(<pre[^>]*>)\n?-- ?\n@", "<br/>-- <br/>\\1", $res);
+        $parts = preg_split("@(:?<p[^>]*>\n?-- ?\n?</p>|<br[^>]*>\n?-- ?\n?<br[^>]*>)@", $res);
     } else {
         while (preg_match("@(^|<pre>|\n)&gt;@i", $res)) {
             $res  = preg_replace("@(^|<pre>|\n)((&gt;[^\n]*\n)+)@ie",
