@@ -100,7 +100,7 @@ class BananaSpool
 
         $do_save = false;
         $first   = $banana->maxspool ? max($groupinfo[2]-$banana->maxspool, $groupinfo[1]) : $groupinfo[1];
-        $last    = $groupinfo[2];
+        $last    = $groupinfo[2];        
         if ($this->version == BANANA_SPOOL_VERSION && is_array($this->overview)) {
             if (count($this->overview)) {
                 for ($id = min(array_keys($this->overview)); $id<$first; $id++) { 
@@ -110,8 +110,6 @@ class BananaSpool
             }
             if (!empty($this->overview)) {
                 $first = max(array_keys($this->overview))+1;
-            } else {
-                return;
             }
         } else {
             unset($this->overview, $this->ids);
@@ -147,7 +145,7 @@ class BananaSpool
                 $this->roots[] = $id;
             }
         }
-        
+
         file_put_contents($file, serialize($this));
     }
 
