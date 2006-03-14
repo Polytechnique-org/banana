@@ -114,14 +114,14 @@ function richtextToHtml($source)
  */
 
 function _headerdecode($charset, $c, $str) {
-    $s = ($c == 'Q') ? quoted_printable_decode($str) : base64_decode($str);
+    $s = ($c == 'Q' || $c == 'q') ? quoted_printable_decode($str) : base64_decode($str);
     $s = iconv($charset, 'iso-8859-15', $s);
     return str_replace('_', ' ', $s);
 }
  
 function headerDecode($value) {
-    $val = preg_replace('/(=\?[^?]*\?[BQ]\?[^?]*\?=) (=\?[^?]*\?[BQ]\?[^?]*\?=)/', '\1\2', $value);
-    return preg_replace('/=\?([^?]*)\?([BQ])\?([^?]*)\?=/e', '_headerdecode("\1", "\2", "\3")', $val);
+    $val = preg_replace('/(=\?[^?]*\?[BQbq]\?[^?]*\?=) (=\?[^?]*\?[BQbq]\?[^?]*\?=)/', '\1\2', $value);
+    return preg_replace('/=\?([^?]*)\?([BQbq])\?([^?]*)\?=/e', '_headerdecode("\1", "\2", "\3")', $val);
 }
 
 function headerEncode($value, $trim = 0) {
