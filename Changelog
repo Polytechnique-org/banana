@@ -1,3 +1,16 @@
+March 2006                          Florent Bruneau <florent.bruneau@m4x.org>
+
+	* Add multipart and attachment support
+	* Add HTML and RichText support
+	* Improve url handling
+	* Fix invalid html in submission form
+	* Add quotations handling
+	* Fix cache issue with empty newsgroups
+	* Add x-face placement support
+	* Improve support of some non-standard clients
+	* Fix support of post without subject
+	* Improve wrapping
+
 ================================================================================
 VERSION 1.2
 
