@@ -30,12 +30,26 @@ class BananaGroups {
 
         $this->type = $_type;
         $desc       = $banana->nntp->xgtitle();
+
+        $this->load();
         
-        if ($_type == BANANA_GROUP_NEW) {
+        if (empty($this->overview) && $_type == BANANA_GROUP_SUB) {
+            $this->type = BANANA_GROUP_ALL;
+            $this->load();
+        }
+    }
+
+    /** Load overviews
+     */
+    function load()
+    {
+        global $banana;
+
+        if ($this->type == BANANA_GROUP_NEW) {
             $list = $banana->nntp->newgroups($banana->profile['lastnews']);
         } else {
             $list = $banana->nntp->liste();
-            if ($_type == BANANA_GROUP_SUB) {
+            if ($this->type == BANANA_GROUP_SUB) {
                 $mylist = Array();
                 foreach ($banana->profile['subscribe'] as $g) {
                     if (isset($list[$g])) {
@@ -51,10 +65,6 @@ class BananaGroups {
             $this->overview[$g][1] = $l[0];
         }
         ksort($this->overview);
-
-        if (empty($this->overview) && $_type == BANANA_GROUP_SUB) {
-            $this = new BananaGroups(BANANA_GROUP_ALL);
-        }
     }
 
     /** updates overview 

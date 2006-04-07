@@ -33,8 +33,7 @@ class nntp
         $url         = parse_url($_url);
         $this->ns    = fsockopen($url['host'], $url['port'], $errno, $errstr, $_timeout);
         if (!$this->ns) {
-            $this = false;
-            return false;
+            return null;
         }
 
         $result        = $this->gline(); 
