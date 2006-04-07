@@ -33,12 +33,15 @@ class BananaPost
         $this->id       = $_id;
         $this->pj       = array();
         $this->messages = array();
-        $this->_header();
+        if (!$this->_header()) {
+            return null;
+        }
+
 
         if ($body = $banana->nntp->body($_id)) {
             $this->body = join("\n", $body);
         } else {
-            return ($this = null);
+            return null;
         }
         
         if (isset($this->headers['content-transfer-encoding'])) {
@@ -263,7 +266,6 @@ class BananaPost
         global $banana;
         $hdrs = $banana->nntp->head($this->id);
         if (!$hdrs) {
-            $this = null;
             return false;
         }
 
@@ -292,6 +294,7 @@ class BananaPost
         $this->name = $this->headers['from'];
         $this->name = preg_replace('/<[^ ]*>/', '', $this->name);
         $this->name = trim($this->name);
+        return true;
     }
 
     function checkcancel()

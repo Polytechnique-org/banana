@@ -7,7 +7,7 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-if(!function_exists('_file_put_contents')) {
+if(!function_exists('file_put_contents')) {
     function file_put_contents($filename, $data)
     {
         $fp = fopen($filename, 'w');
@@ -94,7 +94,7 @@ class BananaSpool
         global $banana;
         $this->group = $_group;
         $groupinfo   = $banana->nntp->group($_group);
-        if (!$groupinfo) { return ($this = null); }
+        if (!$groupinfo) { return null; }
 
         $this->_readFromFile();
 
@@ -130,7 +130,10 @@ class BananaSpool
     {
         $file = $this->_spoolfile();
         if (file_exists($file)) {
-            $this = unserialize(file_get_contents($file));
+            $temp = unserialize(file_get_contents($file));
+            foreach (get_object_vars($temp) as $key=>$val) {
+                $this->$key = $val;
+            }
         }
     }
 
