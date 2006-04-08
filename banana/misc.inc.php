@@ -190,7 +190,7 @@ function formatDisplayHeader($_header,$_text) {
             return $rsl;
 
         case "x-face":
-            return '<img src="xface.php?face='.base64_encode($_text).'"  alt="x-face" />';
+            return '<img src="xface.php?face='.urlencode(base64_encode($_text)).'"  alt="x-face" />';
         
         default:
             if (function_exists('hook_formatDisplayHeader')
