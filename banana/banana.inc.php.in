@@ -341,11 +341,12 @@ class Banana
                 $_POST[$key] = utf8_encode($_POST[$key]);
             }
         }
-        
+       
+		$to   = preg_replace('/\s*(,|;)\s*/', ',', $_POST['newsgroups']);
         $this->_newSpool($group, $this->profile['display'], $this->profile['lastnews']);
         $body = preg_replace("/\n\.[ \t\r]*\n/m", "\n..\n", $_POST['body']);
         $msg  = 'From: '.$this->profile['name']."\n"
-              . "Newsgroups: ".$_POST['newsgroups']."\n"
+              . "Newsgroups: ". $to . "\n"
               . "Subject: ".headerEncode($_POST['subject'], 128)."\n"
               . (empty($this->profile['org']) ? '' : "Organization: {$this->profile['org']}\n")
               . (empty($_POST['followup'])    ? '' : 'Followup-To: '.$_POST['followup']."\n");
