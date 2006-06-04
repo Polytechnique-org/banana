@@ -125,8 +125,8 @@ class BananaGroups {
         $html .= '</table>';
 
         if ($show_form) {
-            return '<form method="post" action="?"><div class="center"><input type="submit" /></div>'
-                .$html.'<div class="center"><input type="submit" /></div></form>';
+            return '<form method="post" action="?"><div class="center"><input type="submit" value="Valider" /></div>'
+                .$html.'<div class="center"><input type="submit" value="Valider" /></div></form>';
         }
         
         return $html;
