@@ -339,7 +339,7 @@ class Banana
             $html .= '<input type="hidden" name="artid" value="'.$id.'" />';
         }
         $html .= '<input type="hidden" name="action" value="new" />';
-    	$html .= '<input type="submit" value="Envoyer les message" /></th></tr>';
+    	$html .= '<input type="submit" value="Envoyer le message" /></th></tr>';
         $html .= '</table></form>';
 
         return $html.$cuts;
