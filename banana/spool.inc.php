@@ -83,6 +83,8 @@ class BananaSpool
     var $ids;
     /** thread starts */
     var $roots;
+    /** test validity */
+    var $valid = true;
 
     /** constructor
      * @param $_group STRING group name
@@ -94,7 +96,10 @@ class BananaSpool
         global $banana;
         $this->group = $_group;
         $groupinfo   = $banana->nntp->group($_group);
-        if (!$groupinfo) { return null; }
+        if (!$groupinfo) {
+            $this->valid = false;
+            return null; 
+        }
 
         $this->_readFromFile();
 

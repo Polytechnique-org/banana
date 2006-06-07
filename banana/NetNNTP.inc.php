@@ -20,6 +20,8 @@ class nntp
     var $lasterrorcode;
     /** last NNTP error text */
     var $lasterrortext;
+    /** test validity */
+    var $valid = true;
 
     /** constructor
      * @param $_host STRING NNTP host
@@ -33,6 +35,7 @@ class nntp
         $url         = parse_url($_url);
         $this->ns    = fsockopen($url['host'], $url['port'], $errno, $errstr, $_timeout);
         if (!$this->ns) {
+            $this->valid = false;
             return null;
         }
 
