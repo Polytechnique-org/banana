@@ -87,6 +87,9 @@ class Banana
         $this->_require('NetNNTP');
         setlocale(LC_ALL,  $this->profile['locale']);
         $this->nntp = new nntp($this->host);
+        if (!$this->nntp || !$this->nntp->valid) {
+            $this->nntp = null;
+        }
     }
 
     function run($class = 'Banana')
@@ -202,7 +205,9 @@ class Banana
 
     function action_showThread($group, $first)
     {
-        $this->_newSpool($group, $this->profile['display'], $this->profile['lastnews']);
+        if (!$this->_newSpool($group, $this->profile['display'], $this->profile['lastnews'])) {
+            return '<p class="error">'._b_('Impossible charger la liste des messages').'</p>';
+        }
 
         if ($first > count($this->spool->overview)) {
             $first = count($this->spool->overview);
@@ -222,9 +227,11 @@ class Banana
 
     function action_showArticle($group, $id, $part)
     {
-        $this->_newSpool($group, $this->profile['display'], $this->profile['lastnews']);
-        $this->_newPost($id);
-        if (!$this->post) {
+        if (!$this->_newSpool($group, $this->profile['display'], $this->profile['lastnews'])) {
+            return '<p class="error">'._b_('Impossible charger la liste des messages').'</p>';
+        }
+
+        if (!$this->_newPost($id)) {
             if ($this->nntp->lasterrorcode == "423") {
                 $this->spool->delid($id);
             }
@@ -243,9 +250,11 @@ class Banana
 
     function action_getAttachment($group, $id, $pjid, $action)
     {
-        $this->_newSpool($group, $this->profile['display'], $this->profile['lastnews']);
-        $this->_newPost($id);
-        if (!$this->post) {
+        if (!$this->_newSpool($group, $this->profile['display'], $this->profile['lastnews'])) {
+            return '<p class="error">'._b_('Impossible charger la liste des messages').'</p>';
+        }
+
+        if (!$this->_newPost($id)) {
             if ($this->nntp->lasterrorcode == "423") {
                 $this->spool->delid($id);
             }
@@ -263,8 +272,13 @@ class Banana
 
     function action_cancelArticle($group, $id)
     {
-        $this->_newSpool($group, $this->profile['display'], $this->profile['lastnews']);
-        $this->_newPost($id);
+        if (!$this->_newSpool($group, $this->profile['display'], $this->profile['lastnews'])) {
+            return '<p class="error">'._b_('Impossible charger la liste des messages').'</p>';
+        }
+
+        if (!$this->_newPost($id)) {
+            return '<p class="error">'._b_('Impossible de trouver le message à annuler').'</p>';
+        }
         $mid  = array_search($id, $this->spool->ids);
 
         if (!$this->post->checkcancel()) {
@@ -293,8 +307,7 @@ class Banana
         
         if ($id > 0) {
             $this->nntp->group($group);
-            $this->_newPost($id);
-            if ($this->post) {
+            if ($this->_newPost($id)) {
                 $subject = preg_replace("/^re\s*:\s*/i", '', 'Re: '.$this->post->headers['subject']);
                 $body    = utf8_encode($this->post->name." "._b_("a écrit"))." :\n".wrap($this->post->get_body(), "> ");
                 $target  = isset($this->post->headers['followup-to']) ? $this->post->headers['followup-to'] : $this->post->headers['newsgroups'];
@@ -343,7 +356,10 @@ class Banana
         }
        
 		$to   = preg_replace('/\s*(,|;)\s*/', ',', $_POST['newsgroups']);
-        $this->_newSpool($group, $this->profile['display'], $this->profile['lastnews']);
+        if (!$this->_newSpool($group, $this->profile['display'], $this->profile['lastnews'])) {
+            return '<p class="error">'._b_('Impossible charger la liste des messages').'</p>';
+        }
+		
         $body = preg_replace("/\n\.[ \t\r]*\n/m", "\n..\n", $_POST['body']);
         $msg  = 'From: '.$this->profile['name']."\n"
               . "Newsgroups: ". $to . "\n"
@@ -354,6 +370,9 @@ class Banana
         if ($artid != -1) {
             $this->_require('post');
             $post = new BananaPost($artid);
+            if (!$post || !$post->valid) {
+                return '<p class="error">'._b_('Impossible charger le message d\'origine').'</p>';
+            }
             $refs = ( isset($post->headers['references']) ? $post->headers['references']." " : "" );
             $msg .= "References: $refs{$post->headers['message-id']}\n";
         }
@@ -412,13 +431,23 @@ class Banana
         $this->_require('spool');
         if (!$this->spool || $this->spool->group != $group) {
             $this->spool = new BananaSpool($group, $disp, $since);
+            if (!$this->spool || !$this->spool->valid) {
+                $this->spool = null;
+                return false;
+            }
         }
+        return true;
     }
 
     function _newPost($id)
     {
         $this->_require('post');
         $this->post = new BananaPost($id);
+        if (!$this->post || !$this->post->valid) {
+            $this->post = null;
+            return false;
+        }
+        return true;
     }
 
     function _newGroup()

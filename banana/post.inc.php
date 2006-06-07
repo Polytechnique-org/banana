@@ -23,6 +23,8 @@ class BananaPost
     var $pj;
     /** poster name */
     var $name;
+    /** test validity */
+    var $valid = true;
 
     /** constructor
      * @param $_id STRING MSGNUM or MSGID (a group should be selected in this case)  
@@ -34,6 +36,7 @@ class BananaPost
         $this->pj       = array();
         $this->messages = array();
         if (!$this->_header()) {
+            $this->valid = false; 
             return null;
         }
 
@@ -41,6 +44,7 @@ class BananaPost
         if ($body = $banana->nntp->body($_id)) {
             $this->body = join("\n", $body);
         } else {
+            $this->valid = false;
             return null;
         }
         
