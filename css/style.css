@@ -38,12 +38,20 @@ table.banana_msg td.thrd { padding: 0px; }
 table.banana_msg table { border: 0px; padding: 0px; margin: 0px; width: 100%; }
 
 table.banana_msg blockquote {
-        color: green;
+        color: blue;
         font-style: italic;
         margin-left: 0;
         padding-left: 1em;
         border-left: solid 1px;
         border-color: blue;
+}
+table.banana_msg blockquote blockquote {
+	color: green;
+	border-color: green;
+}
+table.banana_msg blockquote blockquote blockquote {
+	color: #cc0000;
+	border-color: #cc0000;
 }
 
 /** MISC **/
