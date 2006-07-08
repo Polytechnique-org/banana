@@ -456,7 +456,13 @@ function formatbody($_text, $format='plain', $flowed=false)
         $res = '<br/>'.html_entity_decode(to_entities(richtextToHtml($_text))).'<br/>';
     } else {
         $res  = "\n\n" . to_entities(wrap($_text, "", $flowed))."\n\n";
-    }
+        $formatting = Array('\*' => 'strong',
+                            '_' => 'u',
+                            '/' => 'em');
+        foreach ($formatting as $limit=>$mark) {
+            $res = preg_replace('@' . $limit . '([^\s]+)' . $limit . '@', "<$mark>\\1</$mark>", $res);
+        }
+	}
 
     if ($format != 'html') {
         global $banana;
@@ -484,12 +490,6 @@ function formatbody($_text, $format='plain', $flowed=false)
 	    	    .".'</pre></blockquote><pre>'",
 	            $res);
         }
-		$formatting = Array('\*' => 'strong',
-							'_' => 'u',
-							'/' => 'em');
-		foreach ($formatting as $limit=>$mark) {
-			$res = preg_replace('@' . $limit . '([^\s]+)' . $limit . '@', "<$mark>\\1</$mark>", $res);
-		}
 		$res = preg_replace("@<pre>-- ?\n@", "<pre>\n-- \n", $res);
         $parts = preg_split("/\n-- ?\n/", $res);
     }
