@@ -425,7 +425,7 @@ class Banana
         $msg .= $this->custom.$this->profile['customhdr']."\n".$body;
 
         if ($this->nntp->post($msg)) {
-            redirect('group=' . $group . ($artid == -1 ? '' : '&first=' . $artid));
+            redirect('group=' . $group . ($artid == -1 ? '' : '&amp;first=' . $artid));
         } else {
             return "<p class=\"error\">"._b_('Impossible de poster le message')."</p>".$this->action_showThread($group, $artid);
         }
