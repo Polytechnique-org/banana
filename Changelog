@@ -2,6 +2,7 @@ Sat, 08 Jul 2006                    Florent Bruneau <florent.bruneau@m4x.org>
 
 	* Automatically set fup for crossposts
 	* Full URL redirection
+	* Link abstraction
 
 ================================================================================
 VERSION 1.3

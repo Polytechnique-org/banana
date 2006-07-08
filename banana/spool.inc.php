@@ -341,7 +341,9 @@ class BananaSpool
             if ($_index == $_ref) {
                 $res .= '<span class="cur">'.htmlentities($subject).'</span>';
             } else {
-                $res .= "<a href='?group={$this->group}&amp;artid=$_id'>".htmlentities($subject).'</a>';
+                $res .= makeHREF(Array('group' => $this->group,
+									   'artid' => $_id),
+								 htmlentities($subject));
             }
             $res .= "</td>\n<td class='from'>".formatFrom($this->overview[$_id]->from)."</td>\n</tr>";
 
