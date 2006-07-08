@@ -30,6 +30,20 @@ function textFormat_translate($format)
     }
 }
 
+function redirect($params)
+{
+	header('Location: ' . makeLink($params));
+}
+
+function makeLink($params)
+{
+    $proto = empty($_SERVER['HTTPS']) ? 'http://' : 'http://';
+    $host  = $_SERVER['HTTP_HOST'];
+    $file  = $_SERVER['PHP_SELF'];
+
+	return $proto . $host . $file . '?' . $params;
+}
+
 /********************************************************************************
  * HTML STUFF
  * Taken from php.net
