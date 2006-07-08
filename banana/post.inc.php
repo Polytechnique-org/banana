@@ -373,7 +373,10 @@ class BananaPost
                 preg_match("@text/([^;]+);@", $this->messages[$i]['headers']['content-type'], $format);
                 $format = textFormat_translate($format[1]);
                 if ($i != $partid) {
-                    $res .= '<a href="?group='.$banana->state['group'].'&artid='.$this->id.'&part='.$i.'">'.$format.'</a>';
+                    $res .= makeHREF(Array('group' => $banana->state['group'],
+										   'artid' => $this->id,
+										   'part'  => $i),
+									 $format);
                 } else {
                     $res .= $format;
                 }
@@ -400,8 +403,16 @@ class BananaPost
             $i = 0;
             foreach ($this->pj as $file) {
                 $res .= $file['filename'].' ('.$file['MIME'].') : ';
-                $res .= '<a href="?group='.$banana->state['group'].'&artid='.$this->id.'&pj='.$i.'">télécharger</a>';
-                $res .= ' . <a href="?group='.$banana->state['group'].'&artid='.$this->id.'&pj='.$i.'&action=view" target="_blank">aperçu</a>';
+                $res .= makeHREF(Array('group' => $banana->state['group'],
+				                       'artid' => $this->id,
+									   'pj'    => $i),
+								 _b_('télécharger'));
+				$res .= ' . ';
+                $res .= makeHREF(Array('group' => $banana->state['group'],
+                                       'artid' => $this->id,
+                                       'pj'    => $i,
+									   'action'=> 'view'),
+                                 _b_('aperçu'));
                 $res .=  '<br/>';
                 $i++;
             }

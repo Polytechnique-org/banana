@@ -30,18 +30,65 @@ function textFormat_translate($format)
     }
 }
 
+/** Redirect to the page with the given parameter
+ * @ref makeLink
+ */
 function redirect($params)
 {
 	header('Location: ' . makeLink($params));
 }
 
+/** Make a link using the given parameters
+ * @param ARRAY params, the parameters with
+ *       key => value
+ * Known key are:
+ *  - group       = group name
+ *  - artid/first = article id the the group
+ *  - subscribe   = to show the subscription page
+ *  - action      = action to do (new, cancel, view)
+ *  - part        = to show the given MIME part of the article
+ *  - pj          = to get the given attachment
+ *
+ * Can be overloaded by defining a hook_makeLink function
+ */
 function makeLink($params)
 {
-    $proto = empty($_SERVER['HTTPS']) ? 'http://' : 'http://';
+	if (function_exists('hook_makeLink')
+			&& $res = hook_makeLink($params)) {
+		return $res;
+	}
+    $proto = empty($_SERVER['HTTPS']) ? 'http://' : 'https://';
     $host  = $_SERVER['HTTP_HOST'];
     $file  = $_SERVER['PHP_SELF'];
 
-	return $proto . $host . $file . '?' . $params;
+	if (count($params) != 0) {
+		$get = '?';
+		foreach ($params as $key=>$value) {
+			if (strlen($get) != 1) {
+				$get .= '&';
+			}
+			$get .= $key . '=' . $value;
+		}
+	} else {
+		$get = '';
+	}
+
+	return $proto . $host . $file . $get;
+}
+
+/** Format a link to be use in a link
+ * @ref makeLink
+ */
+function makeHREF($params, $text = null)
+{
+	$link = makeLink($params);
+	if (is_null($text)) {
+		$text = $link;
+	}
+	if ($params['action'] == 'view') {
+		$target = ' target="_blank"';
+	}
+	return '<a href="' . htmlentities($link) . $target . '">' . $text . '</a>';
 }
 
 /********************************************************************************
@@ -177,7 +224,7 @@ function formatDisplayHeader($_header,$_text) {
             $res = "";
             $groups = preg_split("/[\t ]*,[\t ]*/",$_text);
             foreach ($groups as $g) {
-                $res.="<a href='?group=$g'>$g</a>, ";
+                $res .= makeHREF(Array('group' => $g), $g) . ', ';
             }
             return substr($res,0, -2);
 
@@ -198,7 +245,7 @@ function formatDisplayHeader($_header,$_text) {
                 $p = $banana->spool->overview[$p]->parent;
             }
             foreach (array_reverse($par_ok) as $p) {
-                $rsl .= "<a href=\"?group={$banana->spool->group}&amp;artid=$p\">$ndx</a> ";
+                $rsl .= makeHREF(Array('group' => $banana->spool->group), $ndx);
                 $ndx++;
             }
             return $rsl;
@@ -264,15 +311,18 @@ function displayshortcuts($first = -1) {
     extract($banana->state);
 
     $res  = '<div class="banana_scuts">';
-    $res .= '[<a href="?">'._b_('Liste des forums').'</a>] ';
+    $res .= '[' . makeHREF(Array(), _b_('Liste des forums')) . '] ';
     if (is_null($group)) {
-        return $res.'[<a href="?subscribe=1">'._b_('Abonnements').'</a>]</div>';
+        return $res.'[' . makeHREF(Array('subscribe' => 1), _b_('Abonnements')) . ']</div>';
     }
    
-    $res .= "[<a href=\"?group=$group\">$group</a>] ";
+    $res .= '[' . makeHREF(Array('group' => $group), $group) . '] ';
 
     if (is_null($artid)) {
-        $res .= "[<a href=\"?group=$group&amp;action=new\">"._b_('Nouveau message')."</a>] ";
+        $res .= '[' . makeHREF(Array('group'  => $group,
+									 'action' => 'new'),
+							   _b_('Nouveau message'))
+			  . '] ';
         if (sizeof($banana->spool->overview)>$banana->tmax) {
             $res .= '<br />';
             $n = intval(log(count($banana->spool->overview), 10))+1;
@@ -280,17 +330,26 @@ function displayshortcuts($first = -1) {
                 if ($first==$ndx) {
                     $fmt = "[%0{$n}u-%0{$n}u] ";
                 } else {
-                    $fmt = "[<a href=\"?group=$group&amp;first=$ndx\">%0{$n}u-%0{$n}u</a>] ";
+                    $fmt = '[' . makeHREF(Array('group' => $group,
+					                            'first' => $ndx),
+										  '%0' . $n . 'u-%0' . $n . 'u')
+						 . '] ';
                 }
                 $res .= sprintf($fmt, $ndx, min($ndx+$banana->tmax-1,sizeof($banana->spool->overview)));
             }
         }
     } else {
-        $res .= "[<a href=\"?group=$group&amp;artid=$artid&amp;action=new\">"
-             ._b_('Répondre')."</a>] ";
+        $res .= '[' . makeHREF(Array('group'  => $group,
+		                             'artid'  => $artid,
+									 'action' => 'new'),
+							   _b_('Répondre'))
+			  . '] ';
         if ($banana->post && $banana->post->checkcancel()) {
-            $res .= "[<a href=\"?group=$group&amp;artid=$artid&amp;action=cancel\">"
-                 ._b_('Annuler ce message')."</a>] ";
+            $res .= '[' . makeHREF(Array('group'  => $group,
+			                             'artid'  => $artid,
+										 'action' => 'cancel'), 
+								   _b_('Annuler ce message'))
+				  . '] ';
         }
     }
     return $res.'</div>';
