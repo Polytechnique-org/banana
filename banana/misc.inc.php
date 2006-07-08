@@ -484,7 +484,13 @@ function formatbody($_text, $format='plain', $flowed=false)
 	    	    .".'</pre></blockquote><pre>'",
 	            $res);
         }
-	$res = preg_replace("@<pre>-- ?\n@", "<pre>\n-- \n", $res);
+		$formatting = Array('\*' => 'strong',
+							'_' => 'u',
+							'/' => 'em');
+		foreach ($formatting as $limit=>$mark) {
+			$res = preg_replace('@' . $limit . '([^\s]+)' . $limit . '@', "<$mark>\\1</$mark>", $res);
+		}
+		$res = preg_replace("@<pre>-- ?\n@", "<pre>\n-- \n", $res);
         $parts = preg_split("/\n-- ?\n/", $res);
     }
 
