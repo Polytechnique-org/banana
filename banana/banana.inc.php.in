@@ -355,17 +355,25 @@ class Banana
             }
         }
        
-		$to   = preg_replace('/\s*(,|;)\s*/', ',', $_POST['newsgroups']);
+		$forums = preg_split('/\s*(,|;)\s*/', $_POST['newsgroups']);
+		$fup    = $_POST['followup'];
+		if (sizeof($forums) > 1) {
+			if (empty($fup)) {
+				$fup = $forums[0];
+			}
+		}
+		$to     = implode(',', $forums);
+		
         if (!$this->_newSpool($group, $this->profile['display'], $this->profile['lastnews'])) {
             return '<p class="error">'._b_('Impossible charger la liste des messages').'</p>';
         }
 		
         $body = preg_replace("/\n\.[ \t\r]*\n/m", "\n..\n", $_POST['body']);
-        $msg  = 'From: '.$this->profile['name']."\n"
+        $msg  = 'From: ' . $this->profile['name'] . "\n"
               . "Newsgroups: ". $to . "\n"
-              . "Subject: ".headerEncode($_POST['subject'], 128)."\n"
+              . "Subject: " . headerEncode($_POST['subject'], 128) . "\n"
               . (empty($this->profile['org']) ? '' : "Organization: {$this->profile['org']}\n")
-              . (empty($_POST['followup'])    ? '' : 'Followup-To: '.$_POST['followup']."\n");
+              . (empty($fup) ? '' : 'Followup-To: ' . $fup . "\n");
 
         if ($artid != -1) {
             $this->_require('post');
