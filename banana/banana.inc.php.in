@@ -124,7 +124,7 @@ class Banana
         if (is_null($group)) {
             if (isset($banana->get['subscribe'])) {
                 return $banana->action_listSubs();
-            } elseif (isset($_POST['subscribe'])) {
+            } elseif (isset($_POST['validsubs'])) {
                 $banana->action_saveSubs();
             }
             return $banana->action_listGroups();

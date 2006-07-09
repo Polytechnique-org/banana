@@ -1,6 +1,7 @@
 Sun, 09 Jul 2006                    Florent Bruneau <florent.bruneau@m4x.org>
 
 	* Can use a user-defined Array instead of $_GET
+	* Bugfix: can remove all subscriptions
 
 Sat, 08 Jul 2006                    Florent Bruneau <florent.bruneau@m4x.org>
 

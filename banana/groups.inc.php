@@ -126,8 +126,8 @@ class BananaGroups {
 
         if ($show_form) {
             return '<form method="post" action="' . htmlentities(makeLink(Array())) . '">'
-				. '<div class="center"><input type="submit" value="Valider" /></div>'
-                . $html . '<div class="center"><input type="submit" value="Valider" /></div></form>';
+				. '<div class="center"><input type="submit" value="Valider" name="validsubs" /></div>'
+                . $html . '<div class="center"><input type="submit" value="Valider" name="validsubs" /></div></form>';
         }
         
         return $html;
