@@ -33,7 +33,7 @@ function textFormat_translate($format)
 /** Redirect to the page with the given parameter
  * @ref makeLink
  */
-function redirect($params)
+function redirectInBanana($params)
 {
 	header('Location: ' . makeLink($params));
 }
