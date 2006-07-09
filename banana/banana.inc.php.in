@@ -294,7 +294,7 @@ class Banana
         if ($this->nntp->post($msg)) {
             $this->spool->delid($id);
             $this->nntp->quit();
-            redirect(Array('group' => $group,
+            redirectInBanana(Array('group' => $group,
 						   'first' => $id));
         } else {
             return '<p class="error">'._b_('Impossible d\'annuler le message').'</p>';
@@ -430,7 +430,7 @@ class Banana
 			if ($artid != -1) {
 				$dir['first'] = $artid;
 			}
-            redirect($dir);
+            redirectInBanana($dir);
         } else {
             return "<p class=\"error\">"._b_('Impossible de poster le message')."</p>".$this->action_showThread($group, $artid);
         }
