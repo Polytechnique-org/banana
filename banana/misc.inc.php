@@ -85,7 +85,8 @@ function makeHREF($params, $text = null)
 	if (is_null($text)) {
 		$text = $link;
 	}
-	if ($params['action'] == 'view') {
+	$target = null;
+	if (isset($params['action']) && $params['action'] == 'view') {
 		$target = ' target="_blank"';
 	}
 	return '<a href="' . htmlentities($link) . $target . '">' . $text . '</a>';

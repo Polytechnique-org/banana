@@ -46,7 +46,7 @@ class nntp
             $result        = $this->gline();
             $this->posting = ($result{0}=="200");
         }
-        if ($result{0}=="2" && $url['user'] && $url['user']!='anonymous') {
+        if ($result{0}=="2" && isset($url['user']) && $url['user'] != 'anonymous') {
             return $this->authinfo($url['user'], $url['pass']);
         }
         return ($result{0}=="2");
