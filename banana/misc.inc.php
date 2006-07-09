@@ -35,7 +35,7 @@ function textFormat_translate($format)
  */
 function redirectInBanana($params)
 {
-	header('Location: ' . makeLink($params));
+    header('Location: ' . makeLink($params));
 }
 
 /** Make a link using the given parameters
@@ -53,27 +53,27 @@ function redirectInBanana($params)
  */
 function makeLink($params)
 {
-	if (function_exists('hook_makeLink')
-			&& $res = hook_makeLink($params)) {
-		return $res;
-	}
+    if (function_exists('hook_makeLink')
+            && $res = hook_makeLink($params)) {
+        return $res;
+    }
     $proto = empty($_SERVER['HTTPS']) ? 'http://' : 'https://';
     $host  = $_SERVER['HTTP_HOST'];
     $file  = $_SERVER['PHP_SELF'];
 
-	if (count($params) != 0) {
-		$get = '?';
-		foreach ($params as $key=>$value) {
-			if (strlen($get) != 1) {
-				$get .= '&';
-			}
-			$get .= $key . '=' . $value;
-		}
-	} else {
-		$get = '';
-	}
+    if (count($params) != 0) {
+        $get = '?';
+        foreach ($params as $key=>$value) {
+            if (strlen($get) != 1) {
+                $get .= '&';
+            }
+            $get .= $key . '=' . $value;
+        }
+    } else {
+        $get = '';
+    }
 
-	return $proto . $host . $file . $get;
+    return $proto . $host . $file . $get;
 }
 
 /** Format a link to be use in a link
@@ -81,15 +81,15 @@ function makeLink($params)
  */
 function makeHREF($params, $text = null)
 {
-	$link = makeLink($params);
-	if (is_null($text)) {
-		$text = $link;
-	}
-	$target = null;
-	if (isset($params['action']) && $params['action'] == 'view') {
-		$target = ' target="_blank"';
-	}
-	return '<a href="' . htmlentities($link) . $target . '">' . $text . '</a>';
+    $link = makeLink($params);
+    if (is_null($text)) {
+        $text = $link;
+    }
+    $target = null;
+    if (isset($params['action']) && $params['action'] == 'view') {
+        $target = ' target="_blank"';
+    }
+    return '<a href="' . htmlentities($link) . $target . '">' . $text . '</a>';
 }
 
 /********************************************************************************
@@ -321,9 +321,9 @@ function displayshortcuts($first = -1) {
 
     if (is_null($artid)) {
         $res .= '[' . makeHREF(Array('group'  => $group,
-									 'action' => 'new'),
-							   _b_('Nouveau message'))
-			  . '] ';
+                                     'action' => 'new'),
+                               _b_('Nouveau message'))
+              . '] ';
         if (sizeof($banana->spool->overview)>$banana->tmax) {
             $res .= '<br />';
             $n = intval(log(count($banana->spool->overview), 10))+1;
@@ -332,25 +332,25 @@ function displayshortcuts($first = -1) {
                     $fmt = "[%0{$n}u-%0{$n}u] ";
                 } else {
                     $fmt = '[' . makeHREF(Array('group' => $group,
-					                            'first' => $ndx),
-										  '%0' . $n . 'u-%0' . $n . 'u')
-						 . '] ';
+                                                'first' => $ndx),
+                                          '%0' . $n . 'u-%0' . $n . 'u')
+                         . '] ';
                 }
                 $res .= sprintf($fmt, $ndx, min($ndx+$banana->tmax-1,sizeof($banana->spool->overview)));
             }
         }
     } else {
         $res .= '[' . makeHREF(Array('group'  => $group,
-		                             'artid'  => $artid,
-									 'action' => 'new'),
-							   _b_('Répondre'))
-			  . '] ';
+                                     'artid'  => $artid,
+                                     'action' => 'new'),
+                               _b_('Répondre'))
+              . '] ';
         if ($banana->post && $banana->post->checkcancel()) {
             $res .= '[' . makeHREF(Array('group'  => $group,
-			                             'artid'  => $artid,
-										 'action' => 'cancel'), 
-								   _b_('Annuler ce message'))
-				  . '] ';
+                                         'artid'  => $artid,
+                                         'action' => 'cancel'), 
+                                   _b_('Annuler ce message'))
+                  . '] ';
         }
     }
     return $res.'</div>';
@@ -463,7 +463,7 @@ function formatbody($_text, $format='plain', $flowed=false)
         foreach ($formatting as $limit=>$mark) {
             $res = preg_replace('@' . $limit . '([^\s]+)' . $limit . '@', "<$mark>\\1</$mark>", $res);
         }
-	}
+    }
 
     if ($format != 'html') {
         global $banana;
@@ -487,11 +487,11 @@ function formatbody($_text, $format='plain', $flowed=false)
         while (preg_match("@(^|<pre>|\n)&gt;@i", $res)) {
             $res  = preg_replace("@(^|<pre>|\n)((&gt;[^\n]*\n)+)@ie",
                 "'\\1</pre><blockquote><pre>'"
-    		    .".stripslashes(preg_replace('@(^|<pre>|\n)&gt;[ \\t\\r]*@i', '\\1', '\\2'))"
-	    	    .".'</pre></blockquote><pre>'",
-	            $res);
+                .".stripslashes(preg_replace('@(^|<pre>|\n)&gt;[ \\t\\r]*@i', '\\1', '\\2'))"
+                .".'</pre></blockquote><pre>'",
+                $res);
         }
-		$res = preg_replace("@<pre>-- ?\n@", "<pre>\n-- \n", $res);
+        $res = preg_replace("@<pre>-- ?\n@", "<pre>\n-- \n", $res);
         $parts = preg_split("/\n-- ?\n/", $res);
     }
 
@@ -510,4 +510,5 @@ function formatbody($_text, $format='plain', $flowed=false)
     }
 }
 
+// vim:set et sw=4 sts=4 ts=4
 ?>

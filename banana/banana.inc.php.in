@@ -82,7 +82,7 @@ class Banana
     var $post;
     var $spool;
 
-	var $get;
+    var $get;
 
     function Banana()
     {
@@ -94,10 +94,10 @@ class Banana
         }
     }
 
-	/** Run Banana
-	 * @param STRING class Name of the class to use
-	 * @param ARRAY  myget If defined is used instead of get
-	 */
+    /** Run Banana
+     * @param STRING class Name of the class to use
+     * @param ARRAY  myget If defined is used instead of get
+     */
     function run($class = 'Banana', $myget = null)
     {
         global $banana;
@@ -152,9 +152,9 @@ class Banana
                         if ($banana->post->checkcancel()) {
                             $form = '<p class="error">'._b_('Voulez-vous vraiment annuler ce message ?').'</p>'
                                   . '<form action="' 
-								  . htmlentities(makeLink(Array('group' => $group,
-																'artid' => $artid)))
-								  . '" method="post"><p>'
+                                  . htmlentities(makeLink(Array('group' => $group,
+                                                                'artid' => $artid)))
+                                  . '" method="post"><p>'
                                   . '<input type="hidden" name="action" value="cancel" />'
                                   . '<input type="submit" value="Annuler !" />'
                                   . '</p></form>';
@@ -311,7 +311,7 @@ class Banana
             $this->spool->delid($id);
             $this->nntp->quit();
             redirectInBanana(Array('group' => $group,
-						   'first' => $id));
+                           'first' => $id));
         } else {
             return '<p class="error">'._b_('Impossible d\'annuler le message').'</p>';
         }
@@ -336,8 +336,8 @@ class Banana
         $cuts  = displayshortcuts();
         $html  = '<h1>'._b_('Nouveau message').'</h1>'.$cuts;
         $html .= '<form enctype="multipart/form-data" action="'
-			   . htmlentities(makeLink(Array('group' => $group)))
-			   .'" method="post" accept-charset="utf-8">';
+               . htmlentities(makeLink(Array('group' => $group)))
+               .'" method="post" accept-charset="utf-8">';
         $html .= '<table class="bicol" cellpadding="0" cellspacing="0">';
         $html .= '<tr><th colspan="2">'._b_('En-têtes').'</th></tr>';
         $html .= '<tr><td>'._b_('Nom').'</td><td>'.htmlentities($this->profile['name']).'</td></tr>';
@@ -349,16 +349,16 @@ class Banana
         $html .= '<tr><td colspan="2"><textarea name="body" cols="74" rows="16">'
               .  to_entities($body).($this->profile['sig'] ? "\n\n-- \n".htmlentities($this->profile['sig']) : '').'</textarea></td></tr>';
         if ($this->can_attach) {
-        	$html .= '<tr><th colspan="2">'._b_('Pièce jointe').'</th></tr>';
+            $html .= '<tr><th colspan="2">'._b_('Pièce jointe').'</th></tr>';
             $html .= '<tr><td colspan="2"><input type="hidden" name="MAX_FILE_SIZE" value="'.$this->maxfilesize.'" />';
             $html .= '<input type="file" name="newpj" size="40"/></td></tr>';
         }
-	    $html .= '<tr><th colspan="2">';
+        $html .= '<tr><th colspan="2">';
         if ($id > 0) {
             $html .= '<input type="hidden" name="artid" value="'.$id.'" />';
         }
         $html .= '<input type="hidden" name="action" value="new" />';
-    	$html .= '<input type="submit" value="Envoyer le message" /></th></tr>';
+        $html .= '<input type="submit" value="Envoyer le message" /></th></tr>';
         $html .= '</table></form>';
 
         return $html.$cuts;
@@ -374,19 +374,19 @@ class Banana
             }
         }
        
-		$forums = preg_split('/\s*(,|;)\s*/', $_POST['newsgroups']);
-		$fup    = $_POST['followup'];
-		if (sizeof($forums) > 1) {
-			if (empty($fup)) {
-				$fup = $forums[0];
-			}
-		}
-		$to     = implode(',', $forums);
-		
+        $forums = preg_split('/\s*(,|;)\s*/', $_POST['newsgroups']);
+        $fup    = $_POST['followup'];
+        if (sizeof($forums) > 1) {
+            if (empty($fup)) {
+                $fup = $forums[0];
+            }
+        }
+        $to     = implode(',', $forums);
+        
         if (!$this->_newSpool($group, $this->profile['display'], $this->profile['lastnews'])) {
             return '<p class="error">'._b_('Impossible charger la liste des messages').'</p>';
         }
-		
+        
         $body = preg_replace("/\n\.[ \t\r]*\n/m", "\n..\n", $_POST['body']);
         $msg  = 'From: ' . $this->profile['name'] . "\n"
               . "Newsgroups: ". $to . "\n"
@@ -444,10 +444,10 @@ class Banana
         $msg .= $this->custom.$this->profile['customhdr']."\n".$body;
 
         if ($this->nntp->post($msg)) {
-			$dir = Array('group' => $group);
-			if ($artid != -1) {
-				$dir['first'] = $artid;
-			}
+            $dir = Array('group' => $group);
+            if ($artid != -1) {
+                $dir['first'] = $artid;
+            }
             redirectInBanana($dir);
         } else {
             return "<p class=\"error\">"._b_('Impossible de poster le message')."</p>".$this->action_showThread($group, $artid);
@@ -538,4 +538,5 @@ class Banana
     }
 }
 
+// vim:set et sw=4 sts=4 ts=4
 ?>

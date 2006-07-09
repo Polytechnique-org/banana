@@ -107,19 +107,19 @@ class BananaSpool
         $first   = $banana->maxspool ? max($groupinfo[2] - $banana->maxspool, $groupinfo[1]) : $groupinfo[1];
         $last    = $groupinfo[2]; 
 
-		if ($this->version == BANANA_SPOOL_VERSION && is_array($this->overview)) {
-			$mids = array_keys($this->overview);
-			foreach ($mids as $id) {
-				if (($first <= $last && ($id < $first || $id > $last))
-						|| ($first > $last && $id < $first && $id > $last))
-				{
+        if ($this->version == BANANA_SPOOL_VERSION && is_array($this->overview)) {
+            $mids = array_keys($this->overview);
+            foreach ($mids as $id) {
+                if (($first <= $last && ($id < $first || $id > $last))
+                        || ($first > $last && $id < $first && $id > $last))
+                {
                     $this->delid($id, false);
                     $do_save = true;
                 }
             }
             if (!empty($this->overview)) {
                 $first = max(array_keys($this->overview))+1;
-			}
+            }
         } else {
             unset($this->overview, $this->ids);
             $this->version = BANANA_SPOOL_VERSION;
@@ -346,8 +346,8 @@ class BananaSpool
                 $res .= '<span class="cur">'.htmlentities($subject).'</span>';
             } else {
                 $res .= makeHREF(Array('group' => $this->group,
-									   'artid' => $_id),
-								 htmlentities($subject));
+                                       'artid' => $_id),
+                                 htmlentities($subject));
             }
             $res .= "</td>\n<td class='from'>".formatFrom($this->overview[$_id]->from)."</td>\n</tr>";
 
@@ -438,4 +438,5 @@ class BananaSpool
     }
 }
 
+// vim:set et sw=4 sts=4 ts=4
 ?>

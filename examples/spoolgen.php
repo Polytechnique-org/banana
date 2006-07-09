@@ -51,4 +51,6 @@ class MyBanana extends Banana
 
 $banana = new MyBanana();
 $banana->createAllSpool();
+
+// vim:set et sw=4 sts=4 ts=4
 ?>
