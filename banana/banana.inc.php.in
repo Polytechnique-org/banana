@@ -116,7 +116,7 @@ class Banana
             return '<p class="error">'._b_('Impossible de contacter le serveur').'</p>';
         }
 
-        $group  = empty($banana->get['group']) ? null : strtolower($banana->get['group']);
+        $group  = empty($banana->get['group']) ? null : $banana->get['group'];
         $artid  = empty($banana->get['artid']) ? null : strtolower($banana->get['artid']);
         $partid = !isset($banana->get['part']) ? -1 : $banana->get['part'];
         $banana->state = Array ('group' => $group, 'artid' => $artid);
@@ -222,7 +222,7 @@ class Banana
     function action_showThread($group, $first)
     {
         if (!$this->_newSpool($group, $this->profile['display'], $this->profile['lastnews'])) {
-            return '<p class="error">'._b_('Impossible charger la liste des messages').'</p>';
+            return '<p class="error">'._b_('Impossible charger la liste des messages de ') . $group . '</p>';
         }
 
         if ($first > count($this->spool->overview)) {
@@ -244,7 +244,7 @@ class Banana
     function action_showArticle($group, $id, $part)
     {
         if (!$this->_newSpool($group, $this->profile['display'], $this->profile['lastnews'])) {
-            return '<p class="error">'._b_('Impossible charger la liste des messages').'</p>';
+            return '<p class="error">'._b_('Impossible charger la liste des messages de ') . $group . '</p>';
         }
 
         if (!$this->_newPost($id)) {
