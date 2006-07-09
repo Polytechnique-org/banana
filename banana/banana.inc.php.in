@@ -82,6 +82,8 @@ class Banana
     var $post;
     var $spool;
 
+	var $get;
+
     function Banana()
     {
         $this->_require('NetNNTP');
@@ -92,24 +94,35 @@ class Banana
         }
     }
 
-    function run($class = 'Banana')
+	/** Run Banana
+	 * @param STRING class Name of the class to use
+	 * @param ARRAY  myget If defined is used instead of get
+	 */
+    function run($class = 'Banana', $myget = null)
     {
         global $banana;
 
         Banana::_require('misc');
         $banana = new $class();
 
+        if (is_null($myget)) {
+            $banana->get = $_GET;
+        } else {
+            $banana->get = $myget;
+        }
+
+
         if (!$banana->nntp) {
             return '<p class="error">'._b_('Impossible de contacter le serveur').'</p>';
         }
 
-        $group  = empty($_GET['group']) ? null : strtolower($_GET['group']);
-        $artid  = empty($_GET['artid']) ? null : strtolower($_GET['artid']);
-        $partid = !isset($_GET['part']) ? -1 : $_GET['part'];
+        $group  = empty($banana->get['group']) ? null : strtolower($banana->get['group']);
+        $artid  = empty($banana->get['artid']) ? null : strtolower($banana->get['artid']);
+        $partid = !isset($banana->get['part']) ? -1 : $banana->get['part'];
         $banana->state = Array ('group' => $group, 'artid' => $artid);
 
         if (is_null($group)) {
-            if (isset($_GET['subscribe'])) {
+            if (isset($banana->get['subscribe'])) {
                 return $banana->action_listSubs();
             } elseif (isset($_POST['subscribe'])) {
                 $banana->action_saveSubs();
@@ -119,10 +132,10 @@ class Banana
         } elseif (is_null($artid)) {
             if (isset($_POST['action']) && $_POST['action'] == 'new') {
                 return $banana->action_doFup($group, isset($_POST['artid']) ? intval($_POST['artid']) : -1);
-            } elseif (isset($_GET['action']) && $_GET['action'] == 'new') {
+            } elseif (isset($banana->get['action']) && $banana->get['action'] == 'new') {
                 return $banana->action_newFup($group);
             } else {
-                return $banana->action_showThread($group, isset($_GET['first']) ? intval($_GET['first']) : 1);
+                return $banana->action_showThread($group, isset($banana->get['first']) ? intval($banana->get['first']) : 1);
             }
 
         } else {
@@ -132,8 +145,8 @@ class Banana
                 $res = '';
             }
 
-            if (isset($_GET['action'])) {
-                switch ($_GET['action']) {
+            if (isset($banana->get['action'])) {
+                switch ($banana->get['action']) {
                     case 'cancel':
                         $res .= $banana->action_showArticle($group, $artid, $partid);
                         if ($banana->post->checkcancel()) {
@@ -154,12 +167,12 @@ class Banana
                 }
             }
 
-            if (isset($_GET['pj'])) {
+            if (isset($banana->get['pj'])) {
                 $action = false;
-                if (isset($_GET['action']) && $_GET['action'] == 'view') {
+                if (isset($banana->get['action']) && $banana->get['action'] == 'view') {
                     $action = true;
                 }
-                $att = $banana->action_getAttachment($group, $artid, $_GET['pj'], $action);
+                $att = $banana->action_getAttachment($group, $artid, $banana->get['pj'], $action);
                 if ($att != "") {
                     return $res.$att;
                 }
