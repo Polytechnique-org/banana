@@ -374,9 +374,9 @@ class BananaPost
                 $format = textFormat_translate($format[1]);
                 if ($i != $partid) {
                     $res .= makeHREF(Array('group' => $banana->state['group'],
-										   'artid' => $this->id,
-										   'part'  => $i),
-									 $format);
+                                           'artid' => $this->id,
+                                           'part'  => $i),
+                                     $format);
                 } else {
                     $res .= $format;
                 }
@@ -404,14 +404,14 @@ class BananaPost
             foreach ($this->pj as $file) {
                 $res .= $file['filename'].' ('.$file['MIME'].') : ';
                 $res .= makeHREF(Array('group' => $banana->state['group'],
-				                       'artid' => $this->id,
-									   'pj'    => $i),
-								 _b_('télécharger'));
-				$res .= ' . ';
+                                       'artid' => $this->id,
+                                       'pj'    => $i),
+                                 _b_('télécharger'));
+                $res .= ' . ';
                 $res .= makeHREF(Array('group' => $banana->state['group'],
                                        'artid' => $this->id,
                                        'pj'    => $i,
-									   'action'=> 'view'),
+                                       'action'=> 'view'),
                                  _b_('aperçu'));
                 $res .=  '<br/>';
                 $i++;
@@ -427,4 +427,5 @@ class BananaPost
     }
 }
 
+// vim:set et sw=4 sts=4 ts=4
 ?>

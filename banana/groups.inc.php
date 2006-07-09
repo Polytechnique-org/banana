@@ -126,7 +126,7 @@ class BananaGroups {
 
         if ($show_form) {
             return '<form method="post" action="' . htmlentities(makeLink(Array())) . '">'
-				. '<div class="center"><input type="submit" value="Valider" name="validsubs" /></div>'
+                . '<div class="center"><input type="submit" value="Valider" name="validsubs" /></div>'
                 . $html . '<div class="center"><input type="submit" value="Valider" name="validsubs" /></div></form>';
         }
         
@@ -134,4 +134,5 @@ class BananaGroups {
     }
 }
 
+// vim:set et sw=4 sts=4 ts=4
 ?>
