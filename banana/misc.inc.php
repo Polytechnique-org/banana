@@ -99,7 +99,7 @@ function makeHREF($params, $text = null)
  *
  * This function can be overloaded by defining hook_makeImg()
  */
-function makeImg($img, $alt, $width = null)
+function makeImg($img, $alt, $height = null, $width = null)
 {
     if (function_exists('hook_makeImg')
             && $res = hook_makeImg($img, $alt, $width)) {
@@ -109,13 +109,16 @@ function makeImg($img, $alt, $width = null)
     if (!is_null($width)) {
         $width = ' width="' . $width . '"';
     }
-
+    if (!is_null($height)) {
+        $height = ' height="' . $height . '"';
+    }
+    
     $proto = empty($_SERVER['HTTPS']) ? 'http://' : 'https://';
     $host  = $_SERVER['HTTP_HOST'];
     $file  = dirname($_SERVER['PHP_SELF']) . '/img/' . $img . '.gif';
     $url   = $proto . $host . $file; 
 
-    return '<img src="' . $url . '"' . $width . ' alt="' . $alt . '" />';
+    return '<img src="' . $url . '"' . $height . $width . ' alt="' . $alt . '" />';
 }
 
 /********************************************************************************
