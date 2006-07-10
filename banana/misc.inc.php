@@ -102,7 +102,7 @@ function makeHREF($params, $text = null)
 function makeImg($img, $alt, $height = null, $width = null)
 {
     if (function_exists('hook_makeImg')
-            && $res = hook_makeImg($img, $alt, $width)) {
+            && $res = hook_makeImg($img, $alt, $height, $width)) {
         return $res;
     }
 
