@@ -6,7 +6,10 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-div.banana_scuts { text-align: left; padding: 0.5em 0em; }
+div.banana_scuts {
+    text-align: left;
+    padding: 0.5em 0em;
+}
 
 /** GROUP LIST **/
 
@@ -17,7 +20,15 @@ table.banana_group td.dsc { text-align: left; }
 
 /** THREAD VIEW **/
 
-table.banana_thread td { white-space: nowrap; height: 100%; vertical-align: middle; }
+table.banana_thread td {
+    white-space: nowrap;
+    height: 21;
+    vertical-align: middle;
+    padding-top: 0;
+    margin-top: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
 
 table.banana_thread tr.new { font-weight: bold; }
 
@@ -26,7 +37,7 @@ table.banana_thread td.subj { text-align: left; overflow: hidden; }
 table.banana_thread td.from { text-align: left; }
 
 table.banana_thread div.tree { float: left; padding-right: 0.3em; }
-table.banana_thread span.cur { font-style: italic; font-size: 90%; }
+table.banana_thread span.cur { font-style: italic; }
 
 /** MESSAGE VIEW **/
 

@@ -1,3 +1,7 @@
+Mon, 10 Jul 2006                    Florent Bruneau <florent.bruneau@m4x.org>
+	* Use dynamic links from tree images
+	* Bugfix: force spool rows height
+
 Sun, 09 Jul 2006                    Florent Bruneau <florent.bruneau@m4x.org>
 
 	* Can use a user-defined Array instead of $_GET
