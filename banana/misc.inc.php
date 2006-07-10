@@ -92,6 +92,32 @@ function makeHREF($params, $text = null)
     return '<a href="' . htmlentities($link) . $target . '">' . $text . '</a>';
 }
 
+/** Format tree images links
+ * @param img STRING Image name (without extension)
+ * @param alt STRING alternative string
+ * @param width INT  to force width of the image (null if not defined)
+ *
+ * This function can be overloaded by defining hook_makeImg()
+ */
+function makeImg($img, $alt, $width = null)
+{
+    if (function_exists('hook_makeImg')
+            && $res = hook_makeImg($img, $alt, $width)) {
+        return $res;
+    }
+
+    if (!is_null($width)) {
+        $width = ' width="' . $width . '"';
+    }
+
+    $proto = empty($_SERVER['HTTPS']) ? 'http://' : 'https://';
+    $host  = $_SERVER['HTTP_HOST'];
+    $file  = dirname($_SERVER['PHP_SELF']) . '/img/' . $img . '.gif';
+    $url   = $proto . $host . $file; 
+
+    return '<img src="' . $url . '"' . $width . ' alt="' . $alt . '" />';
+}
+
 /********************************************************************************
  * HTML STUFF
  * Taken from php.net

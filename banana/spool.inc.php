@@ -313,16 +313,16 @@ class BananaSpool
 
     function _to_html($_id, $_index, $_first=0, $_last=0, $_ref="", $_pfx_node="", $_pfx_end="", $_head=true)
     {
-        $spfx_f   = '<img src="img/k1.gif" height="21" width="9" alt="o" />'; 
-        $spfx_n   = '<img src="img/k2.gif" height="21" width="9" alt="*" />'; 
-        $spfx_Tnd = '<img src="img/T-direct.gif" height="21" width="12" alt="+" />';
-        $spfx_Lnd = '<img src="img/L-direct.gif" height="21" width="12" alt="`" />';
-        $spfx_snd = '<img src="img/s-direct.gif" height="21" width="5" alt="-" />';
-        $spfx_T   = '<img src="img/T.gif" height="21" width="12" alt="+" />';
-        $spfx_L   = '<img src="img/L.gif" height="21" width="12" alt="`" />';
-        $spfx_s   = '<img src="img/s.gif" height="21" width="5" alt="-" />';
-        $spfx_e   = '<img src="img/e.gif" height="21" width="12" alt="&nbsp;" />';
-        $spfx_I   = '<img src="img/I.gif" height="21" width="12"alt="|" />';
+        $spfx_f   = makeImg('k1',       'o', 9); 
+        $spfx_n   = makeImg('k2',       '*', 9);
+        $spfx_Tnd = makeImg('T-direct', '+', 12);
+        $spfx_Lnd = makeImg('L-direct', '`', 12);
+        $spfx_snd = makeImg('s-direct', '-', 5);
+        $spfx_T   = makeImg('T',        '+', 12);
+        $spfx_L   = makeImg('L',        '`', 12);
+        $spfx_s   = makeImg('s',        '-', 5);
+        $spfx_e   = makeImg('e',        '&nbsp;', 12);
+        $spfx_I   = makeImg('I',        '|', 12);
 
         if ($_index + $this->overview[$_id]->desc < $_first || $_index > $_last) {
             return;
