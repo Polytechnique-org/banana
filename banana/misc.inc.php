@@ -48,6 +48,7 @@ function redirectInBanana($params)
  *  - action      = action to do (new, cancel, view)
  *  - part        = to show the given MIME part of the article
  *  - pj          = to get the given attachment
+ *  - xface       = to make a link to an xface
  *
  * Can be overloaded by defining a hook_makeLink function
  */
@@ -61,7 +62,10 @@ function makeLink($params)
     $host  = $_SERVER['HTTP_HOST'];
     $file  = $_SERVER['PHP_SELF'];
 
-    if (count($params) != 0) {
+    if (isset($params['xface'])) {
+        $file = dirname($file) . '/xface.php';
+        $get  = 'face=' . $params['xface'];
+    } else if (count($params) != 0) {
         $get = '?';
         foreach ($params as $key=>$value) {
             if (strlen($get) != 1) {
@@ -281,7 +285,7 @@ function formatDisplayHeader($_header,$_text) {
             return $rsl;
 
         case "x-face":
-            return '<img src="xface.php?face='.urlencode(base64_encode($_text)).'"  alt="x-face" />';
+            return '<img src="' . makeLink(Array('xface' => urlencode(base64_encode($_text)))) .'"  alt="x-face" />';
         
         default:
             if (function_exists('hook_formatDisplayHeader')
