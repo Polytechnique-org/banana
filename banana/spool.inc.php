@@ -313,16 +313,16 @@ class BananaSpool
 
     function _to_html($_id, $_index, $_first=0, $_last=0, $_ref="", $_pfx_node="", $_pfx_end="", $_head=true)
     {
-        $spfx_f   = makeImg('k1',       'o', 9); 
-        $spfx_n   = makeImg('k2',       '*', 9);
-        $spfx_Tnd = makeImg('T-direct', '+', 12);
-        $spfx_Lnd = makeImg('L-direct', '`', 12);
-        $spfx_snd = makeImg('s-direct', '-', 5);
-        $spfx_T   = makeImg('T',        '+', 12);
-        $spfx_L   = makeImg('L',        '`', 12);
-        $spfx_s   = makeImg('s',        '-', 5);
-        $spfx_e   = makeImg('e',        '&nbsp;', 12);
-        $spfx_I   = makeImg('I',        '|', 12);
+        $spfx_f   = makeImg('k1',       'o', 21, 9); 
+        $spfx_n   = makeImg('k2',       '*', 21, 9);
+        $spfx_Tnd = makeImg('T-direct', '+', 21, 12);
+        $spfx_Lnd = makeImg('L-direct', '`', 21, 12);
+        $spfx_snd = makeImg('s-direct', '-', 21, 5);
+        $spfx_T   = makeImg('T',        '+', 21, 12);
+        $spfx_L   = makeImg('L',        '`', 21, 12);
+        $spfx_s   = makeImg('s',        '-', 21, 5);
+        $spfx_e   = makeImg('e',        '&nbsp;', 21, 12);
+        $spfx_I   = makeImg('I',        '|', 21, 12);
 
         if ($_index + $this->overview[$_id]->desc < $_first || $_index > $_last) {
             return;
