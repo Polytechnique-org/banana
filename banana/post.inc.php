@@ -196,7 +196,7 @@ class BananaPost
      */
     function _fix_charset()
     {
-        if (preg_match('!charset=([^;]*)\s*(;|$)!', $this->headers['content-type'], $matches)) {
+        if (preg_match('!charset="?([^;"]*)"?\s*(;|$)?!', $this->headers['content-type'], $matches)) {
             $body = iconv($matches[1], 'utf-8', $this->body);
             if (strlen($body) == 0) {
                 return false;
