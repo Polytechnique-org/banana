@@ -61,11 +61,7 @@ class BananaPost
         } else {
             $this->_split_multipart($mpart_type[1], $mpart_boundary[1]);
             $this->_find_uuencode();
-            if (preg_match('!charset=([^;]*)\s*(;|$)!', $this->headers['content-type'], $matches)) {
-                $this->body = iconv($matches[1], 'utf-8', $this->body);
-            } else {
-                $this->body = utf8_encode($this->body);
-            }
+            $this->_fix_charset();
         }
     }
 
@@ -195,6 +191,23 @@ class BananaPost
         return true;
     }
 
+    /** Fix body charset (convert body to utf8)
+     * @return false if failed
+     */
+    function _fix_charset()
+    {
+        if (preg_match('!charset=([^;]*)\s*(;|$)!', $this->headers['content-type'], $matches)) {
+            $body = iconv($matches[1], 'utf-8', $this->body);
+            if (strlen($body) == 0) {
+                return false;
+            }
+            $this->body = $body;
+        } else {
+            $this->body = utf8_encode($this->body);
+        }
+        return true;
+    }
+
     /** return body in plain text (useful for messages without a text/plain part)
      */
     function get_body()
@@ -257,11 +270,7 @@ class BananaPost
             }
         }
 
-        if (preg_match('!charset=([^;]*)\s*(;|$)!', $this->headers['content-type'], $matches)) {
-            $this->body = iconv($matches[1], 'utf-8', $this->body);
-        } else {
-            $this->body = utf8_encode($this->body);
-        }
+        $this->_fix_charset();
         return true;
     }
 
