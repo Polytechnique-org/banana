@@ -351,8 +351,10 @@ class BananaPost
         }
 
         $res  = '<table class="bicol banana_msg" cellpadding="0" cellspacing="0">';
-        $res .= '<tr><th colspan="2">' . formatdisplayheader('subject', $this->headers['subject']) . '</th></tr>';
-        $res .= '<tr><td class="headers"><table cellpadding="0" cellspacing="0">';
+        $res .= '<tr><th colspan="2" class="subject">'
+             . formatdisplayheader('subject', $this->headers['subject'])
+             . '</th></tr>';
+        $res .= '<tr class="pair"><td class="headers"><table cellpadding="0" cellspacing="0">';
 
         foreach ($banana->show_hdr as $hdr) {
             if (isset($this->headers[$hdr])) {
@@ -371,12 +373,10 @@ class BananaPost
         }
         $res .= '</td></tr>';
 
-        $res .= '<tr><th colspan="2">'._b_('Corps');
         if (count($this->messages) > 1) {
+            $res .= '<tr><th colspan="2">';        
             for ($i = 0 ; $i < count($this->messages) ; $i++) {
-                if ($i == 0) {
-                    $res .= ' : ';
-                } else {
+                if ($i != 0) {
                     $res .= ' . ';
                 }
                 preg_match("@text/([^;]+);@", $this->messages[$i]['headers']['content-type'], $format);
@@ -390,12 +390,12 @@ class BananaPost
                     $res .= $format;
                 }
             }
+            $res .= '</th></tr>';
         }
-        $res .= '</th></tr>';
  
         preg_match("@text/([^;]+);@", $this->headers['content-type'], $format);
         $format = $format[1];
-        $res .= '<tr><td colspan="2"';
+        $res .= '<tr class="impair"><td colspan="2"';
         if ($format == 'html') {
             if (preg_match('@<body[^>]*bgcolor="?([#0-9a-f]+)"?[^>]*>@i', $this->body, $bgcolor)) {
                 $res .= ' bgcolor="'.$bgcolor[1].'"';
