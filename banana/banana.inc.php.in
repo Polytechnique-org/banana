@@ -450,7 +450,8 @@ class Banana
             }
             redirectInBanana($dir);
         } else {
-            return "<p class=\"error\">"._b_('Impossible de poster le message')."</p>".$this->action_showThread($group, $artid);
+            return '<p class="error">' . _b_('Impossible de poster le message') . '</p>'
+                   . $this->action_showThread($group, $artid);
         }
     }
 
