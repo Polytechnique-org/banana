@@ -117,6 +117,11 @@ class Banana
         }
 
         $group  = empty($banana->get['group']) ? null : $banana->get['group'];
+        if (isset($banana->grp_pattern) && !preg_match('/' . $banana->grp_pattern . '/', $group)) {
+            return '<p class="error">'
+                    . $group . _b_(' : ce newsgroup n\'existe pas ou vous n\'avez pas l\'autorisation d\'y accéder')
+                    . '</p>';
+        }
         $artid  = empty($banana->get['artid']) ? null : strtolower($banana->get['artid']);
         $partid = !isset($banana->get['part']) ? -1 : $banana->get['part'];
         $banana->state = Array ('group' => $group, 'artid' => $artid);
