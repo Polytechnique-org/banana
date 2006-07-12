@@ -347,6 +347,7 @@ class BananaSpool
             } else {
                 $res .= makeHREF(Array('group' => $this->group,
                                        'artid' => $_id),
+                                 htmlentities($subject),
                                  htmlentities($subject));
             }
             $res .= "</td>\n<td class='from'>".formatFrom($this->overview[$_id]->from)."</td>\n</tr>";
