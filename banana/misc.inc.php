@@ -83,17 +83,20 @@ function makeLink($params)
 /** Format a link to be use in a link
  * @ref makeLink
  */
-function makeHREF($params, $text = null)
+function makeHREF($params, $text = null, $popup = null)
 {
     $link = makeLink($params);
     if (is_null($text)) {
         $text = $link;
     }
+    if (!is_null($popup)) {
+        $popup = ' title="' . $popup . '"';
+    }
     $target = null;
     if (isset($params['action']) && $params['action'] == 'view') {
         $target = ' target="_blank"';
     }
-    return '<a href="' . htmlentities($link) . $target . '">' . $text . '</a>';
+    return '<a href="' . htmlentities($link) . $target . '"' . $popup . '>' . $text . '</a>';
 }
 
 /** Format tree images links
@@ -358,17 +361,20 @@ function displayshortcuts($first = -1) {
                                _b_('Nouveau message'))
               . '] ';
         if (sizeof($banana->spool->overview)>$banana->tmax) {
-            $res .= '<br />';
+            $res .= '<br />Page : ';
             $n = intval(log(count($banana->spool->overview), 10))+1;
-            for ($ndx=1; $ndx <= sizeof($banana->spool->overview); $ndx += $banana->tmax) {
+            $i = 1;
+            for ($ndx = 1 ; $ndx <= sizeof($banana->spool->overview) ; $ndx += $banana->tmax) {
                 if ($first==$ndx) {
-                    $fmt = "[%0{$n}u-%0{$n}u] ";
+                    $fmt = $i . ' ';
                 } else {
-                    $fmt = '[' . makeHREF(Array('group' => $group,
-                                                'first' => $ndx),
-                                          '%0' . $n . 'u-%0' . $n . 'u')
-                         . '] ';
+                    $fmt = makeHREF(Array('group' => $group,
+                                          'first' => $ndx),
+                                    $i, 
+                                    '%0' . $n . 'u-%0' . $n . 'u')
+                         . ' ';
                 }
+                $i++;
                 $res .= sprintf($fmt, $ndx, min($ndx+$banana->tmax-1,sizeof($banana->spool->overview)));
             }
         }
