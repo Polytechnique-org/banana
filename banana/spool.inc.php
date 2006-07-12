@@ -309,6 +309,10 @@ class BananaSpool
      * @param $_pfx_node STRING prefix used for current node
      * @param $_pfx_end STRING prefix used for children of current node
      * @param $_head BOOLEAN true if first post in thread
+     *
+     * If you want to analyse subject, you can define the function hook_getSubject(&$subject) which
+     * take the subject as a reference parameter, transform this subject to be displaid in the spool
+     * view and return a string. This string will be put after the subject.
      */
 
     function _to_html($_id, $_index, $_first=0, $_last=0, $_ref="", $_pfx_node="", $_pfx_end="", $_head=true)
@@ -342,13 +346,19 @@ class BananaSpool
             if (strlen($subject) == 0) {
                 $subject = _b_('(pas de sujet)');
             }
+            $link = null;
+            if (function_exists('hook_getSubject')) {
+                $link = hook_getSubject($subject);
+            }
+            $subject = htmlentities($subject);
             if ($_index == $_ref) {
-                $res .= '<span class="cur">'.htmlentities($subject).'</span>';
+                $res .= '<span class="cur">' . $subject . $link . '</span>';
             } else {
                 $res .= makeHREF(Array('group' => $this->group,
                                        'artid' => $_id),
-                                 htmlentities($subject),
-                                 htmlentities($subject));
+                                 $subject,
+                                 $subject)
+                     . $link;
             }
             $res .= "</td>\n<td class='from'>".formatFrom($this->overview[$_id]->from)."</td>\n</tr>";
 
