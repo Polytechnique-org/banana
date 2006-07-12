@@ -410,7 +410,7 @@ class BananaSpool
                  . '</td></tr>';
         }
         $res .= '<tr><th colspan="3" class="subs">'
-             . makeHREF(Array('subscribe' => 1), 'Gérer mes abonnements')
+             . makeHREF(Array('subscribe' => 1), _b_('Gérer mes abonnements'))
              . '</th></tr>';
 
         return $res .= '</table>';
