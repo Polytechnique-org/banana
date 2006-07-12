@@ -428,10 +428,14 @@ class BananaPost
             $res .= '</td></tr>';
         }
         
-        $res .= '<tr><th colspan="2">'._b_('Apercu').'</th></tr>';
+        $res .= '<tr><th colspan="2">' . _b_('Apercu de ')
+             . makeHREF(Array('group' => $banana->state['group']),
+                        $banana->state['group'])
+             . '</th></tr>';
         $ndx  = $banana->spool->getndx($this->id);
-        $res .= '<tr><td class="thrd" colspan="2">'.$banana->spool->to_html($ndx-$banana->tbefore, $ndx+$banana->tafter, $ndx).'</td></tr>';
-
+        $res .= '<tr><td class="thrd" colspan="2">'
+             . $banana->spool->to_html($ndx-$banana->tbefore, $ndx+$banana->tafter, $ndx)
+             . '</td></tr>';
         return $res.'</table>';
     }
 }

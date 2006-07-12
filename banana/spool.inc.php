@@ -403,6 +403,16 @@ class BananaSpool
             $res .= '<tr><td colspan="3">'._b_('Aucun message dans ce forum').'</td></tr>';
         }
 
+        global $banana;
+        if (is_object($banana->groups)) {
+            $res .= '<tr><td colspan="3" class="subs">'
+                 . $banana->groups->to_html()
+                 . '</td></tr>';
+        }
+        $res .= '<tr><th colspan="3" class="subs">'
+             . makeHREF(Array('subscribe' => 1), 'Gérer mes abonnements')
+             . '</th></tr>';
+
         return $res .= '</table>';
     }
 
