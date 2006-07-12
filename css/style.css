@@ -38,6 +38,8 @@ table.banana_thread td.from { text-align: left; }
 
 table.banana_thread div.tree { float: left; padding-right: 0.3em; }
 table.banana_thread span.cur { font-style: italic; }
+table.banana_thread table { border: 0px; padding: 0px; margin: 0px; width: 100%; }
+table.banana_thread td.subs { padding: 0%; }
 
 /** MESSAGE VIEW **/
 

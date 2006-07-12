@@ -467,6 +467,9 @@ class Banana
                 return false;
             }
         }
+        if (count($this->profile['subscribe']) > 0) {
+            $this->_newGroup(false);
+        }
         return true;
     }
 
@@ -481,11 +484,11 @@ class Banana
         return true;
     }
 
-    function _newGroup()
+    function _newGroup($showNew = true)
     {
         $this->_require('groups');
         $this->groups = new BananaGroups(BANANA_GROUP_SUB);
-        if ($this->groups->type == BANANA_GROUP_SUB) {
+        if ($showNew && $this->groups->type == BANANA_GROUP_SUB) {
             $this->newgroups = new BananaGroups(BANANA_GROUP_NEW);
         }
     }
