@@ -493,8 +493,13 @@ function formatbody($_text, $format='plain', $flowed=false)
         $formatting = Array('\*' => 'strong',
                             '_' => 'u',
                             '/' => 'em');
+        $word    = '-a-z0-9\'âäàãéêëêïîìöôòõüûùÿ';
         foreach ($formatting as $limit=>$mark) {
-            $res = preg_replace('@' . $limit . '([^\s]+)' . $limit . '@', "<$mark>\\1</$mark>", $res);
+            $res = preg_replace('@([^' . $word . '])'
+                                . $limit . '([' . $word . ']+)' . $limit 
+                                . '([^' . $word  . '])@i'
+                                ,'\1<' . $mark . '>\2</' . $mark . '>\3'
+                                , $res);
         }
     }
 
