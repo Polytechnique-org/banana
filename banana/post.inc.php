@@ -351,7 +351,7 @@ class BananaPost
         }
 
         $res  = '<table class="bicol banana_msg" cellpadding="0" cellspacing="0">';
-        $res .= '<tr><th colspan="2">'._b_('En-têtes').'</th></tr>';
+        $res .= '<tr><th colspan="2">' . formatdisplayheader('subject', $this->headers['subject']) . '</th></tr>';
         $res .= '<tr><td class="headers"><table cellpadding="0" cellspacing="0">';
 
         foreach ($banana->show_hdr as $hdr) {

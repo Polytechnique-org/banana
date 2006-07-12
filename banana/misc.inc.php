@@ -170,6 +170,21 @@ function htmlToPlainText($res)
     return $res;
 }
 
+/** Match **, // and __ to format plain text
+ */
+function formatPlainText($text)
+{
+    $formatting = Array('\*' => 'strong',
+                        '_' => 'u',
+                        '/' => 'em');
+    foreach ($formatting as $limit=>$mark) {
+        $text = preg_replace('@(^|\W)' . $limit . '(\w+)' . $limit . '(\W|$)@'
+                            ,'\1<' . $mark . '>\2</' . $mark . '>\3'
+                            , $text);
+    }
+    return $text;
+} 
+
 /********************************************************************************
  * RICHTEXT STUFF
  */
@@ -252,6 +267,11 @@ function header_translate($hdr) {
 
 function formatDisplayHeader($_header,$_text) {
     global $banana;
+    if (function_exists('hook_formatDisplayHeader')
+            && $res = hook_formatDisplayHeader($_header, $_text)) {
+        return $res;
+    }
+
     switch ($_header) {
         case "date": 
             return formatDate($_text);
@@ -289,13 +309,11 @@ function formatDisplayHeader($_header,$_text) {
 
         case "x-face":
             return '<img src="' . makeLink(Array('xface' => urlencode(base64_encode($_text)))) .'"  alt="x-face" />';
-        
+    
+        case "subject":
+            return formatPlainText($_text);
+
         default:
-            if (function_exists('hook_formatDisplayHeader')
-                    && $res = hook_formatDisplayHeader($_header, $_text))
-            {
-                return $res;
-            }
             return htmlentities($_text);
     }
 }
@@ -496,14 +514,7 @@ function formatbody($_text, $format='plain', $flowed=false)
         $res = '<br/>'.html_entity_decode(to_entities(richtextToHtml($_text))).'<br/>';
     } else {
         $res  = "\n\n" . to_entities(wrap($_text, "", $flowed))."\n\n";
-        $formatting = Array('\*' => 'strong',
-                            '_' => 'u',
-                            '/' => 'em');
-        foreach ($formatting as $limit=>$mark) {
-            $res = preg_replace('@(\W)' . $limit . '(\w+)' . $limit . '(\W)@'
-                                ,'\1<' . $mark . '>\2</' . $mark . '>\3'
-                                , $res);
-        }
+        $res  = formatPlainText($res);
     }
 
     if ($format != 'html') {

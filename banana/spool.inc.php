@@ -350,7 +350,7 @@ class BananaSpool
             if (function_exists('hook_getSubject')) {
                 $link = hook_getSubject($subject);
             }
-            $subject = htmlentities($subject);
+            $subject = formatPlainText(htmlentities($subject));
             if ($_index == $_ref) {
                 $res .= '<span class="cur">' . $subject . $link . '</span>';
             } else {
