@@ -22,7 +22,7 @@ table.banana_group td.dsc { text-align: left; }
 
 table.banana_thread td {
     white-space: nowrap;
-    height: 21;
+    height: 21px;
     vertical-align: middle;
     padding-top: 0;
     margin-top: 0;
