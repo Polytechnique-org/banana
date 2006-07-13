@@ -315,7 +315,9 @@ function formatDisplayHeader($_header,$_text) {
                 $p = $banana->spool->overview[$p]->parent;
             }
             foreach (array_reverse($par_ok) as $p) {
-                $rsl .= makeHREF(Array('group' => $banana->spool->group), $ndx) . ' ';
+                $rsl .= makeHREF(Array('group' => $banana->spool->group,
+                                       'artid' => $p),
+                                 $ndx) . ' ';
                 $ndx++;
             }
             return $rsl;
