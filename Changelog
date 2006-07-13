@@ -1,5 +1,9 @@
+Thu, 13 Jul 2006                    Florent Bruneau <florent.bruneau@m4x.org>
+	* Bugfix: xfaces handling
+	
 Wed, 12 Jul 2006                    Florent Bruneau <florent.bruneau@m4x.org>
 	* Add the list of subscriptions after the spool
+	* Make article view more user-friendly
 
 Tue, 11 Jul 2006                    Florent Bruneau <florent.bruneau@m4x.org>
 	* Bugfix: body conversion from unknown charset
