@@ -64,7 +64,7 @@ function makeLink($params)
 
     if (isset($params['xface'])) {
         $file = dirname($file) . '/xface.php';
-        $get  = 'face=' . urlencode($params['xface']);
+        $get  = 'face=' . urlencode(base64_encode($params['xface']));
     } else if (count($params) != 0) {
         $get = '?';
         foreach ($params as $key=>$value) {
@@ -308,7 +308,7 @@ function formatDisplayHeader($_header,$_text) {
             return $rsl;
 
         case "x-face":
-            return '<img src="' . makeLink(Array('xface' => base64_encode(headerDecode($_text)))) .'"  alt="x-face" />';
+            return '<img src="' . makeLink(Array('xface' => headerDecode($_text))) .'"  alt="x-face" />';
     
         case "subject":
             $link = null;
