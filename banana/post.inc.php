@@ -315,7 +315,32 @@ class BananaPost
         if (function_exists('hook_checkcancel')) {
             return hook_checkcancel($this->headers);
         }
-        return ($this->headers['from'] == $_SESSION['name']." <".$_SESSION['mail'].">");
+        if (!isset($_SESSION)) {
+            return false;
+        }
+        return ($this->headers['from'] == $_SESSION['name'] . ' <' . $_SESSION['mail']. '>');
+    }
+
+    /** Make some links to browse the current newsgroup
+     */
+    function _browser()
+    {
+        global $banana;
+        $ret = '<div class="banana_menu">';
+        $actions = Array('prevThread' => Array('prev_thread', 'Discussion précédente'),
+                         'prevPost'   => Array('prev',        'Article précédent'),
+                         'nextPost'   => Array('next',        'Article suivant'),
+                         'nextThread' => Array('next_thread', 'Discussion suivante'));
+        foreach ($actions as $method=>$params) {
+            $id = $banana->spool->$method($this->id);
+            if (!is_null($id)) {
+                $ret .= makeImgLink(Array('group' => $banana->state['group'],
+                                          'artid' => $id),
+                                    $params[0] . '.gif',
+                                    $params[1]);
+            }
+        }
+        return $ret . '</div>';
     }
 
     /** convert message to html
@@ -352,9 +377,28 @@ class BananaPost
 
         $res  = '<table class="bicol banana_msg" cellpadding="0" cellspacing="0">';
         $res .= '<tr><th colspan="2" class="subject">'
-             . formatdisplayheader('subject', $this->headers['subject'])
-             . '</th></tr>';
-        $res .= '<tr class="pair"><td class="headers"><table cellpadding="0" cellspacing="0">';
+             . $this->_browser()
+             . '<div class="banana_action">'
+             . makeImgLink(Array('group'  => $this->group,
+                                 'action' => 'new'),
+                           'post.gif',
+                           'Nouveau message')
+             . makeImgLink(Array('group'  => $banana->state['group'],
+                                 'artid'  => $this->id,
+                                 'action' => 'new'),
+                           'reply.gif',
+                           'Répondre');
+        if ($this->checkCancel()) {
+            $res .= makeImgLink(Array('group'  => $banana->state['group'],
+                                      'artid'  => $this->id,
+                                      'action' => 'cancel'),
+                                'cancel.gif',
+                                'Annuler');
+        }
+        $res .= '</div>'
+             . formatDisplayHeader('subject', $this->headers['subject'])
+             . '</th></tr>'
+             . '<tr class="pair"><td class="headers"><table cellpadding="0" cellspacing="0">';
 
         foreach ($banana->show_hdr as $hdr) {
             if (isset($this->headers[$hdr])) {
@@ -428,10 +472,6 @@ class BananaPost
             $res .= '</td></tr>';
         }
         
-        $res .= '<tr><th colspan="2">' . _b_('Apercu de ')
-             . makeHREF(Array('group' => $banana->state['group']),
-                        $banana->state['group'])
-             . '</th></tr>';
         $ndx  = $banana->spool->getndx($this->id);
         $res .= '<tr><td class="thrd" colspan="2">'
              . $banana->spool->to_html($ndx-$banana->tbefore, $ndx+$banana->tafter, $ndx)

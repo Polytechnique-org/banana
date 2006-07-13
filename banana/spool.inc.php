@@ -317,16 +317,16 @@ class BananaSpool
 
     function _to_html($_id, $_index, $_first=0, $_last=0, $_ref="", $_pfx_node="", $_pfx_end="", $_head=true)
     {
-        $spfx_f   = makeImg('k1',       'o', 21, 9); 
-        $spfx_n   = makeImg('k2',       '*', 21, 9);
-        $spfx_Tnd = makeImg('T-direct', '+', 21, 12);
-        $spfx_Lnd = makeImg('L-direct', '`', 21, 12);
-        $spfx_snd = makeImg('s-direct', '-', 21, 5);
-        $spfx_T   = makeImg('T',        '+', 21, 12);
-        $spfx_L   = makeImg('L',        '`', 21, 12);
-        $spfx_s   = makeImg('s',        '-', 21, 5);
-        $spfx_e   = makeImg('e',        '&nbsp;', 21, 12);
-        $spfx_I   = makeImg('I',        '|', 21, 12);
+        $spfx_f   = makeImg('k1.gif',       'o', 21, 9); 
+        $spfx_n   = makeImg('k2.gif',       '*', 21, 9);
+        $spfx_Tnd = makeImg('T-direct.gif', '+', 21, 12);
+        $spfx_Lnd = makeImg('L-direct.gif', '`', 21, 12);
+        $spfx_snd = makeImg('s-direct.gif', '-', 21, 5);
+        $spfx_T   = makeImg('T.gif',        '+', 21, 12);
+        $spfx_L   = makeImg('L.gif',        '`', 21, 12);
+        $spfx_s   = makeImg('s.gif',        '-', 21, 5);
+        $spfx_e   = makeImg('e.gif',        '&nbsp;', 21, 12);
+        $spfx_I   = makeImg('I.gif',        '|', 21, 12);
 
         if ($_index + $this->overview[$_id]->desc < $_first || $_index > $_last) {
             return;
@@ -397,10 +397,22 @@ class BananaSpool
     {
         $res  = '<table class="bicol banana_thread" cellpadding="0" cellspacing="0">';
        
+        $new  = '<div class="banana_action">'
+              . makeImgLink(Array('group'  => $this->group,
+                               'action' => 'new'),
+                            'post.gif',
+                            'Nouveau message');
+        $new .= '</div>';
+        
         if (is_null($_ref)) {
             $res .= '<tr><th>'._b_('Date').'</th>';
             $res .= '<th>'._b_('Sujet').'</th>';
-            $res .= '<th>'._b_('Auteur').'</th></tr>';
+            $res .= '<th>'. $new . _b_('Auteur').'</th></tr>';
+        } else {
+            $res .= '<tr><th colspan="3">' . _b_('Aperçu de ')
+                 . makeHREF(Array('group' => $this->group),
+                            $this->group)
+                 . '</th></tr>';
         }
 
         $index = 1;
@@ -420,10 +432,6 @@ class BananaSpool
                  . $banana->groups->to_html()
                  . '</td></tr>';
         }
-        $res .= '<tr><th colspan="3" class="subs">'
-             . makeHREF(Array('subscribe' => 1), _b_('Gérer mes abonnements'))
-             . '</th></tr>';
-
         return $res .= '</table>';
     }
 
@@ -456,6 +464,102 @@ class BananaSpool
             $ndx += $this->overview[$i]->desc;
         }
         return $ndx;
+    }
+
+    /** Return root message of the given thread
+     * @param id INTEGER id of a message
+     */
+     function root($id)
+     {
+        $id_cur = $id;
+        while (true) {
+            $id_parent = $this->overview[$id_cur]->parent;
+            if (is_null($id_parent)) break;
+            $id_cur = $id_parent;
+        }
+        return $id_cur;
+    }
+
+    /** Returns previous thread root index
+     * @param id INTEGER message number
+     */
+    function prevThread($id)
+    {
+        $root = $this->root($id);
+        $last = null;
+        foreach ($this->roots as $i) {
+            if ($i == $root) {
+                return $last;
+            }
+            $last = $i;
+        }
+        return $last;
+    }
+
+    /** Returns next thread root index
+     * @param id INTEGER message number
+     */
+    function nextThread($id)
+    {
+        $root = $this->root($id);
+        $ok   = false;
+        foreach ($this->roots as $i) {
+            if ($ok) {
+                return $i;
+            }
+            if ($i == $root) {
+                $ok = true;
+            }
+        }
+        return null;
+    }
+
+    /** Return prev post in the thread
+     * @param id INTEGER message number
+     */
+    function prevPost($id)
+    {
+        $parent = $this->overview[$id]->parent;
+        if (is_null($parent)) {
+            return null;
+        }
+        $last = $parent;
+        foreach ($this->overview[$parent]->children as $child) {
+            if ($child == $id) {
+                return $last;
+            }
+            $last = $child;
+        }
+        return null;
+    }
+
+    /** Return next post in the thread
+     * @param id INTEGER message number
+     */
+    function nextPost($id)
+    {
+        if (count($this->overview[$id]->children) != 0) {
+            return $this->overview[$id]->children[0];
+        }
+        
+        $cur    = $id;
+        while (true) {
+            $parent = $this->overview[$cur]->parent;
+            if (is_null($parent)) {
+                return null;
+            }
+            $ok = false;
+            foreach ($this->overview[$parent]->children as $child) {
+                if ($ok) {
+                    return $child;
+                }
+                if ($child == $cur) {
+                    $ok = true;
+                }
+            }
+            $cur = $parent;
+        }
+        return null;
     }
 }
 
