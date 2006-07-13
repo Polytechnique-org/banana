@@ -83,7 +83,7 @@ function makeLink($params)
 /** Format a link to be use in a link
  * @ref makeLink
  */
-function makeHREF($params, $text = null, $popup = null)
+function makeHREF($params, $text = null, $popup = null, $class = null)
 {
     $link = makeLink($params);
     if (is_null($text)) {
@@ -92,11 +92,14 @@ function makeHREF($params, $text = null, $popup = null)
     if (!is_null($popup)) {
         $popup = ' title="' . $popup . '"';
     }
+    if (!is_null($class)) {
+        $class = ' class="' . $class . '"';
+    }
     $target = null;
     if (isset($params['action']) && $params['action'] == 'view') {
         $target = ' target="_blank"';
     }
-    return '<a href="' . htmlentities($link) . $target . '"' . $popup . '>' . $text . '</a>';
+    return '<a href="' . htmlentities($link) . $target . '"' . $popup . $class . '>' . $text . '</a>';
 }
 
 /** Format tree images links
@@ -122,10 +125,20 @@ function makeImg($img, $alt, $height = null, $width = null)
     
     $proto = empty($_SERVER['HTTPS']) ? 'http://' : 'https://';
     $host  = $_SERVER['HTTP_HOST'];
-    $file  = dirname($_SERVER['PHP_SELF']) . '/img/' . $img . '.gif';
+    $file  = dirname($_SERVER['PHP_SELF']) . '/img/' . $img;
     $url   = $proto . $host . $file; 
 
     return '<img src="' . $url . '"' . $height . $width . ' alt="' . $alt . '" />';
+}
+
+/** Make a link using an image
+ */
+function makeImgLink($params, $img, $alt, $height = null, $width = null, $class = null)
+{
+    return makeHREF($params,
+                    makeImg($img, ' [' . $alt . ']', $height, $width),
+                    $alt,
+                    $class);
 }
 
 /********************************************************************************
@@ -365,53 +378,44 @@ function formatFrom($text) {
     return preg_replace("/\\\(\(|\))/","\\1",$result);
 }
 
-function displayshortcuts($first = -1) {
+function displayShortcuts($first = -1)
+{
     global $banana;
     extract($banana->state);
-
+    
     $res  = '<div class="banana_scuts">';
-    $res .= '[' . makeHREF(Array(), _b_('Liste des forums')) . '] ';
-    if (is_null($group)) {
-        return $res.'[' . makeHREF(Array('subscribe' => 1), _b_('Abonnements')) . ']</div>';
+    $res .= '<span class="title"> Profil :</span> ' . makeHREF(Array('subscribe' => 1), _b_('Abonnements'));
+    if (function_exists('hook_shortcuts') && $cstm = hook_shortcuts()) {
+        $res .= ' . ' . $cstm;
     }
-   
-    $res .= '[' . makeHREF(Array('group' => $group), $group) . '] ';
+    $res .= '<br />';
+    
+    $res .=  '<span class="title">Navigation :</span> '
+         . (is_null($group) ? 'Les forums' : makeHREF(Array(), _b_('Les forums')));
 
-    if (is_null($artid)) {
-        $res .= '[' . makeHREF(Array('group'  => $group,
-                                     'action' => 'new'),
-                               _b_('Nouveau message'))
-              . '] ';
-        if (sizeof($banana->spool->overview)>$banana->tmax) {
-            $res .= '<br />Page : ';
-            $n = intval(log(count($banana->spool->overview), 10))+1;
-            $i = 1;
-            for ($ndx = 1 ; $ndx <= sizeof($banana->spool->overview) ; $ndx += $banana->tmax) {
-                if ($first==$ndx) {
-                    $fmt = $i . ' ';
-                } else {
-                    $fmt = makeHREF(Array('group' => $group,
-                                          'first' => $ndx),
-                                    $i, 
-                                    '%0' . $n . 'u-%0' . $n . 'u')
-                         . ' ';
+    if (!is_null($group)) {
+        $res .= ' > ' . makeHREF(Array('group' => $group), $group);
+        if (is_null($artid)) {
+            if (sizeof($banana->spool->overview)>$banana->tmax) {
+                $res .= ' > Pages<br />';
+                $n = intval(log(count($banana->spool->overview), 10))+1;
+                $i = 1;
+                for ($ndx = 1 ; $ndx <= sizeof($banana->spool->overview) ; $ndx += $banana->tmax) {
+                    if ($first==$ndx) {
+                        $fmt = $i . ' ';
+                    } else {
+                        $fmt = makeHREF(Array('group' => $group,
+                                              'first' => $ndx),
+                                        $i, 
+                                        '%0' . $n . 'u-%0' . $n . 'u')
+                             . ' ';
+                    }
+                    $i++;
+                    $res .= sprintf($fmt, $ndx, min($ndx+$banana->tmax-1,sizeof($banana->spool->overview)));
                 }
-                $i++;
-                $res .= sprintf($fmt, $ndx, min($ndx+$banana->tmax-1,sizeof($banana->spool->overview)));
             }
-        }
-    } else {
-        $res .= '[' . makeHREF(Array('group'  => $group,
-                                     'artid'  => $artid,
-                                     'action' => 'new'),
-                               _b_('Répondre'))
-              . '] ';
-        if ($banana->post && $banana->post->checkcancel()) {
-            $res .= '[' . makeHREF(Array('group'  => $group,
-                                         'artid'  => $artid,
-                                         'action' => 'cancel'), 
-                                   _b_('Annuler ce message'))
-                  . '] ';
+        } else {
+            $res .= ' > Message';
         }
     }
     return $res.'</div>';
