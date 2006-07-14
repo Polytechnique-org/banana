@@ -431,8 +431,8 @@ function autoformat($text)
 {
     global $banana;
     $length = $banana->wrap;
-        
-    $cmd = "echo ".escapeshellarg($text)." | perl -MText::Autoformat -e 'autoformat {left=>1, right=>$length, all=>1 };'";
+    
+    $cmd = "echo ".escapeshellarg($text)." | perl -MText::Autoformat -e 'autoformat {left=>1, right=>$length };'";
     exec($cmd, $result, $ret);
     if ($ret != 0) {
         $result = split("\n", $text);
@@ -460,7 +460,8 @@ function wrap($text, $_prefix="", $_force=false)
     $format = false;
     foreach ($splits as $line) {
         if ($_force || strlen($line) > $max) {
-            if (preg_match("!^(.*)($url)(.*)!i", $line, $matches) && strlen($matches[2]) > $length && strlen($matches) < 900) {
+            if (preg_match("!^(.*)($url)(.*)!i", $line, $matches)
+                    && strlen($matches[2]) > $length && strlen($matches) < 900) {
                 if (strlen($matches[1]) != 0) {
                     array_push($next, rtrim($matches[1]));
                     if (strlen($matches[1]) > $max) {
@@ -484,8 +485,12 @@ function wrap($text, $_prefix="", $_force=false)
                     }
                 }
             } else {
-                $format = true;
-                array_push($next, $line);
+                if (strlen($line) > 2 * $max) {
+                    $next = array_merge($next, autoformat($line));
+                } else {
+                    $format = true;
+                    array_push($next, $line);
+                }
             }
         } else {
             array_push($next, $line);
@@ -523,7 +528,7 @@ function formatbody($_text, $format='plain', $flowed=false)
     } else if ($format == 'richtext') {
         $res = '<br/>'.html_entity_decode(to_entities(richtextToHtml($_text))).'<br/>';
     } else {
-        $res  = "\n\n" . to_entities(wrap($_text, "", $flowed))."\n\n";
+        $res  = "\n" . to_entities(wrap($_text, "", $flowed))."\n";
         $res  = formatPlainText($res);
     }
 
