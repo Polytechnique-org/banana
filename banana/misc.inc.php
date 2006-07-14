@@ -427,12 +427,16 @@ function displayShortcuts($first = -1)
  *  FORMATTING STUFF : BODY
  */
 
-function autoformat($text)
+function autoformat($text, $part = false)
 {
     global $banana;
     $length = $banana->wrap;
+    $all = null;
+    if (!$part) {
+        $all = ', all=1';
+    }
     
-    $cmd = "echo ".escapeshellarg($text)." | perl -MText::Autoformat -e 'autoformat {left=>1, right=>$length };'";
+    $cmd = "echo ".escapeshellarg($text)." | perl -MText::Autoformat -e 'autoformat {left=>1, right=>$length$all };'";
     exec($cmd, $result, $ret);
     if ($ret != 0) {
         $result = split("\n", $text);
@@ -486,7 +490,7 @@ function wrap($text, $_prefix="", $_force=false)
                 }
             } else {
                 if (strlen($line) > 2 * $max) {
-                    $next = array_merge($next, autoformat($line));
+                    $next = array_merge($next, autoformat($line, true));
                 } else {
                     $format = true;
                     array_push($next, $line);
