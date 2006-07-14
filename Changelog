@@ -1,3 +1,6 @@
+Fri, 14 Jul 2006                    Florent Bruneau <florent.bruneau@m4x.org>
+	* Bugfix: wrapping issues with very long lines
+
 Thu, 13 Jul 2006                    Florent Bruneau <florent.bruneau@m4x.org>
 	* Bugfix: xfaces handling
 	
