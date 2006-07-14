@@ -1,0 +1,67 @@
+/***************************************************************************
+ *  Copyright (C) 2003-2004 Polytechnique.org                              *
+ *  http://opensource.polytechnique.org/                                   *
+ *                                                                         *
+ *  This program is free software; you can redistribute it and/or modify   *
+ *  it under the terms of the GNU General Public License as published by   *
+ *  the Free Software Foundation; either version 2 of the License, or      *
+ *  (at your option) any later version.                                    *
+ *                                                                         *
+ *  This program is distributed in the hope that it will be useful,        *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of         *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          *
+ *  GNU General Public License for more details.                           *
+ *                                                                         *
+ *  You should have received a copy of the GNU General Public License      *
+ *  along with this program; if not, write to the Free Software            *
+ *  Foundation, Inc.,                                                      *
+ *  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA                *
+ ***************************************************************************/
+
+body {
+    font-family:"Trebuchet MS",Verdana,Geneva,Arial,Helvetica,sans-serif;
+    margin:2em 1%;
+    padding:0;
+}
+
+div.bloc { width: 800px; margin-left: auto; margin-right: auto; }
+
+div.foot {
+    border-top: 1px solid #a2c2e1;
+    padding-top: 1em;
+    margin-top: 1em;
+}
+
+a:link, a:visited { color: #f60; background: transparent; }
+a:active, a:hover { color: #369; background: transparent; }
+
+hr { border: none; border-top: 1px dotted #a2c2e1; }
+
+h1 {
+    color: #369;
+    background: inherit;
+    font-size: 200%;
+    text-align: center;
+    margin: 0em;
+    border-bottom: 2px solid #369;
+    padding: 4px;
+    margin: 1em 0em;
+}
+
+table.bicol {
+    border-collapse: collapse;
+    border: 1px solid #a2c2e1;
+    width: 100%;
+}
+
+table.bicol tr.impair { }
+table.bicol tr.pair   { color: inherit; background: #eee; }
+
+table.bicol th {
+    color: #369;
+    background: #d6e1ec;
+    padding: 0px 4px;
+}
+
+table.bicol td { padding: 0px 4px; }
+
