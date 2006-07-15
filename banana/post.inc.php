@@ -327,10 +327,10 @@ class BananaPost
     {
         global $banana;
         $ret = '<div class="banana_menu">';
-        $actions = Array('prevThread' => Array('prev_thread', 'Discussion précédente'),
-                         'prevPost'   => Array('prev',        'Article précédent'),
-                         'nextPost'   => Array('next',        'Article suivant'),
-                         'nextThread' => Array('next_thread', 'Discussion suivante'));
+        $actions = Array('prevThread' => Array('prev_thread', _b_('Discussion précédente')),
+                         'prevPost'   => Array('prev',        _b_('Article précédent')),
+                         'nextPost'   => Array('next',        _b_('Article suivant')),
+                         'nextThread' => Array('next_thread', _b_('Discussion suivante')));
         foreach ($actions as $method=>$params) {
             $id = $banana->spool->$method($this->id);
             if (!is_null($id)) {
@@ -382,18 +382,18 @@ class BananaPost
              . makeImgLink(Array('group'  => $banana->state['group'],
                                  'action' => 'new'),
                            'post.gif',
-                           'Nouveau message')
+                           _b_('Nouveau message'))
              . makeImgLink(Array('group'  => $banana->state['group'],
                                  'artid'  => $this->id,
                                  'action' => 'new'),
                            'reply.gif',
-                           'Répondre');
+                           _b_('Répondre'));
         if ($this->checkCancel()) {
             $res .= makeImgLink(Array('group'  => $banana->state['group'],
                                       'artid'  => $this->id,
                                       'action' => 'cancel'),
                                 'cancel.gif',
-                                'Annuler');
+                                _b_('Annuler'));
         }
         $res .= '</div>'
              . formatDisplayHeader('subject', $this->headers['subject'])

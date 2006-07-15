@@ -399,22 +399,23 @@ function displayShortcuts($first = -1)
         $res .= ' > ' . makeHREF(Array('group' => $group), $group);
         if (is_null($artid)) {
             if (sizeof($banana->spool->overview)>$banana->tmax) {
-                $res .= ' > Pages<br />';
+                $res .= ' > Pages';
+                $res .= '<div class="pages">';
                 $n = intval(log(count($banana->spool->overview), 10))+1;
                 $i = 1;
                 for ($ndx = 1 ; $ndx <= sizeof($banana->spool->overview) ; $ndx += $banana->tmax) {
                     if ($first==$ndx) {
-                        $fmt = $i . ' ';
+                        $res .= '<strong>' . $i . '</strong> ';
                     } else {
-                        $fmt = makeHREF(Array('group' => $group,
+                        $res .= makeHREF(Array('group' => $group,
                                               'first' => $ndx),
                                         $i, 
-                                        '%0' . $n . 'u-%0' . $n . 'u')
+                                        $ndx . '-' . min($ndx+$banana->tmax-1,sizeof($banana->spool->overview)))
                              . ' ';
                     }
                     $i++;
-                    $res .= sprintf($fmt, $ndx, min($ndx+$banana->tmax-1,sizeof($banana->spool->overview)));
                 }
+                $res .= '</div>';
             }
             if (!is_null($action)) {
                 if ($action == 'new') {
@@ -425,7 +426,7 @@ function displayShortcuts($first = -1)
             if (!is_null($action)) {
                 $res .= ' > ' . makeHREF(Array('group' => $group,
                                                'artid' => $artid),
-                                         'Message')
+                                         _b_('Message'))
                      . ' > ';
                 if ($action == 'new') {
                     $res .= 'Répondre';
