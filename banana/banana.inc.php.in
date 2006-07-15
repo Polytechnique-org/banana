@@ -75,7 +75,7 @@ class Banana
     var $profile     = Array( 'name' => 'Anonymous <anonymouse@example.com>', 'sig'  => '', 'org'  => '',
             'customhdr' =>'', 'display' => 0, 'lastnews' => 0, 'locale'  => 'fr_FR', 'subscribe' => array());
     
-    var $state       = Array('group' => null, 'artid' => null);
+    var $state       = Array('group' => null, 'artid' => null, 'action' => null);
     var $nntp;
     var $groups;
     var $newgroups;
@@ -111,7 +111,6 @@ class Banana
             $banana->get = $myget;
         }
 
-
         if (!$banana->nntp) {
             return '<p class="error">'._b_('Impossible de contacter le serveur').'</p>';
         }
@@ -125,7 +124,8 @@ class Banana
         }
         $artid  = empty($banana->get['artid']) ? null : strtolower($banana->get['artid']);
         $partid = !isset($banana->get['part']) ? -1 : $banana->get['part'];
-        $banana->state = Array ('group' => $group, 'artid' => $artid);
+        $action = !isset($banana->get['action']) ? null : $banana->get['action'];
+        $banana->state = Array ('group' => $group, 'artid' => $artid, 'action' => $action);
 
         if (is_null($group)) {
             if (isset($banana->get['subscribe'])) {
@@ -138,7 +138,7 @@ class Banana
         } elseif (is_null($artid)) {
             if (isset($_POST['action']) && $_POST['action'] == 'new') {
                 return $banana->action_doFup($group, isset($_POST['artid']) ? intval($_POST['artid']) : -1);
-            } elseif (isset($banana->get['action']) && $banana->get['action'] == 'new') {
+            } elseif ($action == 'new') {
                 return $banana->action_newFup($group);
             } else {
                 return $banana->action_showThread($group, isset($banana->get['first']) ? intval($banana->get['first']) : 1);
@@ -151,8 +151,8 @@ class Banana
                 $res = '';
             }
 
-            if (isset($banana->get['action'])) {
-                switch ($banana->get['action']) {
+            if (!is_null($action)) {
+                switch ($action) {
                     case 'cancel':
                         $res .= $banana->action_showArticle($group, $artid, $partid);
                         if ($banana->post->checkcancel()) {
@@ -174,11 +174,11 @@ class Banana
             }
 
             if (isset($banana->get['pj'])) {
-                $action = false;
-                if (isset($banana->get['action']) && $banana->get['action'] == 'view') {
-                    $action = true;
+                $view = false;
+                if ($action == 'view') {
+                    $view = true;
                 }
-                $att = $banana->action_getAttachment($group, $artid, $banana->get['pj'], $action);
+                $att = $banana->action_getAttachment($group, $artid, $banana->get['pj'], $view);
                 if ($att != "") {
                     return $res.$att;
                 }
