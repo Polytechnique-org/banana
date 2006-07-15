@@ -34,6 +34,7 @@ div.foot {
 
 a:link, a:visited { color: #f60; background: transparent; }
 a:active, a:hover { color: #369; background: transparent; }
+a img { border: 0px; }
 
 hr { border: none; border-top: 1px dotted #a2c2e1; }
 
