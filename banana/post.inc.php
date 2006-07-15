@@ -103,8 +103,10 @@ class BananaPost
             $local_header = $part['headers'];
             $local_body   = $part['body'];
             if (!$this->_split_multipart($local_header, $local_body)) {
-                $is_text = isset($local_header['content-type']) && preg_match("@text/([^;]+);@", $local_header['content-type'])
-                         && (!isset($local_header['content-disposition']) || !preg_match('@attachment@', $local_header['content-disposition'])); 
+                $is_text = isset($local_header['content-type'])
+                         && preg_match("@text/([^;]+);@", $local_header['content-type'])
+                         && (!isset($local_header['content-disposition']) 
+                             || !preg_match('@attachment@', $local_header['content-disposition'])); 
 
                 // alternative ==> multiple formats for messages
                 if ($type == 'alternative' && $is_text) {
@@ -167,27 +169,33 @@ class BananaPost
         $local_header = $part['headers'];
         $local_body = $part['body'];
 
-        if ((isset($local_header['content-disposition']) && preg_match("/filename=\"?([^\"]+)\"?/", $local_header['content-disposition'], $filename))
-            || (isset($local_header['content-type']) && preg_match("/name=\"?([^\"]+)\"?/", $local_header['content-type'], $filename))) {
+        if ((isset($local_header['content-disposition']) && preg_match('/filename="?([^"]+)"?/', $local_header['content-disposition'], $filename))
+            || (isset($local_header['content-type']) && preg_match('/name="?([^"]+)"?/', $local_header['content-type'], $filename))) {
             $filename = $filename[1];
         }           
         if (!isset($filename)) {
             $filename = "attachment".count($pj);
         }
 
-        if (isset($local_header['content-type'])) {
-            if (preg_match("/^\\s*([^ ;]+);/", $local_header['content-type'], $mimetype)) {
-                $mimetype = $mimetype[1];
-            }
-        }
-        if (!isset($mimetype)) {
+        if (isset($local_header['content-type'])
+                && preg_match('/^\s*([^ ;]+);/', $local_header['content-type'], $mimetype)) {
+            $mimetype = $mimetype[1];
+        } else {
             return false;
+        }
+
+        if (isset($local_header['content-id'])
+                && preg_match('/^\s*<([^> ]+)>/', $local_header['content-id'], $cid)) {
+            $cid = $cid[1];
+        } else {
+            $cid = null;
         }
 
         array_push($this->pj, Array('MIME' => $mimetype,
                                     'filename' => $filename,
                                     'encoding' => strtolower($local_header['content-transfer-encoding']),
-                                    'data' => $local_body));
+                                    'data' => $local_body,
+                                    'cid' => $cid));
         return true;
     }
 
@@ -221,6 +229,25 @@ class BananaPost
         } else {
             return htmlToPlainText($this->body);
         }
+    }
+
+    /** return local url for the given cid
+     * @param cid STRING
+     */
+    function find_attachment($cid)
+    {
+        global $banana;
+        $i = 0;
+        foreach ($this->pj as $pj) {
+            if ($pj['cid'] == $cid) {
+                return htmlentities(makeLink(Array('group'  => $banana->state['group'],
+                                                   'artid'  => $this->id,
+                                                   'pj'     => $i,
+                                                   'action' => 'view')));
+            }
+            $i++;
+        }
+        return 'cid:' . $cid;;
     }
 
     /** decode an attachment
@@ -444,6 +471,7 @@ class BananaPost
             if (preg_match('@<body[^>]*bgcolor="?([#0-9a-f]+)"?[^>]*>@i', $this->body, $bgcolor)) {
                 $res .= ' bgcolor="'.$bgcolor[1].'"';
             }
+            $this->body = preg_replace('/cid:([^\'" ]+)/e', "find_attachment('\\1')", $this->body);
             $res .= '>'.formatbody($this->body, $format); 
         } else {
             $res .= '><pre>'.formatbody($this->body).'</pre>';
@@ -479,6 +507,14 @@ class BananaPost
              . '</td></tr>';
         return $res.'</table>';
     }
+}
+
+/** Wrapper for Post::find_attachment
+ */
+function find_attachment($cid)
+{
+    global $banana;
+    return $banana->post->find_attachment($cid);
 }
 
 // vim:set et sw=4 sts=4 ts=4

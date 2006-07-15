@@ -12,9 +12,12 @@ class Banana
     var $maxspool    = 3000;
 
     var $hdecode     = array('from','name','organization','subject');
-    var $parse_hdr   = array('content-disposition', 'content-transfer-encoding', 'content-type', 'date', 'followup-to', 'from',
-            'message-id', 'newsgroups', 'organization', 'references', 'subject', 'x-face');
-    var $show_hdr    = array('from', 'newsgroups', 'followup', 'date', 'organization', 'references', 'x-face');
+    var $parse_hdr   = array('content-disposition', 'content-transfer-encoding',
+                             'content-type', 'content-id', 'date', 'followup-to',
+                             'from', 'message-id', 'newsgroups', 'organization',
+                             'references', 'subject', 'x-face');
+    var $show_hdr    = array('from', 'newsgroups', 'followup', 'date',
+                             'organization', 'references', 'x-face');
 
     /** Favorites MIMEtypes to use, by order for reading multipart messages
      */
