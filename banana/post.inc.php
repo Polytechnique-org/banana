@@ -439,7 +439,7 @@ class BananaPost
  
         preg_match("@text/([^;]+);@", $this->headers['content-type'], $format);
         $format = $format[1];
-        $res .= '<tr class="impair"><td colspan="2"';
+        $res .= '<tr class="impair"><td colspan="2" class="body"';
         if ($format == 'html') {
             if (preg_match('@<body[^>]*bgcolor="?([#0-9a-f]+)"?[^>]*>@i', $this->body, $bgcolor)) {
                 $res .= ' bgcolor="'.$bgcolor[1].'"';
