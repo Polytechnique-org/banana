@@ -58,7 +58,7 @@ class BananaPost
 
         if ($this->_split_multipart($this->headers, $this->body)) {
             $this->set_body_to_part(0);
-        } else {
+        } elseif(isset($mpart_type)) {
             $this->_split_multipart($mpart_type[1], $mpart_boundary[1]);
             $this->_find_uuencode();
             $this->_fix_charset();
@@ -90,7 +90,8 @@ class BananaPost
      */
     function _split_multipart($headers, $body)
     {
-        if (!preg_match("@multipart/([^;]+);@", $headers['content-type'], $type)) {
+        if (!isset($headers['content-type'])
+                || !preg_match("@multipart/([^;]+);@", $headers['content-type'], $type)) {
             return false;
         }
             
@@ -138,6 +139,7 @@ class BananaPost
     {
         global $banana;
 
+        $local_headers = Array();
         $lines = split("\n", $part);
         while (count($lines)) {
             $line = array_shift($lines);
@@ -156,7 +158,8 @@ class BananaPost
             }
         }
         $local_body = join("\n", $lines);
-        if (preg_match("/quoted-printable/", $local_headers['content-transfer-encoding'])) {
+        if (isset($local_headers['content-transfer-encoding'])
+                && preg_match("/quoted-printable/", $local_headers['content-transfer-encoding'])) {
             $local_body = quoted_printable_decode($local_body);
         }
         return Array('headers' => $local_headers, 'body' => $local_body); 
@@ -174,7 +177,7 @@ class BananaPost
             $filename = $filename[1];
         }           
         if (!isset($filename)) {
-            $filename = "attachment".count($pj);
+            $filename = "attachment" . count($this->pj);
         }
 
         if (isset($local_header['content-type'])
@@ -427,6 +430,7 @@ class BananaPost
              . '</th></tr>'
              . '<tr class="pair"><td class="headers"><table cellpadding="0" cellspacing="0">';
 
+        $xface = null;
         foreach ($banana->show_hdr as $hdr) {
             if (isset($this->headers[$hdr])) {
                 $res2 = formatdisplayheader($hdr, $this->headers[$hdr]);
