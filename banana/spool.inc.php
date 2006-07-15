@@ -405,9 +405,9 @@ class BananaSpool
         $new .= '</div>';
         
         if (is_null($_ref)) {
-            $res .= '<tr><th>'._b_('Date').'</th>';
-            $res .= '<th>'._b_('Sujet').'</th>';
-            $res .= '<th>'. $new . _b_('Auteur').'</th></tr>';
+            $res .= '<tr><th>' . _b_('Date') . '</th>';
+            $res .= '<th>' . $new . _b_('Sujet') . '</th>';
+            $res .= '<th>' . _b_('Auteur') . '</th></tr>';
         } else {
             $res .= '<tr><th colspan="3">' . _b_('Aperçu de ')
                  . makeHREF(Array('group' => $this->group),
