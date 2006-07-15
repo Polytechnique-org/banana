@@ -545,11 +545,11 @@ function cleanurl($url)
 function formatbody($_text, $format='plain', $flowed=false)
 {
     if ($format == 'html') {
-        $res = '<br/>'.html_entity_decode(to_entities(removeEvilTags($_text))).'<br/>';
+        $res = html_entity_decode(to_entities(removeEvilTags($_text)));
     } else if ($format == 'richtext') {
-        $res = '<br/>'.html_entity_decode(to_entities(richtextToHtml($_text))).'<br/>';
+        $res = html_entity_decode(to_entities(richtextToHtml($_text)));
     } else {
-        $res  = "\n" . to_entities(wrap($_text, "", $flowed)) . "\n";
+        $res  = to_entities(wrap($_text, "", $flowed));
         $res  = formatPlainText($res);
     }
 
@@ -572,7 +572,6 @@ function formatbody($_text, $format='plain', $flowed=false)
         $res = preg_replace("@(<pre[^>]*>)\n?-- ?\n@", "<br/>-- <br/>\\1", $res);
         $parts = preg_split("@(:?<p[^>]*>\n?-- ?\n?</p>|<br[^>]*>\n?-- ?\n?<br[^>]*>)@", $res);
         $sign  = '<hr style="width: 100%; margin: 1em 0em; " />';
-        $end   = '<br />';
     } else {
         while (preg_match("@(^|<pre>|\n)&gt;@i", $res)) {
             $res  = preg_replace("@(^|<pre>|\n)((&gt;[^\n]*\n)+)@ie",
@@ -584,10 +583,9 @@ function formatbody($_text, $format='plain', $flowed=false)
         $res = preg_replace("@<pre>-- ?\n@", "<pre>\n-- \n", $res);
         $parts = preg_split("/\n-- ?\n/", $res);
         $sign  = '</pre><hr style="width: 100%; margin: 1em 0em; " /><pre>';
-        $end   = null;
     }
 
-    return join($sign, $parts) . $end;
+    return join($sign, $parts);
 }
 
 // vim:set et sw=4 sts=4 ts=4
