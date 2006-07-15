@@ -532,7 +532,7 @@ function formatbody($_text, $format='plain', $flowed=false)
     } else if ($format == 'richtext') {
         $res = '<br/>'.html_entity_decode(to_entities(richtextToHtml($_text))).'<br/>';
     } else {
-        $res  = "\n" . to_entities(wrap($_text, "", $flowed))."\n";
+        $res  = "\n" . to_entities(wrap($_text, "", $flowed)) . "\n";
         $res  = formatPlainText($res);
     }
 
@@ -554,6 +554,8 @@ function formatbody($_text, $format='plain', $flowed=false)
         $res = preg_replace("@<br[^>]*>\n?-- ?\n?(<p[^>]*>)@", "<br/>-- <br/>\\2", $res);
         $res = preg_replace("@(<pre[^>]*>)\n?-- ?\n@", "<br/>-- <br/>\\1", $res);
         $parts = preg_split("@(:?<p[^>]*>\n?-- ?\n?</p>|<br[^>]*>\n?-- ?\n?<br[^>]*>)@", $res);
+        $sign  = '<hr style="width: 100%; margin: 1em 0em; " />';
+        $end   = '<br />';
     } else {
         while (preg_match("@(^|<pre>|\n)&gt;@i", $res)) {
             $res  = preg_replace("@(^|<pre>|\n)((&gt;[^\n]*\n)+)@ie",
@@ -564,21 +566,11 @@ function formatbody($_text, $format='plain', $flowed=false)
         }
         $res = preg_replace("@<pre>-- ?\n@", "<pre>\n-- \n", $res);
         $parts = preg_split("/\n-- ?\n/", $res);
+        $sign  = '</pre><hr style="width: 100%; margin: 1em 0em; " /><pre>';
+        $end   = null;
     }
 
-    if (count($parts) > 1) {
-        $sign  = array_pop($parts);
-        if ($format == 'html') {
-            $res  = join('<br/>-- <br/>', $parts);
-            $sign = '<hr style="width: 100%; margin: 1em 0em; " />'.$sign.'<br/>';
-        } else {
-            $res  = join('\n-- \n', $parts);
-            $sign = '</pre><hr style="width: 100%; margin: 1em 0em; " /><pre>'.$sign;
-        }
-        return $res.$sign;
-    } else {
-        return $res;
-    }
+    return join($sign, $parts) . $end;
 }
 
 // vim:set et sw=4 sts=4 ts=4
