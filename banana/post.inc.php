@@ -379,7 +379,7 @@ class BananaPost
         $res .= '<tr><th colspan="2" class="subject">'
              . $this->_browser()
              . '<div class="banana_action">'
-             . makeImgLink(Array('group'  => $this->group,
+             . makeImgLink(Array('group'  => $banana->state['group'],
                                  'action' => 'new'),
                            'post.gif',
                            'Nouveau message')

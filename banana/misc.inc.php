@@ -416,8 +416,25 @@ function displayShortcuts($first = -1)
                     $res .= sprintf($fmt, $ndx, min($ndx+$banana->tmax-1,sizeof($banana->spool->overview)));
                 }
             }
+            if (!is_null($action)) {
+                if ($action == 'new') {
+                    $res .= ' > Nouveau Message';
+                }
+            }
         } else {
-            $res .= ' > Message';
+            if (!is_null($action)) {
+                $res .= ' > ' . makeHREF(Array('group' => $group,
+                                               'artid' => $artid),
+                                         'Message')
+                     . ' > ';
+                if ($action == 'new') {
+                    $res .= 'Répondre';
+                } elseif ($action == 'cancel') {
+                    $res .= 'Annuler';
+                }
+            } else {
+                $res .= ' > Message';
+            }
         }
     }
     return $res.'</div>';
