@@ -380,52 +380,56 @@ function formatFrom($text) {
     return preg_replace("/\\\(\(|\))/","\\1",$result);
 }
 
+function makeTab($link, $text)
+{
+    return Array(makeHREF($link, $text),
+                 $text);
+}
+
 function displayTabs()
 {
     global $banana;
     extract($banana->state);
-    
-    $res  = Array();
     if (function_exists('hook_shortcuts') && $cstm = hook_shortcuts()) {
         $res = $cstm;
     }
  
-    array_push($res,
-               makeHREF(Array('subscribe' => 1), _b_('Abonnements')),
-               is_null($group) ? Array(_b_('Les forums'), true) : makeHREF(Array(), _b_('Les forums')));
+    $res['subscribe'] = makeTab(Array('subscribe' => 1), _b_('Abonnements'));
+    $res['forums']    = makeTab(Array(), _b_('Les forums'));
 
     if (!is_null($group)) {
-        $grplink = makeHREF(Array('group' => $group), $group);
-        $grpcur  = Array($group, true);
+        $res['group'] = makeTab(Array('group' => $group), $group);
         if (is_null($artid)) {
             if (@$action == 'new') {
-                array_push($res, $grplink, Array(_b_('Nouveau Message'), true));
-            } else {
-                array_push($res, $grpcur);
+                $res['action'] = makeTab(Array('group'  => $group,
+                                               'action' => 'new'),
+                                         _b_('Nouveau Message'));
             }
         } else {
+            $res['message'] = makeTab(Array('group' => $group,
+                                            'artid' => $artid),
+                                      _b_('Message'));
             if (!is_null($action)) {
-                array_push($res,
-                           $grplink,
-                           makeHREF(Array('group' => $group,
-                                          'artid' => $artid),
-                                    _b_('Message')));
                 if ($action == 'new') {
-                    array_push($res, Array(_b_('Répondre'), true));
+                    $res['action'] = makeTab(Array('group'  => $group,
+                                                   'artid'  => $artid,
+                                                   'action' => 'new'),
+                                             _b_('Réponse'));
                 } elseif ($action == 'cancel') {
-                    array_push($res, Array(_b_('Annuler'), true));
+                    $res['action'] = makeTab(Array('group'  => $group,
+                                                   'artid'  => $artid,
+                                                   'action' => 'cancel'),
+                                             _b_('Annuler'));
                 }
-            } else {
-                array_push($res, $grplink, Array(_b_('Message'), true));
             }
         }
     }
     $ret = '<ul id="onglet">';
-    foreach ($res as $onglet) {
-        if (is_string($onglet)) {
-            $ret .= '<li>' . $onglet . '</li>';
+    foreach ($res as $name=>$onglet) {
+        if ($name != $page) {
+            $ret .= '<li>' . $onglet[0] . '</li>';
         } else {
-            $ret .= '<li class="actif">' . $onglet[0] . '</li>';
+            $ret .= '<li class="actif">' . $onglet[1] . '</li>';
         }
     }
     $ret .= '</ul>';
@@ -461,7 +465,7 @@ function displayPages($first = -1)
 
 function makeTable($text)
 {
-    return '<table class="cadre_a_onglet" cellpadding="0" cellspacing="0">'
+    return '<table class="cadre_a_onglet" cellpadding="0" cellspacing="0" width="100%">'
          . '<tr><td>'
          . displayTabs()
          . '</td></tr>'
