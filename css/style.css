@@ -13,6 +13,11 @@ div.banana_scuts {
 div.banana_scuts .title {
     font-weight: bold;
 }
+div.banana_scuts .pages {
+    font-size: 80%;
+    text-align: center;
+    padding-top: 0.1em;
+}
 div.banana_action { float: right; }
 div.banana_menu { float: left; }
 

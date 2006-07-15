@@ -399,9 +399,9 @@ class BananaSpool
        
         $new  = '<div class="banana_action">'
               . makeImgLink(Array('group'  => $this->group,
-                               'action' => 'new'),
+                                  'action' => 'new'),
                             'post.gif',
-                            'Nouveau message');
+                            _b_('Nouveau message'));
         $new .= '</div>';
         
         if (is_null($_ref)) {
