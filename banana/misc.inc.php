@@ -380,66 +380,96 @@ function formatFrom($text) {
     return preg_replace("/\\\(\(|\))/","\\1",$result);
 }
 
-function displayShortcuts($first = -1)
+function displayTabs()
 {
     global $banana;
     extract($banana->state);
     
-    $res  = '<div class="banana_scuts">';
-    $res .= '<span class="title"> Profil :</span> ' . makeHREF(Array('subscribe' => 1), _b_('Abonnements'));
+    $res  = Array();
     if (function_exists('hook_shortcuts') && $cstm = hook_shortcuts()) {
-        $res .= ' . ' . $cstm;
+        $res = $cstm;
     }
-    $res .= '<br />';
-    
-    $res .=  '<span class="title">Navigation :</span> '
-         . (is_null($group) ? 'Les forums' : makeHREF(Array(), _b_('Les forums')));
+ 
+    array_push($res,
+               makeHREF(Array('subscribe' => 1), _b_('Abonnements')),
+               is_null($group) ? Array(_b_('Les forums'), true) : makeHREF(Array(), _b_('Les forums')));
 
     if (!is_null($group)) {
-        $res .= ' > ' . makeHREF(Array('group' => $group), $group);
+        $grplink = makeHREF(Array('group' => $group), $group);
+        $grpcur  = Array($group, true);
         if (is_null($artid)) {
-            if (sizeof($banana->spool->overview)>$banana->tmax) {
-                $res .= ' > Pages';
-                $res .= '<div class="pages">';
-                $n = intval(log(count($banana->spool->overview), 10))+1;
-                $i = 1;
-                for ($ndx = 1 ; $ndx <= sizeof($banana->spool->overview) ; $ndx += $banana->tmax) {
-                    if ($first==$ndx) {
-                        $res .= '<strong>' . $i . '</strong> ';
-                    } else {
-                        $res .= makeHREF(Array('group' => $group,
-                                              'first' => $ndx),
-                                        $i, 
-                                        $ndx . '-' . min($ndx+$banana->tmax-1,sizeof($banana->spool->overview)))
-                             . ' ';
-                    }
-                    $i++;
-                }
-                $res .= '</div>';
-            }
-            if (!is_null($action)) {
-                if ($action == 'new') {
-                    $res .= ' > Nouveau Message';
-                }
+            if (@$action == 'new') {
+                array_push($res, $grplink, Array(_b_('Nouveau Message'), true));
+            } else {
+                array_push($res, $grpcur);
             }
         } else {
             if (!is_null($action)) {
-                $res .= ' > ' . makeHREF(Array('group' => $group,
-                                               'artid' => $artid),
-                                         _b_('Message'))
-                     . ' > ';
+                array_push($res,
+                           $grplink,
+                           makeHREF(Array('group' => $group,
+                                          'artid' => $artid),
+                                    _b_('Message')));
                 if ($action == 'new') {
-                    $res .= 'Répondre';
+                    array_push($res, Array(_b_('Répondre'), true));
                 } elseif ($action == 'cancel') {
-                    $res .= 'Annuler';
+                    array_push($res, Array(_b_('Annuler'), true));
                 }
             } else {
-                $res .= ' > Message';
+                array_push($res, $grplink, Array(_b_('Message'), true));
             }
         }
     }
-    return $res.'</div>';
+    $ret = '<ul id="onglet">';
+    foreach ($res as $onglet) {
+        if (is_string($onglet)) {
+            $ret .= '<li>' . $onglet . '</li>';
+        } else {
+            $ret .= '<li class="actif">' . $onglet[0] . '</li>';
+        }
+    }
+    $ret .= '</ul>';
+    return $ret;
 }
+
+function displayPages($first = -1)
+{
+    global $banana;
+    extract($banana->state);
+    $res = null; 
+    if (!is_null($group) && is_null($artid)
+            && sizeof($banana->spool->overview)>$banana->tmax) {
+        $res .= '<div class="pages">';
+        $n = intval(log(count($banana->spool->overview), 10))+1;
+        $i = 1;
+        for ($ndx = 1 ; $ndx <= sizeof($banana->spool->overview) ; $ndx += $banana->tmax) {
+            if ($first==$ndx) {
+                $res .= '<strong>' . $i . '</strong> ';
+            } else {
+                $res .= makeHREF(Array('group' => $group,
+                                       'first' => $ndx),
+                                 $i, 
+                                 $ndx . '-' . min($ndx+$banana->tmax-1,sizeof($banana->spool->overview)))
+                     . ' ';
+            }
+            $i++;
+        }
+        $res .= '</div>';
+    }
+    return $res;
+}
+
+function makeTable($text)
+{
+    return '<table class="cadre_a_onglet" cellpadding="0" cellspacing="0">'
+         . '<tr><td>'
+         . displayTabs()
+         . '</td></tr>'
+         . '<tr><td class="conteneur_tab">'
+         . $text
+         . '</td></tr>'
+         . '</table>';
+}        
 
 /********************************************************************************
  *  FORMATTING STUFF : BODY

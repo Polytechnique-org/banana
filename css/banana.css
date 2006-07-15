@@ -66,3 +66,53 @@ table.bicol th {
 
 table.bicol td { padding: 0px 4px; }
 
+table.cadre_a_onglet{
+    width: 100%;
+    border-width: 0;
+    padding : 0;
+    margin: 0;
+}
+
+td.conteneur_tab {
+    border-width : 1px 2px 2px 1px;
+    border-style : solid;
+    border-color : #a2c2e1;
+    padding : 4px 4px 4px 4px;
+}
+
+#onglet {
+    display : block;
+    margin : 0;
+    padding : 0;
+}
+
+#onglet li {
+    display : block;
+    float : left;
+    padding : 0.4ex;
+    margin : 0 0.3ex -1px 0;
+    background : #eee;
+    border-width : 1px 1px 0px 1px;
+    border-style : solid;
+    border-color : #a2c2e1;
+    border-bottom-color : #a2c2e1;
+    width: auto;
+    height: 5ex;
+    text-align: center;
+}
+
+#onglet li:hover { background : #fc3; }
+
+#onglet li.actif {
+    background-color: #fff;
+    border-bottom-color : #eceade;
+}
+
+#onglet li a {
+    font-size: 80%;
+    font-weight : normal;
+    text-decoration : none;
+}
+
+#onglet li a:hover { text-decoration: underline; }
+#onglet li img { margin-right : 2px; }

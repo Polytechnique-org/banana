@@ -132,19 +132,19 @@ class Banana
 
         if (is_null($group)) {
             if (isset($banana->get['subscribe'])) {
-                return $banana->action_listSubs();
+                return makeTable($banana->action_listSubs());
             } elseif (isset($_POST['validsubs'])) {
                 $banana->action_saveSubs();
             }
-            return $banana->action_listGroups();
+            return makeTable($banana->action_listGroups());
 
         } elseif (is_null($artid)) {
             if (isset($_POST['action']) && $_POST['action'] == 'new') {
-                return $banana->action_doFup($group, isset($_POST['artid']) ? intval($_POST['artid']) : -1);
+                return makeTable($banana->action_doFup($group, isset($_POST['artid']) ? intval($_POST['artid']) : -1));
             } elseif ($action == 'new') {
-                return $banana->action_newFup($group);
+                return makeTable($banana->action_newFup($group));
             } else {
-                return $banana->action_showThread($group, isset($banana->get['first']) ? intval($banana->get['first']) : 1);
+                return makeTable($banana->action_showThread($group, isset($banana->get['first']) ? intval($banana->get['first']) : 1));
             }
 
         } else {
@@ -167,12 +167,12 @@ class Banana
                                   . '<input type="hidden" name="action" value="cancel" />'
                                   . '<input type="submit" value="Annuler !" />'
                                   . '</p></form>';
-                            return $form.$res;
+                            return makeTable($form . $res);
                         }
-                        return $res;
+                        return makeTable("" . $res);
 
                     case 'new':
-                        return $banana->action_newFup($group, $artid);
+                        return makeTable($banana->action_newFup($group, $artid));
                 }
             }
 
@@ -182,13 +182,10 @@ class Banana
                     $view = true;
                 }
                 $att = $banana->action_getAttachment($group, $artid, $banana->get['pj'], $view);
-                if ($att != "") {
-                    return $res.$att;
-                }
-                return "";
+                return makeTable($res . $att);
             }
             
-            return $res . $banana->action_showArticle($group, $artid, $partid);
+            return makeTable($banana->action_showArticle($group, $artid, $partid));
         }
     }
 
@@ -205,15 +202,14 @@ class Banana
     {
         $this->_newGroup();
         
-        $cuts = displayshortcuts();
-        $res  = '<h1>'._b_('Les forums de Banana').'</h1>'.$cuts.$this->groups->to_html();
+        $res  = $this->groups->to_html();
         if (count($this->newgroups->overview)) {
             $res .= '<p>'._b_('Les forums suivants ont été créés depuis ton dernier passage :').'</p>';
             $res .= $this->newgroups->to_html();
         }
 
         $this->nntp->quit();
-        return $res.$cuts;
+        return $res;
     }
 
     function action_listSubs()
@@ -221,8 +217,7 @@ class Banana
         $this->_require('groups');
         $this->groups = new BananaGroups(BANANA_GROUP_ALL);
         
-        $cuts = displayshortcuts();
-        $res  = '<h1>'._b_('Abonnements').'</h1>'.$cuts.$this->groups->to_html(true).$cuts;
+        $res  = $this->groups->to_html(true);
 
         $this->nntp->quit();
         return $res;
@@ -239,15 +234,13 @@ class Banana
         }
 
         $first = $first - ($first % $this->tmax) + 1;
-
-        $cuts = displayshortcuts($first);
         
-        $res  = '<h1>'.$group.'</h1>'.$cuts;
-        $res  .= $this->spool->to_html($first, $first+$this->tmax);
+        $pages = displayPages($first);
+        $res  = $pages . $this->spool->to_html($first, $first+$this->tmax) . $pages;
 
         $this->nntp->quit();
         
-        return $res.$cuts;
+        return $res;
     }
 
     function action_showArticle($group, $id, $part)
@@ -261,16 +254,14 @@ class Banana
                 $this->spool->delid($id);
             }
             $this->nntp->quit();
-            return displayshortcuts().'<p class="error">'._b_('Impossible d\'accéder au message.   Le message a peut-être été annulé').'</p>';
+            return '<p class="error">'._b_('Impossible d\'accéder au message.   Le message a peut-être été annulé').'</p>';
         }
 
-        $cuts = displayshortcuts();
-        $res  = '<h1>'._b_('Message').'</h1>'.$cuts;
-        $res .= $this->post->to_html($part);
+        $res = $this->post->to_html($part);
 
         $this->nntp->quit();
         
-        return $res.$cuts;
+        return $res;
     }
 
     function action_getAttachment($group, $id, $pjid, $action)
@@ -284,14 +275,14 @@ class Banana
                 $this->spool->delid($id);
             }
             $this->nntp->quit();
-            return displayshortcuts().'<p class="error">'._b_('Impossible d\'accéder au message.   Le message a peut-être été annulé').'</p>';
+            return '<p class="error">'._b_('Impossible d\'accéder au message.   Le message a peut-être été annulé').'</p>';
         }
 
         $this->nntp->quit();
         if ($this->post->get_attachment($pjid, $action)) {
             return "";
         } else {
-            return displayshortcuts().'<p calss="error">'._b_('Impossible d\'accéder à la pièce jointe.').'</p>';
+            return '<p calss="error">'._b_('Impossible d\'accéder à la pièce jointe.').'</p>';
         }
     }
 
@@ -342,9 +333,7 @@ class Banana
 
         $this->nntp->quit();
 
-        $cuts  = displayshortcuts();
-        $html  = '<h1>'._b_('Nouveau message').'</h1>'.$cuts;
-        $html .= '<form enctype="multipart/form-data" action="'
+        $html  = '<form enctype="multipart/form-data" action="'
                . htmlentities(makeLink(Array('group' => $group)))
                .'" method="post" accept-charset="utf-8">';
         $html .= '<table class="bicol" cellpadding="0" cellspacing="0">';
@@ -370,7 +359,7 @@ class Banana
         $html .= '<input type="submit" value="Envoyer le message" /></th></tr>';
         $html .= '</table></form>';
 
-        return $html.$cuts;
+        return $html;
     }
 
     function action_doFup($group, $artid = -1)
