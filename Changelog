@@ -1,4 +1,5 @@
 Sat, 15 Jul 2006                    Florent Bruneau <florent.bruneau@m4x.org>
+	* New tabbed structure
 	* Support of Content-ID references (multipart/related)
 
 Fri, 14 Jul 2006                    Florent Bruneau <florent.bruneau@m4x.org>

@@ -6,17 +6,11 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-div.banana_scuts {
-    text-align: left;
-    padding: 0.5em 0em;
-}
-div.banana_scuts .title {
-    font-weight: bold;
-}
-div.banana_scuts .pages {
+div.pages {
     font-size: 80%;
     text-align: center;
     padding-top: 0.1em;
+    padding-bottom: 0.1em;
 }
 div.banana_action { float: right; }
 div.banana_menu { float: left; }
