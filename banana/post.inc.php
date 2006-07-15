@@ -455,17 +455,18 @@ class BananaPost
             $res .= '<tr><td colspan="2">';
             $i = 0;
             foreach ($this->pj as $file) {
-                $res .= $file['filename'].' ('.$file['MIME'].') : ';
-                $res .= makeHREF(Array('group' => $banana->state['group'],
-                                       'artid' => $this->id,
-                                       'pj'    => $i),
-                                 _b_('télécharger'));
-                $res .= ' . ';
-                $res .= makeHREF(Array('group' => $banana->state['group'],
-                                       'artid' => $this->id,
-                                       'pj'    => $i,
-                                       'action'=> 'view'),
-                                 _b_('aperçu'));
+                $res .= makeImgLink(Array('group' => $banana->state['group'],
+                                          'artid' => $this->id,
+                                          'pj'    => $i),
+                                    'save.gif',
+                                    _b_('Télécharger')) . ' ';
+                $res .= makeImgLink(Array('group' => $banana->state['group'],
+                                          'artid' => $this->id,
+                                          'pj'    => $i,
+                                          'action'=> 'view'),
+                                    'preview.gif',
+                                    _b_('Aperçu'));
+                $res .= ' ' . $file['filename'].' ('.$file['MIME'].')';
                 $res .=  '<br/>';
                 $i++;
             }

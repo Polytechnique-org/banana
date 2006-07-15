@@ -99,7 +99,7 @@ function makeHREF($params, $text = null, $popup = null, $class = null)
     if (isset($params['action']) && $params['action'] == 'view') {
         $target = ' target="_blank"';
     }
-    return '<a href="' . htmlentities($link) . $target . '"' . $popup . $class . '>' . $text . '</a>';
+    return '<a href="' . htmlentities($link) .'"' . $target . $popup . $class . '>' . $text . '</a>';
 }
 
 /** Format tree images links
