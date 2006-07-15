@@ -58,8 +58,10 @@ class BananaPost
 
         if ($this->_split_multipart($this->headers, $this->body)) {
             $this->set_body_to_part(0);
-        } elseif(isset($mpart_type)) {
-            $this->_split_multipart($mpart_type[1], $mpart_boundary[1]);
+        } else {
+            if(isset($mpart_type)) {
+                $this->_split_multipart($mpart_type[1], $mpart_boundary[1]);
+            }
             $this->_find_uuencode();
             $this->_fix_charset();
         }
