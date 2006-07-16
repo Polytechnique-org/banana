@@ -178,7 +178,7 @@ class BananaSpool
         $msgids   = $banana->nntp->xhdr('Message-ID', $arg);
         $refs     = $banana->nntp->xhdr('References', $arg);
 
-        if (is_array($this->ids)) {
+        if (is_array(@$this->ids)) {
             $this->ids = array_merge($this->ids, array_flip($msgids));
         } else {
             $this->ids = array_flip($msgids);
@@ -186,16 +186,11 @@ class BananaSpool
 
         foreach ($msgids as $id=>$msgid) {
             $msg                = new BananaSpoolHead($dates[$id], $subjects[$id], $froms[$id]);
-            if (isset($ref[$id])) {
-                $refs[$id]          = str_replace('><', '> <', $refs[$id]);
-                $msgrefs            = preg_split("/[ \t]/", strtr($refs[$id], $this->ids));
-                $parents            = preg_grep('/^\d+$/', $msgrefs);
-                $msg->parent        = array_pop($parents);
-                $msg->parent_direct = preg_match('/^\d+$/', array_pop($msgrefs));
-            } else {
-                $msg->parent        = null;
-                $msg->parent_direct = null;
-            }
+            $refs[$id]          = str_replace('><', '> <', @$refs[$id]);
+            $msgrefs            = preg_split("/[ \t]/", strtr($refs[$id], $this->ids));
+            $parents            = preg_grep('/^\d+$/', $msgrefs);
+            $msg->parent        = array_pop($parents);
+            $msg->parent_direct = preg_match('/^\d+$/', array_pop($msgrefs));
 
             if (isset($this->overview[$id])) {
                 $msg->desc     = $this->overview[$id]->desc;
