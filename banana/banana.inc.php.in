@@ -335,11 +335,16 @@ class Banana
             $body     = $_POST['body'];
             $target   = $_POST['newsgroups'];
             $followup = $_POST['followup'];
-            $this->state['page'] = 'message';
+            $this->state['page']   = 'action';
+            $this->state['group']  = $group;
+            $this->state['action'] = 'new';
+            if ($id != -1) {
+                $this->state['artid'] = $id;
+            }
         } elseif ($id > 0) {
             $this->nntp->group($group);
             if ($this->_newPost($id)) {
-                $subject  = preg_replace("/^re\s*:\s*/i", '', 'Re: '.$this->post->headers['subject']);
+                $subject  = 'Re: ' . preg_replace("/^re\s*:\s*/i", '', $this->post->headers['subject']);
                 $body     = utf8_encode($this->post->name." "._b_("a écrit"))." :\n"
                                         . wrap($this->post->get_body(), "> ")
                           . $this->profile['sig'] ? "\n\n-- \n". $this->profile['sig'] : '';
@@ -376,8 +381,8 @@ class Banana
                   . '<input type="file" name="newpj" size="40"/></td></tr>';
         }
         $html .= '<tr><th colspan="2">';
-        if ($id > 0) {
-            $html .= '<input type="hidden" name="artid" value="'.$id.'" />';
+        if ($id != -1) {
+            $html .= '<input type="hidden" name="artid" value="' . $id . '" />';
         }
         $html .= '<input type="hidden" name="action" value="new" />'
               . '<input type="submit" value="' . _b_('Envoyer le message') . '" /></th></tr>'

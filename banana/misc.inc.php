@@ -426,7 +426,7 @@ function displayTabs()
     }
     $ret = '<ul id="onglet">';
     foreach ($res as $name=>$onglet) {
-        if ($name != $page) {
+        if ($name != @$page) {
             $ret .= '<li>' . $onglet[0] . '</li>';
         } else {
             $ret .= '<li class="actif">' . $onglet[1] . '</li>';
