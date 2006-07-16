@@ -30,6 +30,7 @@ if ($res != "") {
       <div class="foot">
         <em>Banana</em>, a Web interface for a NNTP Server<br />
         Developed under GPL License for <a href="http://www.polytechnique.org">Polytechnique.org</a>
+        Use <em>silk</em> icons from <a href="http://www.famfamfam.com/lab/icons/silk/">www.famfamfam.com</a>
       </div>
     </div>
   </body>
