@@ -415,14 +415,15 @@ class BananaPost
              . makeImgLink(Array('group'  => $banana->state['group'],
                                  'action' => 'new'),
                            'post.gif',
-                           _b_('Nouveau message'))
+                           _b_('Nouveau message')) . '&nbsp;'
              . makeImgLink(Array('group'  => $banana->state['group'],
                                  'artid'  => $this->id,
                                  'action' => 'new'),
                            'reply.gif',
                            _b_('Répondre'));
         if ($this->checkCancel()) {
-            $res .= makeImgLink(Array('group'  => $banana->state['group'],
+            $res .= '&nbsp;'
+                  . makeImgLink(Array('group'  => $banana->state['group'],
                                       'artid'  => $this->id,
                                       'action' => 'cancel'),
                                 'cancel.gif',
