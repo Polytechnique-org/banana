@@ -49,6 +49,10 @@ h1 {
     margin: 1em 0em;
 }
 
+/****
+ * Bicolor table
+ */
+
 table.bicol {
     border-collapse: collapse;
     border: 1px solid #a2c2e1;
@@ -66,7 +70,11 @@ table.bicol th {
 
 table.bicol td { padding: 0px 4px; }
 
-table.cadre_a_onglet{
+/****
+ * Tabs
+ */
+
+table.cadre_a_onglet {
     width: 100%;
     border-width: 0;
     padding : 0;
@@ -84,6 +92,7 @@ td.conteneur_tab {
     display : block;
     margin : 0;
     padding : 0;
+    margin-left: 3px;
 }
 
 #onglet li {
@@ -97,19 +106,21 @@ td.conteneur_tab {
     border-color : #a2c2e1;
     border-bottom-color : #a2c2e1;
     width: auto;
-    height: 5ex;
+    height: 3.5ex;
     text-align: center;
+    font-size: 80%;
+    vertical-align: middle;
 }
 
 #onglet li:hover { background : #d6e1ec; }
 
 #onglet li.actif {
+    font-weight: bold;
     background-color: #fff;
-    border-bottom-color : #eceade;
+    border-bottom-color : #fff;
 }
 
 #onglet li a {
-    font-size: 80%;
     font-weight : normal;
     text-decoration : none;
 }

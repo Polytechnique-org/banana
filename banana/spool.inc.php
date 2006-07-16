@@ -186,11 +186,16 @@ class BananaSpool
 
         foreach ($msgids as $id=>$msgid) {
             $msg                = new BananaSpoolHead($dates[$id], $subjects[$id], $froms[$id]);
-            $refs[$id]          = str_replace('><', '> <', $refs[$id]);
-            $msgrefs            = preg_split("/[ \t]/", strtr($refs[$id], $this->ids));
-            $parents            = preg_grep('/^\d+$/', $msgrefs);
-            $msg->parent        = array_pop($parents);
-            $msg->parent_direct = preg_match('/^\d+$/', array_pop($msgrefs));
+            if (isset($ref[$id])) {
+                $refs[$id]          = str_replace('><', '> <', $refs[$id]);
+                $msgrefs            = preg_split("/[ \t]/", strtr($refs[$id], $this->ids));
+                $parents            = preg_grep('/^\d+$/', $msgrefs);
+                $msg->parent        = array_pop($parents);
+                $msg->parent_direct = preg_match('/^\d+$/', array_pop($msgrefs));
+            } else {
+                $msg->parent        = null;
+                $msg->parent_direct = null;
+            }
 
             if (isset($this->overview[$id])) {
                 $msg->desc     = $this->overview[$id]->desc;
