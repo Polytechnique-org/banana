@@ -352,6 +352,9 @@ class Banana
                                 $this->post->headers['followup-to'] : $this->post->headers['newsgroups'];
                 $followup = null;
             }
+        } else {
+            $subject = $target = $followup = null;
+            $body = $this->profile['sig'] ? "\n\n-- \n". $this->profile['sig'] : '';
         }
 
         $this->nntp->quit();
@@ -373,7 +376,7 @@ class Banana
                . '<td>' . $this->profile['org'] . '</td></tr>'
                . '<tr><th colspan="2">' . _b_('Corps') . '</th></tr>'
                . '<tr><td colspan="2"><textarea name="body" cols="74" rows="16">'
-               .  to_entities($body) . '</textarea></td></tr>';
+               .  $body . '</textarea></td></tr>';
         if ($this->can_attach) {
             $html .= '<tr><th colspan="2">' . _b_('Pièce jointe') . '</th></tr>'
                   . '<tr><td colspan="2">'
@@ -475,7 +478,8 @@ class Banana
             }
             redirectInBanana($dir);
         } else {
-            return '<p class="error">' . _b_('Impossible de poster le message') . '</p>'
+            return '<p class="error">' . _b_('Impossible de poster le message. Le serveur a retourné l\'erreur :') . '</p>'
+                   . '<pre class="error">' . utf8_encode($this->nntp->lasterrortext) .'</pre>'
                    . $this->action_newFup($group, $artid);
         }
     }
