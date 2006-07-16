@@ -78,4 +78,9 @@ table.banana_msg blockquote blockquote blockquote {
 
 div.center { text-align: center; padding: 1em; }
 p.error { color: red; background: inherit; }
+pre.error {
+    color: red;
+    margin-left: 2em;
+    font-size: 90%;
+}
 
