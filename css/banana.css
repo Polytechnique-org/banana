@@ -101,7 +101,7 @@ td.conteneur_tab {
     text-align: center;
 }
 
-#onglet li:hover { background : #fc3; }
+#onglet li:hover { background : #d6e1ec; }
 
 #onglet li.actif {
     background-color: #fff;

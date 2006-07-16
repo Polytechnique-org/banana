@@ -209,7 +209,8 @@ class BananaPost
      */
     function _fix_charset()
     {
-        if (preg_match('!charset="?([^;"]*)"?\s*(;|$)?!', $this->headers['content-type'], $matches)) {
+        if (isset($this->headers['content-type'])
+                && preg_match('!charset="?([^;"]*)"?\s*(;|$)?!', $this->headers['content-type'], $matches)) {
             $body = iconv($matches[1], 'utf-8', $this->body);
             if (strlen($body) == 0) {
                 return false;
@@ -470,8 +471,12 @@ class BananaPost
             $res .= '</th></tr>';
         }
  
-        preg_match("@text/([^;]+);@", $this->headers['content-type'], $format);
-        $format = $format[1];
+        if (isset($this->headers['content-type'])
+                && preg_match("@text/([^;]+);@", $this->headers['content-type'], $format)) {
+            $format = $format[1];
+        } else {
+            $format = 'plain';
+        }
         $res .= '<tr class="impair"><td colspan="2" class="body"';
         if ($format == 'html') {
             if (preg_match('@<body[^>]*bgcolor="?([#0-9a-f]+)"?[^>]*>@i', $this->body, $bgcolor)) {

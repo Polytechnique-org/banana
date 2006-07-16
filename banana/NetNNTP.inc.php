@@ -475,8 +475,9 @@ class nntp
             
         $array  = array();
         while (($result = $this->gline()) != '.') {
-            preg_match("/([^ \t]+) (.*)$/", $result, $regs);
-            $array[$regs[1]] = $regs[2];
+            if (preg_match("/([^ \t]+) (.*)$/", $result, $regs)) {
+                $array[$regs[1]] = $regs[2];
+            }
         }
         return $array;
     }
