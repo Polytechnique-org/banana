@@ -479,16 +479,14 @@ function makeTable($text)
  *  FORMATTING STUFF : BODY
  */
 
-function autoformat($text, $part = false)
+function autoformat($text)
 {
     global $banana;
     $length = $banana->wrap;
-    $all = null;
-    if (!$part) {
-        $all = ', all=1';
-    }
     
-    $cmd = "echo ".escapeshellarg($text)." | perl -MText::Autoformat -e 'autoformat {left=>1, right=>$length$all };'";
+    $cmd = 'echo ' . escapeshellarg($text)
+         . ' | perl -MText::Autoformat -e \'autoformat {left=>1, right=>' . $length . ', all=>1 };\'';
+
     exec($cmd, $result, $ret);
     if ($ret != 0) {
         $result = split("\n", $text);
@@ -505,7 +503,7 @@ function wrap($text, $_prefix="", $_force=false)
     } else {
         $sign = '';
     }
-   
+
     global $banana;
     $url    = $banana->url_regexp;
     $length = $banana->wrap;
@@ -541,12 +539,8 @@ function wrap($text, $_prefix="", $_force=false)
                     }
                 }
             } else {
-                if (strlen($line) > 2 * $max) {
-                    $next = array_merge($next, autoformat($line, true));
-                } else {
-                    $format = true;
-                    array_push($next, $line);
-                }
+                array_push($next, $line);
+                $format = true;
             }
         } else {
             array_push($next, $line);
@@ -575,6 +569,13 @@ function cleanurl($url)
 {
     $url = str_replace('@', '%40', $url);
     return '<a href="'.$url.'" title="'.$url.'">'.cutlink($url).'</a>';
+}
+
+/** Remove quotation marks
+ */
+function replaceQuotes($text)
+{
+    return stripslashes(preg_replace("@(^|<pre>|\n)&gt;[ \t\r]*@i", '\1', $text));
 }
 
 function formatbody($_text, $format='plain', $flowed=false)
@@ -611,8 +612,8 @@ function formatbody($_text, $format='plain', $flowed=false)
         while (preg_match("@(^|<pre>|\n)&gt;@i", $res)) {
             $res  = preg_replace("@(^|<pre>|\n)((&gt;[^\n]*\n)+)@ie",
                 "'\\1</pre><blockquote><pre>'"
-                .".stripslashes(preg_replace('@(^|<pre>|\n)&gt;[ \\t\\r]*@i', '\\1', '\\2'))"
-                .".'</pre></blockquote><pre>'",
+                ." . replaceQuotes('\\2')"
+                ." . '</pre></blockquote><pre>'",
                 $res);
         }
         $res = preg_replace("@<pre>-- ?\n@", "<pre>\n-- \n", $res);
