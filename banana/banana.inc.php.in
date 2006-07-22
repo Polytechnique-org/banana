@@ -53,7 +53,7 @@ class Banana
      *   $matches[2] = "http://www.polytechnique.org"
      *   $matches[3] = "]"
      */
-    var $url_regexp  = '(["\[])?((?:https?|ftp|news)://(?:&amp;|,?[a-z@0-9.~%$£µ&i#\-+=_/\?])*)(["\]])?';
+    var $url_regexp  = '(["\[])?((?:https?|ftp|news)://(?:&amp;|,*[a-z@0-9.~%$£µ&i#\-+=_/\?])*)(["\]])?';
 
     
     /** Boundary for multipart messages
