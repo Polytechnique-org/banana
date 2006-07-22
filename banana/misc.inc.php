@@ -571,6 +571,14 @@ function cleanurl($url)
     return '<a href="'.$url.'" title="'.$url.'">'.cutlink($url).'</a>';
 }
 
+function catchMailLink($email)
+{
+    if (strpos($email, '$') !== false) {
+        return $email;
+    }   
+    return '<a href="mailto:' . $email . '">' . $email . '</a>';
+}
+
 /** Remove quotation marks
  */
 function replaceQuotes($text)
@@ -594,7 +602,9 @@ function formatbody($_text, $format='plain', $flowed=false)
         $url  = $banana->url_regexp;
         $res  = preg_replace("/(&lt;|&gt;|&quot;)/", " \\1 ", $res);
         $res  = preg_replace("!$url!ie", "'\\1'.cleanurl('\\2').'\\3'", $res);
-        $res  = preg_replace('/(["\[])?(?:mailto:)?([a-z0-9.\-+_]+@[a-z0-9.\-+_]+)(["\]])?/i', '\1<a href="mailto:\2">\2</a>\3', $res);
+        $res  = preg_replace('/(["\[])?(?:mailto:)?([a-z0-9.\-+_\$]+@[a-z0-9.\-+_]+)(["\]])?/ie',
+                             "'\\1' . catchMailLink('\\2') . '\\3'",
+                             $res);
         $res  = preg_replace("/ (&lt;|&gt;|&quot;) /", "\\1", $res);
 
         if ($format == 'richtext') {

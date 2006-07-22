@@ -1,3 +1,7 @@
+Sat, 22 Jul 2006                    Florent Bruneau <florent.bruneau@m4x.org>
+	* Impove url and email catcher
+	* Bugfix: quotes formating
+
 Sat, 15 Jul 2006                    Florent Bruneau <florent.bruneau@m4x.org>
 	* New tabbed structure
 	* Support of Content-ID references (multipart/related)
