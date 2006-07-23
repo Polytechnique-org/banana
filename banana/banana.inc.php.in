@@ -316,10 +316,14 @@ class Banana
              . "\n"
              . "Message canceled with Banana";
         if ($this->nntp->post($msg)) {
+            $ndx = $this->spool->getndx($artid) - 1;
+            if ($ndx > 50) {
+                $ndx = 0;
+            }
             $this->spool->delid($id);
             $this->nntp->quit();
             redirectInBanana(Array('group' => $group,
-                                   'first' => $id));
+                                   'first' => $ndx));
         } else {
             return '<p class="error">'._b_('Impossible d\'annuler le message').'</p>';
         }
@@ -475,7 +479,10 @@ class Banana
         if ($this->nntp->post($msg)) {
             $dir = Array('group' => $group);
             if ($artid != -1) {
-                $dir['first'] = $artid;
+                $ndx = $this->spool->getndx($artid);
+                if ($ndx > 50) {
+                    $dir['first'] = $ndx;
+                }
             }
             redirectInBanana($dir);
         } else {
