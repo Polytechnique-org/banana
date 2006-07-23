@@ -319,7 +319,7 @@ class Banana
             $this->spool->delid($id);
             $this->nntp->quit();
             redirectInBanana(Array('group' => $group,
-                           'first' => $id));
+                                   'first' => $id));
         } else {
             return '<p class="error">'._b_('Impossible d\'annuler le message').'</p>';
         }
@@ -345,16 +345,17 @@ class Banana
             $this->nntp->group($group);
             if ($this->_newPost($id)) {
                 $subject  = 'Re: ' . preg_replace("/^re\s*:\s*/i", '', $this->post->headers['subject']);
-                $body     = utf8_encode($this->post->name." "._b_("a écrit"))." :\n"
+                $body     = to_entities(utf8_encode($this->post->name." "._b_("a écrit"))." :\n"
                                         . wrap($this->post->get_body(), "> ")
-                          . $this->profile['sig'] ? "\n\n-- \n". $this->profile['sig'] : '';
+                          . ($this->profile['sig'] ? "\n\n-- \n". $this->profile['sig'] : ''));
                 $target   = isset($this->post->headers['followup-to']) ?
                                 $this->post->headers['followup-to'] : $this->post->headers['newsgroups'];
                 $followup = null;
             }
         } else {
-            $subject = $target = $followup = null;
-            $body = $this->profile['sig'] ? "\n\n-- \n". $this->profile['sig'] : '';
+            $targe   = $group;
+            $subject = $followup = null;
+            $body    = $this->profile['sig'] ? "\n\n-- \n". $this->profile['sig'] : '';
         }
 
         $this->nntp->quit();
