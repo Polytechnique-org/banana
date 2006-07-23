@@ -76,6 +76,10 @@ table.banana_msg blockquote blockquote blockquote {
 	color: #cc0000;
 	border-color: #cc0000;
 }
+table.banana_msg blockquote blockquote blockquote blockquote {
+    color: #aaaa00;
+    border-color: #aaaa00;
+}
 
 /** MISC **/
 
