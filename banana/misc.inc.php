@@ -300,7 +300,7 @@ function formatDisplayHeader($_header,$_text) {
 
         case "from":
             return formatFrom($_text);
-        
+
         case "references":
             $rsl     = "";
             $ndx     = 1;
@@ -573,7 +573,13 @@ function cleanurl($url)
 
 function catchMailLink($email)
 {
-    if (strpos($email, '$') !== false) {
+    global $banana;
+    $mid = '<' . $email . '>';
+    if (isset($banana->spool->ids[$mid])) {
+        return makeHREF(Array('group' => $banana->state['group'],
+                              'artid' => $banana->spool->ids[$mid]),
+                        $email);
+    } elseif (strpos($email, '$') !== false) {
         return $email;
     }   
     return '<a href="mailto:' . $email . '">' . $email . '</a>';
@@ -602,8 +608,8 @@ function formatbody($_text, $format='plain', $flowed=false)
         $url  = $banana->url_regexp;
         $res  = preg_replace("/(&lt;|&gt;|&quot;)/", " \\1 ", $res);
         $res  = preg_replace("!$url!ie", "'\\1'.cleanurl('\\2').'\\3'", $res);
-        $res  = preg_replace('/(["\[])?(?:mailto:)?([a-z0-9.\-+_\$]+@[a-z0-9.\-+_]+)(["\]])?/ie',
-                             "'\\1' . catchMailLink('\\2') . '\\3'",
+        $res  = preg_replace('/(["\[])?(?:mailto:|news:)?([a-z0-9.\-+_\$]+@([\-.+_]?[a-z0-9])+)(["\]])?/ie',
+                             "'\\1' . catchMailLink('\\2') . '\\4'",
                              $res);
         $res  = preg_replace("/ (&lt;|&gt;|&quot;) /", "\\1", $res);
 
