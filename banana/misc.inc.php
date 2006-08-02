@@ -626,7 +626,7 @@ function formatbody($_text, $format='plain', $flowed=false)
         $sign  = '<hr style="width: 100%; margin: 1em 0em; " />';
     } else {
         while (preg_match("@(^|<pre>|\n)&gt;@i", $res)) {
-            $res  = preg_replace("@(^|<pre>|\n)((&gt;[^\n]*\n)+)@ie",
+            $res  = preg_replace("@(^|<pre>|\n)((&gt;[^\n]*(?:\n|$))+)@ie",
                 "'\\1</pre><blockquote><pre>'"
                 ." . replaceQuotes('\\2')"
                 ." . '</pre></blockquote><pre>'",
