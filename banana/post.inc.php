@@ -360,9 +360,10 @@ class BananaPost
     {
         global $banana;
         $ret = '<div class="banana_menu">';
-        $actions = Array('prevThread' => Array('prev_thread', _b_('Discussion précédente')),
+        $actions = Array('nextUnread' => Array('next_unread', _b_('Message non-lu suivant')),
                          'prevPost'   => Array('prev',        _b_('Article précédent')),
                          'nextPost'   => Array('next',        _b_('Article suivant')),
+                         'prevThread' => Array('prev_thread', _b_('Discussion précédente')),
                          'nextThread' => Array('next_thread', _b_('Discussion suivante')));
         foreach ($actions as $method=>$params) {
             $id = $banana->spool->$method($this->id);
