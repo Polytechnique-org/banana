@@ -592,6 +592,9 @@ class BananaSpool
         // Look in current thread
         $cur = $id;
         while (true) {
+            if (is_null($cur)) {
+                break;
+            }
             $parent = $this->overview[$cur]->parent;
             $ok     = false;
             if (is_null($parent)) {
