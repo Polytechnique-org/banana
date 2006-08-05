@@ -561,6 +561,59 @@ class BananaSpool
         }
         return null;
     }
+
+    /** Look for an unread message in the thread rooted by the message
+     * @param id INTEGER message number
+     */
+    function _nextUnread($id)
+    {
+        if (!$this->overview[$id]->isread) {
+            return $id;
+        }
+        foreach ($this->overview[$id]->children as $child) {
+            return $this->_nextUnread($child);
+        }
+        return null;
+    }
+
+    /** Find next unread message
+     * @param id INTEGER message number
+     */
+    function nextUnread($id)
+    {
+        // Look in message children
+        foreach ($this->overview[$id]->children as $child) {
+            $next = $this->_nextUnread($child);
+            if (is_null($next)) {
+                return $next;
+            }
+        }
+
+        // Look in current thread
+        $cur = $id;
+        while (true) {
+            $parent = $this->overview[$cur]->parent;
+            $ok     = false;
+            if (is_null($parent)) {
+                $array = &$this->overview[$parent]->children;
+            } else {
+                $array = &$this->roots;
+            }
+            foreach ($array as $child) {
+                if ($ok) {
+                    $next = $this->_nextUnread($child);
+                    if (!is_null($next)) {
+                        return $next;
+                    }
+                }
+                if ($child == $cur) {
+                    $ok = true;
+                }
+            }
+            $cur = $parent;
+        }
+        return null;
+    }    
 }
 
 // vim:set et sw=4 sts=4 ts=4
