@@ -584,20 +584,17 @@ class BananaSpool
         // Look in message children
         foreach ($this->overview[$id]->children as $child) {
             $next = $this->_nextUnread($child);
-            if (is_null($next)) {
+            if (!is_null($next)) {
                 return $next;
             }
         }
 
         // Look in current thread
         $cur = $id;
-        while (true) {
-            if (is_null($cur)) {
-                break;
-            }
+        while (!is_null($cur)) {
             $parent = $this->overview[$cur]->parent;
             $ok     = false;
-            if (is_null($parent)) {
+            if (!is_null($parent)) {
                 $array = &$this->overview[$parent]->children;
             } else {
                 $array = &$this->roots;
