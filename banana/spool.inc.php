@@ -571,7 +571,10 @@ class BananaSpool
             return $id;
         }
         foreach ($this->overview[$id]->children as $child) {
-            return $this->_nextUnread($child);
+            $unread = $this->_nextUnread($child);
+            if (!is_null($unread)) {
+                return $unread;
+            }    
         }
         return null;
     }
