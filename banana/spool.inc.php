@@ -405,9 +405,25 @@ class BananaSpool
         $new .= '</div>';
         
         if (is_null($_ref)) {
-            $res .= '<tr><th>' . _b_('Date') . '</th>';
-            $res .= '<th>' . $new . _b_('Sujet') . '</th>';
-            $res .= '<th>' . _b_('Auteur') . '</th></tr>';
+            $next = $this->nextUnread();
+            if (!is_null($next)) {
+                $next = '<div class="banana_menu">'
+                      . makeImgLink(Array('group' => $this->group,
+                                          'artid' => $next),
+                                    'next_unread.gif',
+                                    _b_('Message non-lu suivant'))
+                      . '</div>';
+            }
+            $new  = '<div class="banana_action">'
+                  . makeImgLink(Array('group'  => $this->group,
+                                      'action' => 'new'),
+                                'post.gif',
+                                _b_('Nouveau message'))
+                  . '</div>';
+
+            $res .= '<tr><th>' . $next . _b_('Date') . '</th>';
+            $res .= '<th>' .  _b_('Sujet') . '</th>';
+            $res .= '<th>' . $new . _b_('Auteur') . '</th></tr>';
         } else {
             $res .= '<tr><th colspan="3">' . _b_('Aperçu de ')
                  . makeHREF(Array('group' => $this->group),
@@ -582,21 +598,23 @@ class BananaSpool
     /** Find next unread message
      * @param id INTEGER message number
      */
-    function nextUnread($id)
+    function nextUnread($id = null)
     {
-        // Look in message children
-        foreach ($this->overview[$id]->children as $child) {
-            $next = $this->_nextUnread($child);
-            if (!is_null($next)) {
-                return $next;
+        if (!is_null($id)) {
+            // Look in message children
+            foreach ($this->overview[$id]->children as $child) {
+                $next = $this->_nextUnread($child);
+                if (!is_null($next)) {
+                    return $next;
+                }
             }
         }
 
         // Look in current thread
         $cur = $id;
-        while (!is_null($cur)) {
-            $parent = $this->overview[$cur]->parent;
-            $ok     = false;
+        do {
+            $parent = is_null($cur) ? null : $this->overview[$cur]->parent;
+            $ok     = is_null($cur) ? true : false;
             if (!is_null($parent)) {
                 $array = &$this->overview[$parent]->children;
             } else {
@@ -614,7 +632,7 @@ class BananaSpool
                 }
             }
             $cur = $parent;
-        }
+        } while(!is_null($cur));
         return null;
     }    
 }
