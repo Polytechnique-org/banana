@@ -465,11 +465,17 @@ function displayPages($first = -1)
 
 function makeTable($text)
 {
+    $links = null;
+    if (function_exists('hook_browsingAction')) {
+        $links = hook_browsingAction();
+    }
+
     return '<table class="cadre_a_onglet" cellpadding="0" cellspacing="0" width="100%">'
          . '<tr><td>'
          . displayTabs()
          . '</td></tr>'
          . '<tr><td class="conteneur_tab">'
+         . $links
          . $text
          . '</td></tr>'
          . '</table>';
@@ -552,7 +558,11 @@ function wrap($text, $_prefix="", $_force=false, $firstpass = true)
         $result = array_merge($result, $next);
     }
 
-    $result = $_prefix.join("\n$_prefix", $result).($_prefix ? '' : $sign);
+    $break = "\n";
+    if (!$firstpass) {
+        $break .= $_prefix;
+    }
+    $result = $_prefix.join($break, $result).($_prefix ? '' : $sign);
     if ($firstpass) {
         return wrap($result, $_prefix, $_force, false);
     }
