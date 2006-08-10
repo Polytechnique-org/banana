@@ -479,13 +479,13 @@ function makeTable($text)
  *  FORMATTING STUFF : BODY
  */
 
-function autoformat($text)
+function autoformat($text, $force = 0)
 {
     global $banana;
     $length = $banana->wrap;
-    
+    $force  = $force ? 1 : 0; 
     $cmd = 'echo ' . escapeshellarg($text)
-         . ' | perl -MText::Autoformat -e \'autoformat {left=>1, right=>' . $length . ', all=>1 };\'';
+         . ' | perl -MText::Autoformat -e \'autoformat {left=>1, right=>' . $length . ', all=>' . $force . ' };\'';
 
     exec($cmd, $result, $ret);
     if ($ret != 0) {
@@ -494,7 +494,7 @@ function autoformat($text)
     return $result;
 }                                
 
-function wrap($text, $_prefix="", $_force=false)
+function wrap($text, $_prefix="", $_force=false, $firstpass = true)
 {
     $parts = preg_split("/\n-- ?\n/", $text);
     if (count($parts)  >1) {
@@ -524,7 +524,7 @@ function wrap($text, $_prefix="", $_force=false)
                 }
                     
                 if ($format) {
-                    $result = array_merge($result, autoformat(join("\n", $next)));
+                    $result = array_merge($result, autoformat(join("\n", $next), $firstpass));
                 } else {
                     $result = array_merge($result, $next);
                 }
@@ -547,12 +547,16 @@ function wrap($text, $_prefix="", $_force=false)
         }
     }
     if ($format) {
-        $result = array_merge($result, autoformat(join("\n", $next)));
+        $result = array_merge($result, autoformat(join("\n", $next), $firstpass));
     } else {
         $result = array_merge($result, $next);
     }
 
-    return $_prefix.join("\n$_prefix", $result).($_prefix ? '' : $sign);
+    $result = $_prefix.join("\n$_prefix", $result).($_prefix ? '' : $sign);
+    if ($firstpass) {
+        return wrap($result, $_prefix, $_force, false);
+    }
+    return $result;
 }
 
 function cutlink($link)
