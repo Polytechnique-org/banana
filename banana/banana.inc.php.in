@@ -479,10 +479,7 @@ class Banana
         if ($this->nntp->post($msg)) {
             $dir = Array('group' => $group);
             if ($artid != -1) {
-                $ndx = $this->spool->getndx($artid);
-                if ($ndx > 50) {
-                    $dir['first'] = $ndx;
-                }
+                $dir['artid'] = $artid;
             }
             redirectInBanana($dir);
         } else {

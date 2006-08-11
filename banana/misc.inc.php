@@ -559,10 +559,12 @@ function wrap($text, $_prefix="", $_force=false, $firstpass = true)
     }
 
     $break = "\n";
+    $prefix = null;
     if (!$firstpass) {
         $break .= $_prefix;
+        $prefix = $_prefix;
     }
-    $result = $_prefix.join($break, $result).($_prefix ? '' : $sign);
+    $result = $prefix.join($break, $result).($prefix ? '' : $sign);
     if ($firstpass) {
         return wrap($result, $_prefix, $_force, false);
     }
