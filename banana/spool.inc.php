@@ -397,13 +397,6 @@ class BananaSpool
     {
         $res  = '<table class="bicol banana_thread" cellpadding="0" cellspacing="0">';
        
-        $new  = '<div class="banana_action">'
-              . makeImgLink(Array('group'  => $this->group,
-                                  'action' => 'new'),
-                            'post.gif',
-                            _b_('Nouveau message'));
-        $new .= '</div>';
-        
         if (is_null($_ref)) {
             $next = $this->nextUnread();
             if (!is_null($next)) {
@@ -411,14 +404,14 @@ class BananaSpool
                       . makeImgLink(Array('group' => $this->group,
                                           'artid' => $next),
                                     'next_unread.gif',
-                                    _b_('Message non-lu suivant'))
+                                    _b_('Message non-lu suivant'), null, null, null, 'u')
                       . '</div>';
             }
             $new  = '<div class="banana_action">'
                   . makeImgLink(Array('group'  => $this->group,
                                       'action' => 'new'),
                                 'post.gif',
-                                _b_('Nouveau message'))
+                                _b_('Nouveau message'), null, null, null, 'p')
                   . '</div>';
 
             $res .= '<tr><th>' . $next . _b_('Date') . '</th>';

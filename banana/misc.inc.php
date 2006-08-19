@@ -83,11 +83,14 @@ function makeLink($params)
 /** Format a link to be use in a link
  * @ref makeLink
  */
-function makeHREF($params, $text = null, $popup = null, $class = null)
+function makeHREF($params, $text = null, $popup = null, $class = null, $accesskey = null)
 {
     $link = makeLink($params);
     if (is_null($text)) {
         $text = $link;
+    }
+    if (!is_null($accesskey)) {
+        $popup .= ' (raccourci : ' . $accesskey . ')';
     }
     if (!is_null($popup)) {
         $popup = ' title="' . $popup . '"';
@@ -99,7 +102,13 @@ function makeHREF($params, $text = null, $popup = null, $class = null)
     if (isset($params['action']) && $params['action'] == 'view') {
         $target = ' target="_blank"';
     }
-    return '<a href="' . htmlentities($link) .'"' . $target . $popup . $class . '>' . $text . '</a>';
+    if (!is_null($accesskey)) {
+        $accesskey = ' accesskey="' . $accesskey . '"';
+    }
+
+    return '<a href="' . htmlentities($link) . '"' 
+          . $target . $popup . $class . $accesskey
+          . '>' . $text . '</a>';
 }
 
 /** Format tree images links
@@ -133,12 +142,13 @@ function makeImg($img, $alt, $height = null, $width = null)
 
 /** Make a link using an image
  */
-function makeImgLink($params, $img, $alt, $height = null, $width = null, $class = null)
+function makeImgLink($params, $img, $alt, $height = null, $width = null, $class = null, $accesskey = null)
 {
     return makeHREF($params,
                     makeImg($img, ' [' . $alt . ']', $height, $width),
                     $alt,
-                    $class);
+                    $class,
+                    $accesskey);
 }
 
 /********************************************************************************

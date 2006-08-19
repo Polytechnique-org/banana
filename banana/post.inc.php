@@ -360,18 +360,20 @@ class BananaPost
     {
         global $banana;
         $ret = '<div class="banana_menu">';
-        $actions = Array('nextUnread' => Array('next_unread', _b_('Message non-lu suivant')),
-                         'prevPost'   => Array('prev',        _b_('Article précédent')),
-                         'nextPost'   => Array('next',        _b_('Article suivant')),
-                         'prevThread' => Array('prev_thread', _b_('Discussion précédente')),
-                         'nextThread' => Array('next_thread', _b_('Discussion suivante')));
+        $actions = Array('nextUnread' => Array('next_unread', _b_('Message non-lu suivant'), 'u'),
+                         'prevPost'   => Array('prev',        _b_('Article précédent'), 'a'),
+                         'nextPost'   => Array('next',        _b_('Article suivant'), 'z'),
+                         'prevThread' => Array('prev_thread', _b_('Discussion précédente'), 'q'),
+                         'nextThread' => Array('next_thread', _b_('Discussion suivante'), 's'));
         foreach ($actions as $method=>$params) {
             $id = $banana->spool->$method($this->id);
             if (!is_null($id)) {
                 $ret .= makeImgLink(Array('group' => $banana->state['group'],
                                           'artid' => $id),
                                     $params[0] . '.gif',
-                                    $params[1]);
+                                    $params[1],
+                                    null, null, null,
+                                    $params[2]);
             }
         }
         return $ret . '</div>';
@@ -416,19 +418,19 @@ class BananaPost
              . makeImgLink(Array('group'  => $banana->state['group'],
                                  'action' => 'new'),
                            'post.gif',
-                           _b_('Nouveau message')) . '&nbsp;'
+                           _b_('Nouveau message'), null, null, null, 'p') . '&nbsp;'
              . makeImgLink(Array('group'  => $banana->state['group'],
                                  'artid'  => $this->id,
                                  'action' => 'new'),
                            'reply.gif',
-                           _b_('Répondre'));
+                           _b_('Répondre'), null, null, null, 'r');
         if ($this->checkCancel()) {
             $res .= '&nbsp;'
                   . makeImgLink(Array('group'  => $banana->state['group'],
                                       'artid'  => $this->id,
                                       'action' => 'cancel'),
                                 'cancel.gif',
-                                _b_('Annuler'));
+                                _b_('Annuler'), null, null, null, 'c');
         }
         $res .= '</div>'
              . formatDisplayHeader('subject', $this->headers['subject'])
