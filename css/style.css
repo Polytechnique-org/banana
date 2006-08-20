@@ -61,24 +61,28 @@ table.banana_msg td.thrd { padding: 0px; }
 table.banana_msg table { border: 0px; padding: 0px; margin: 0px; width: 100%; }
 
 table.banana_msg blockquote {
-        color: blue;
-        font-style: italic;
-        margin-left: 0;
-        padding-left: 1em;
-        border-left: solid 1px;
-        border-color: blue;
+    color: blue;
+    font-style: italic;
+    margin-left: 0;
+    padding-left: 1em;
+    border-left: solid 1px;
+    border-color: blue;
+    background: inherit;    
 }
 table.banana_msg blockquote blockquote {
 	color: green;
 	border-color: green;
+    background: inherit;
 }
 table.banana_msg blockquote blockquote blockquote {
 	color: #cc0000;
 	border-color: #cc0000;
+    background: inherit;
 }
 table.banana_msg blockquote blockquote blockquote blockquote {
     color: #aaaa00;
     border-color: #aaaa00;
+    background: inherit;
 }
 
 /** MISC **/
@@ -89,5 +93,6 @@ pre.error {
     color: red;
     margin-left: 2em;
     font-size: 90%;
+    background: inherit;
 }
 
