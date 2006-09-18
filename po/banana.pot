@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-07-15 17:47+0200\n"
+"POT-Creation-Date: 2006-09-18 21:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,11 +16,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../banana/banana.inc.php:54
+#: ../banana/banana.inc.php:54 ../banana/banana.inc.php:119
 msgid "Impossible de contacter le serveur"
 msgstr ""
 
-#: ../banana/banana.inc.php:93
+#: ../banana/banana.inc.php:93 ../banana/banana.inc.php:169
 msgid "Voulez-vous vraiment annuler ce message ?"
 msgstr ""
 
@@ -28,7 +28,7 @@ msgstr ""
 msgid "Les forums de Banana"
 msgstr ""
 
-#: ../banana/banana.inc.php:126
+#: ../banana/banana.inc.php:126 ../banana/banana.inc.php:215
 msgid "Les forums suivants ont été créés depuis ton dernier passage :"
 msgstr ""
 
@@ -36,7 +36,8 @@ msgstr ""
 msgid "Abonnements"
 msgstr ""
 
-#: ../banana/banana.inc.php:175
+#: ../banana/banana.inc.php:175 ../banana/banana.inc.php:265
+#: ../banana/banana.inc.php:286
 msgid "Impossible d'accéder au message.   Le message a peut-être été annulé"
 msgstr ""
 
@@ -44,15 +45,15 @@ msgstr ""
 msgid "Message"
 msgstr ""
 
-#: ../banana/banana.inc.php:194
+#: ../banana/banana.inc.php:194 ../banana/banana.inc.php:309
 msgid "Vous n'avez pas les permissions pour annuler ce message"
 msgstr ""
 
-#: ../banana/banana.inc.php:208
+#: ../banana/banana.inc.php:208 ../banana/banana.inc.php:328
 msgid "Impossible d'annuler le message"
 msgstr ""
 
-#: ../banana/banana.inc.php:222
+#: ../banana/banana.inc.php:222 ../banana/banana.inc.php:352
 msgid "a écrit"
 msgstr ""
 
@@ -61,31 +62,36 @@ msgid "Nouveau message"
 msgstr ""
 
 #: ../banana/banana.inc.php:233 ../banana/post.inc.php:100
+#: ../banana/banana.inc.php:371
 msgid "En-têtes"
 msgstr ""
 
 #: ../banana/banana.inc.php:234 ../banana/groups.inc.php:93
+#: ../banana/banana.inc.php:372
 msgid "Nom"
 msgstr ""
 
 #: ../banana/banana.inc.php:235 ../banana/misc.inc.php:34
-#: ../banana/spool.inc.php:360
+#: ../banana/spool.inc.php:360 ../banana/banana.inc.php:374
 msgid "Sujet"
 msgstr ""
 
 #: ../banana/banana.inc.php:236 ../banana/misc.inc.php:35
+#: ../banana/banana.inc.php:376
 msgid "Forums"
 msgstr ""
 
-#: ../banana/banana.inc.php:237
+#: ../banana/banana.inc.php:237 ../banana/banana.inc.php:378
 msgid "Suivi à"
 msgstr ""
 
 #: ../banana/banana.inc.php:238 ../banana/misc.inc.php:38
+#: ../banana/banana.inc.php:380
 msgid "Organisation"
 msgstr ""
 
 #: ../banana/banana.inc.php:239 ../banana/post.inc.php:111
+#: ../banana/banana.inc.php:382
 msgid "Corps"
 msgstr ""
 
@@ -155,4 +161,58 @@ msgstr ""
 
 #: ../banana/spool.inc.php:372
 msgid "Aucun message dans ce forum"
+msgstr ""
+
+#: ../banana/banana.inc.php:127
+msgid ""
+" : ce newsgroup n'existe pas ou vous n'avez pas l'autorisation d'y accéder"
+msgstr ""
+
+#: ../banana/banana.inc.php:237 ../banana/banana.inc.php:257
+msgid "Impossible charger la liste des messages de "
+msgstr ""
+
+#: ../banana/banana.inc.php:278 ../banana/banana.inc.php:300
+#: ../banana/banana.inc.php:420
+msgid "Impossible charger la liste des messages"
+msgstr ""
+
+#: ../banana/banana.inc.php:293
+msgid "Impossible d'accéder à la pièce jointe."
+msgstr ""
+
+#: ../banana/banana.inc.php:304
+msgid "Impossible de trouver le message à annuler"
+msgstr ""
+
+#: ../banana/banana.inc.php:386
+msgid "Pièce jointe"
+msgstr ""
+
+#: ../banana/banana.inc.php:396
+msgid "Envoyer le message"
+msgstr ""
+
+#: ../banana/banana.inc.php:434
+msgid "Impossible charger le message d'origine"
+msgstr ""
+
+#: ../banana/banana.inc.php:457
+msgid "Fichier trop gros pour être envoyé : "
+msgstr ""
+
+#: ../banana/banana.inc.php:461
+msgid "Erreur lors de l'upload de "
+msgstr ""
+
+#: ../banana/banana.inc.php:465
+msgid "Le fichier spécifié n'existe pas : "
+msgstr ""
+
+#: ../banana/banana.inc.php:469
+msgid "Une erreur est survenue sur le serveur lors de l'upload de "
+msgstr ""
+
+#: ../banana/banana.inc.php:486
+msgid "Impossible de poster le message. Le serveur a retourné l'erreur :"
 msgstr ""
