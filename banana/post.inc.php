@@ -211,7 +211,7 @@ class BananaPost
     {
         if (isset($this->headers['content-type'])
                 && preg_match('!charset="?([^;"]*)"?\s*(;|$)?!', $this->headers['content-type'], $matches)) {
-            $body = iconv($matches[1], 'utf-8', $this->body);
+            $body = iconv($matches[1], 'utf-8//IGNORE', $this->body);
             if (strlen($body) == 0) {
                 return false;
             }
