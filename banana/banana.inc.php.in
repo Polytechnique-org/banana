@@ -350,8 +350,8 @@ class Banana
             if ($this->_newPost($id)) {
                 $subject  = 'Re: ' . preg_replace("/^re\s*:\s*/i", '', $this->post->headers['subject']);
                 $body     = to_entities(utf8_encode($this->post->name." "._b_("a écrit"))." :\n"
-                                        . wrap($this->post->get_body(), "> ")
-                          . ($this->profile['sig'] ? "\n\n-- \n". $this->profile['sig'] : ''));
+                                        . wrap($this->post->get_body(), "> "))
+                          . ($this->profile['sig'] ? "\n\n-- \n". $this->profile['sig'] : '');
                 $target   = isset($this->post->headers['followup-to']) ?
                                 $this->post->headers['followup-to'] : $this->post->headers['newsgroups'];
                 $followup = null;
