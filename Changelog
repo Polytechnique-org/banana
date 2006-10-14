@@ -1,3 +1,8 @@
+Sat, 14 Oct 2006                    Florent Bruneau <florent.bruneau@m4x.org>
+
+	* Bugfix: Signature encoding in replies
+	* Bugfix: Don't lose badly encoded messages
+
 ================================================================================
 VERSION 1.4
 
