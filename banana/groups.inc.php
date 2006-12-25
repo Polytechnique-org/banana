@@ -29,8 +29,6 @@ class BananaGroups {
         global $banana;
 
         $this->type = $_type;
-        $desc       = $banana->nntp->xgtitle();
-
         $this->load();
         
         if (empty($this->overview) && $_type == BANANA_GROUP_SUB) {
@@ -45,6 +43,7 @@ class BananaGroups {
     {
         global $banana;
 
+        $desc = $banana->nntp->xgtitle();
         if ($this->type == BANANA_GROUP_NEW) {
             $list = $banana->nntp->newgroups($banana->profile['lastnews']);
         } else {
