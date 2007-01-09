@@ -6,28 +6,12 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-div.pages {
-    font-size: 80%;
-    text-align: center;
-    padding-top: 0.1em;
-    padding-bottom: 0.1em;
-}
-div.banana_action { float: right; }
-div.banana_menu { float: left; }
-
-
 /** GROUP LIST **/
-
-table.banana_group { width: 100%; }
-table.banana_group td.new { text-align: center; }
-table.banana_group td.all { text-align: center; }
-table.banana_group td.grp { text-align: left; }
-table.banana_group td.dsc { text-align: left; }
+.banana .grp { text-align: left; }
+.banana .dsc { text-align: left; }
 
 /** THREAD VIEW **/
-
-table.banana_thread { width: 100%; }
-table.banana_thread td {
+.banana table.thread td {
     white-space: nowrap;
     height: 20px;
     vertical-align: middle;
@@ -37,62 +21,57 @@ table.banana_thread td {
     margin-bottom: 0;
 }
 
-table.banana_thread tr.new { font-weight: bold; }
+.banana table.thread .new { font-weight: bold; }
 
-table.banana_thread td.date { width: 15%; text-align: center; }
-table.banana_thread td.subj { text-align: left; overflow: hidden; }
-table.banana_thread td.from { text-align: left; }
+.banana table.thread .date { width: 15%; text-align: center; }
+.banana table.thread .subj { text-align: left; overflow: hidden; }
+.banana table.thread .from { text-align: left; }
 
-table.banana_thread div.tree { float: left; padding-right: 0.3em; }
-table.banana_thread span.cur { font-style: italic; }
-table.banana_thread table { border: 0px; padding: 0px; margin: 0px; width: 100%; }
-table.banana_thread td.subs { padding: 0%; }
+.banana table.thread .cur { font-style: italic; }
+.banana table.thread .subs { padding: 0%; }
 
 /** MESSAGE VIEW **/
-
-table.banana_msg { width: 100%; }
-table.banana_msg td.headers { width: 100%; }
-table.banana_msg .hdr { width: 15%; text-align: right; font-weight: bold; padding-right: 1em; }
-table.banana_msg td.xface { text-align: right; }
-table.banana_msg th.subject { font-size: 120%; }
-table.banana_msg td.body { padding-top: 1em; padding-bottom: 0.5em; }
-
-table.banana_msg td.thrd { padding: 0px; }
-table.banana_msg table { border: 0px; padding: 0px; margin: 0px; width: 100%; }
-
-table.banana_msg blockquote {
+.banana table.message .hdr { width: 15%; text-align: right; font-weight: bold; padding-right: 1em; }
+.banana table.message .xface { text-align: right; }
+.banana table.message .subject { font-size: 120%; }
+.banana table.message .body { padding-top: 1em; padding-bottom: 0.5em; }
+.banana table.message blockquote {
     color: blue;
     font-style: italic;
     margin-left: 0;
-    padding-left: 1em;
+    padding-left: 1ex;
     border-left: solid 1px;
     border-color: blue;
     background: inherit;    
 }
-table.banana_msg blockquote blockquote {
+.banana table.message blockquote blockquote {
 	color: green;
 	border-color: green;
     background: inherit;
 }
-table.banana_msg blockquote blockquote blockquote {
+.banana table.message blockquote blockquote blockquote {
 	color: #cc0000;
 	border-color: #cc0000;
     background: inherit;
 }
-table.banana_msg blockquote blockquote blockquote blockquote {
+.banana table.message blockquote blockquote blockquote blockquote {
     color: #aaaa00;
     border-color: #aaaa00;
     background: inherit;
 }
 
 /** MISC **/
-
-div.center { text-align: center; padding: 1em; }
-p.error { color: red; background: inherit; }
-pre.error {
-    color: red;
+.banana .center { text-align: center; padding: 1em; }
+.banana .error { color: red; background: inherit; }
+.banana pre.error {
     margin-left: 2em;
     font-size: 90%;
-    background: inherit;
 }
-
+.banana .pages {
+    font-size: 80%;
+    text-align: center;
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
+}
+.banana div.action { float: right; }
+.banana div.menu { float: left; }

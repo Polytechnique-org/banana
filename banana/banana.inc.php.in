@@ -1,6 +1,6 @@
 <?php
 /********************************************************************************
-* install.d/config.inc.php : configuration file
+* banana/banana.inc.php : banana main file
 * --------------------------
 *
 * This file is part of the banana distribution
@@ -9,41 +9,43 @@
 
 class Banana
 {
-    var $maxspool    = 3000;
+    static public $maxspool    = 3000;
 
-    var $hdecode     = array('from','name','organization','subject');
-    var $parse_hdr   = array('content-disposition', 'content-transfer-encoding',
-                             'content-type', 'content-id', 'date', 'followup-to',
-                             'from', 'message-id', 'newsgroups', 'organization',
-                             'references', 'subject', 'x-face');
-    var $show_hdr    = array('from', 'newsgroups', 'followup', 'date',
-                             'organization', 'references', 'x-face');
+    static public $parse_hdr   = array('content-disposition', 'content-transfer-encoding',
+                                       'content-type', 'content-id', 'date', 'followup-to',
+                                       'from', 'message-id', 'newsgroups', 'organization',
+                                       'references', 'subject', 'x-face', 'in-reply-to',
+                                       'to', 'cc', 'reply-to');
+    static public $show_hdr    = array('from', 'newsgroups', 'followup-to', 'to', 'cc', 'reply-to',
+                                       'organization', 'date', 'references', 'in-reply-to');
 
     /** Favorites MIMEtypes to use, by order for reading multipart messages
      */
-    var $body_mime   = array('text/plain', 'text/html', 'text/richtext');
+    static public $body_mime   = array('text/html', 'text/plain', 'text/enriched', 'text', 'message');
+
     /** Indicate wether posting attachment is allowed
      */
-    var $can_attach  = true;
+    static public $can_attach  = true;
     /** Maximum allowed file size for attachment
      */
-    var $maxfilesize = 100000;
+    static public $maxfilesize = 100000;
     /** Indicate wether x-face should be skinned as specials data or not
      */
-    var $formatxface = true;
+    static public $formatxface = true;
 
     /** Regexp for selecting newsgroups to show (if empty, match all newsgroups)
      * ex : '^xorg\..*' for xorg.*
      */
-    var $grp_pattern;
+    static public $grp_pattern = null;
 
-    var $tbefore     = 5;
-    var $tafter      = 5;
-    var $tmax        = 50;
+    static public $tbefore     = 5;
+    static public $tafter      = 5;
+    static public $tmax        = 50;
 
-    var $wrap        = 74;
+    static public $wrap        = 78;
+    
     /** Match an url
-     * Should be included in a regexp delimited using ! (eg: "!$url_regexp!i")
+     * Should be included in a regexp delimited using /, !, , or @ (eg: "/$url_regexp/i")
      * If it matches, return 3 main parts :
      *  \\1 and \\3 are delimiters
      *  \\2 is the url
@@ -53,526 +55,426 @@ class Banana
      *   $matches[2] = "http://www.polytechnique.org"
      *   $matches[3] = "]"
      */
-    var $url_regexp  = '(["\[])?((?:https?|ftp|news)://(?:&amp;|\.*,*[a-z@0-9~%$£µ&i#\-+=_/\?])*)(["\]])?';
+    static public $url_regexp  = '(["\[])?((?:[a-z]+:\/\/|www\.)(?:[\.\,\;\!]*[a-z\@0-9~%$£µ&i#\-+=_\/\?]+)+)(["\]])?';
 
-    
-    /** Boundary for multipart messages
-     */
-    var $boundary    = 'bananaBoundary42';
     /** Global headers to use for messages
      */
-    var $custom      = "Mime-Version: 1.0\nUser-Agent: Banana @VERSION@\n";
-    /** Global headers to use from multipart messages
-     */
-    var $custom_mp   = "Content-Type: multipart/mixed; boundary=\"bananaBoundary42\"\nContent-Transfer-Encoding: 7bit\n";
-    /** Body type when using plain text
-     */
-    var $custom_plain= "Content-Type: text/plain; charset=utf-8\nContent-Transfert-Encoding: 8bit\n"; 
+    static public $custom_hdr  = array('Mime-Version' => '1.0', 'User-Agent' => 'Banana @VERSION@');
 
     /** News serveur to use
      */
-    var $host        = 'news://localhost:119/';
+    static public $host        = 'news://localhost:119/';
 
     /** User profile
      */
-    var $profile     = Array( 'name' => 'Anonymous <anonymouse@example.com>', 'sig'  => '', 'org'  => '',
-            'customhdr' =>'', 'display' => 0, 'lastnews' => 0, 'locale'  => 'fr_FR', 'subscribe' => array());
-    
-    var $state       = Array('group' => null, 'artid' => null, 'action' => null);
-    var $nntp;
-    var $groups;
-    var $newgroups;
-    var $post;
-    var $spool;
+    static public $profile     = Array( 'From' => 'Anonymous <anonymouse@example.com>', 'sig'  => '',
+                                        'Organization'  => '', 'custom_hdr' => array(), 'display' => 0,
+                                        'lastnews' => 0, 'locale'  => 'fr_FR', 'subscribe' => array());
 
-    var $get;
+    static public $protocole   = null;
+    static public $spool       = null;
+    static public $message     = null;
+    static public $page        = null;
 
-    function Banana()
+    static public $group       = null;
+    static public $artid       = null;
+    static public $action      = null;
+    static public $part        = null;
+    static public $first       = null;
+
+    static public $debug_nntp   = false;
+    static public $debug_smarty = false;
+
+
+    // Actions
+    const ACTION_BOX_NEEDED = 1; // mask
+    const ACTION_BOX_LIST   = 2;
+    const ACTION_BOX_SUBS   = 4;
+    const ACTION_MSG_LIST   = 3;
+    const ACTION_MSG_READ   = 5;
+    const ACTION_MSG_NEW    = 9;
+    const ACTION_MSG_CANCEL = 17;
+
+    // Box list view
+    const BOXES_ALL = 0;
+    const BOXES_SUB = 1;
+    const BOXES_NEW = 2;
+
+    // Spool view mode
+    const SPOOL_ALL    = 0;
+    const SPOOL_UNREAD = 1;
+
+    /** Class parameters storage
+     */
+    public $params;
+
+    /** Build the instance of Banana
+     * This constructor only call \ref loadParams, connect to the server, and build the Smarty page
+     * @param protocole Protocole to use
+     */
+    public function __construct($params = null, $protocole = 'NNTP', $pageclass = 'BananaPage')
     {
-        $this->_require('NetNNTP');
-        setlocale(LC_ALL,  $this->profile['locale']);
-        $this->nntp = new nntp($this->host);
-        if (!$this->nntp || !$this->nntp->valid) {
-            $this->nntp = null;
+        Banana::load('text.func');
+        if (is_null($params)) {
+            $this->params = $_GET;
+        } else {
+            $this->params = $params;
+        }
+        $this->loadParams();
+
+        // connect to protocole handler
+        Banana::load($protocole);
+        $classname = 'Banana' . $protocole;
+        Banana::$protocole = new $classname(Banana::$group);
+
+        // build the page
+        if ($pageclass == 'BananaPage') {
+            Banana::load('page');
+        }
+        Banana::$page = new $pageclass;
+    }
+
+    /** Fill state vars (Banana::$group, Banana::$artid, Banana::$action, Banana;:$part, Banana::$first)
+     */
+    protected function loadParams()
+    {
+        Banana::$group = isset($this->params['group']) ? $this->params['group'] : null;
+        Banana::$artid = isset($this->params['artid']) ? $this->params['artid'] : null;
+        Banana::$first = isset($this->params['first']) ? $this->params['first'] : null;
+        Banana::$part  = isset($this->params['part']) ? $this->params['part'] : 'text';
+
+        // Look for the action to execute
+        if (is_null(Banana::$group)) {
+            if (isset($this->params['subscribe'])) {
+                Banana::$action = Banana::ACTION_BOX_SUBS;
+            } else {
+                Banana::$action = Banana::ACTION_BOX_LIST;
+            }
+            return;
+        }
+        $action = isset($this->params['action']) ? $this->params['action'] : null; 
+        if (is_null(Banana::$artid)) {
+            if ($action == 'new') {
+                Banana::$action = Banana::ACTION_MSG_NEW;
+            } else {
+                Banana::$action = Banana::ACTION_MSG_LIST;
+            }
+            return;
+        }
+        switch ($action) {
+          case 'new':
+            Banana::$action = Banana::ACTION_MSG_NEW;
+            return;
+          case 'cancel':
+            Banana::$action = Banana::ACTION_MSG_CANCEL;
+            return;
+          default:
+            Banana::$action = Banana::ACTION_MSG_READ;
         }
     }
 
-    /** Run Banana
-     * @param STRING class Name of the class to use
-     * @param ARRAY  myget If defined is used instead of get
+    /** Register an action to show on banana page
+     * @param action_code HTML code of the action
+     * @param pages ARRAY pages where to show the action (null == every pages)
+     * @return true if success
      */
-    function run($class = 'Banana', $myget = null)
+    public function registerAction($action_code, array $pages = null)
     {
-        global $banana;
+        return Banana::$page->registerAction($action_code, $pages);
+    }
 
-        Banana::_require('misc');
-        $banana = new $class();
+    /** Register a new page
+     * @param name Name of the page
+     * @param text Text for the tab of the page
+     * @param template Template path for the page if null, the page is not handled by banana
+     * @return true if success
+     */
+    public function registerPage($name, $text, $template = null)
+    {
+        return Banana::$page->registerPage($name, $text, $template);
+    }
 
-        if (is_null($myget)) {
-            $banana->get = $_GET;
-        } else {
-            $banana->get = $myget;
+    /** Run Banana
+     * This function need user profile to be initialised
+     */
+    public function run()
+    {
+        // Configure locales
+        setlocale(LC_ALL,  Banana::$profile['locale']);
+        
+        // Check if the state is valid
+        if (Banana::$protocole->lastErrNo()) {
+            return Banana::$page->kill(_b_('Une erreur a été rencontrée lors de la connexion au serveur') . '<br />'
+                                      . Banana::$protocole->lastError());
+        }
+        if (!Banana::$protocole->isValid()) {
+            return Banana::$page->kill(_b_('Connexion non-valide'));
+        }
+        if (Banana::$action & Banana::ACTION_BOX_NEEDED) {
+            if(isset(Banana::$grp_pattern) && !preg_match('/' . Banana::$grp_pattern . '/', $group)) {
+                Banana::$page->setPage('group');        
+                return Banana::$page->kill(_b_("Ce newsgroup n'existe pas ou vous n'avez pas l'autorisation d'y accéder"));
+            }
         }
 
-        if (!$banana->nntp) {
-            $banana->state['page'] = 'error';
-            return makeTable('<p class="error">'._b_('Impossible de contacter le serveur').'</p>');
+        // Dispatch to the action handlers
+        switch (Banana::$action) {
+          case Banana::ACTION_BOX_SUBS:
+            $error = $this->action_subscribe();
+            break;
+          case Banana::ACTION_BOX_LIST:
+            $error = $this->action_listBoxes();
+            break;
+          case Banana::ACTION_MSG_LIST:
+            $error = $this->action_showThread(Banana::$group, Banana::$first);
+            break;
+          case Banana::ACTION_MSG_READ:
+            $error = $this->action_showMessage(Banana::$group, Banana::$artid, Banana::$part);
+            break;
+          case Banana::ACTION_MSG_NEW:
+            $error = $this->action_newMessage(Banana::$group, Banana::$artid);
+            break;
+          case Banana::ACTION_MSG_CANCEL:
+            $error = $this->action_cancelMessage(Banana::$group, Banana::$artid);
+            break;
+          default:
+            $error = _b_("L'action demandée n'est pas supportée par Banana");
         }
 
-        $group  = empty($banana->get['group']) ? null : $banana->get['group'];
-        if (!is_null($group)
-                &&  isset($banana->grp_pattern) && !preg_match('/' . $banana->grp_pattern . '/', $group)) {
-            $banana->state['page'] = 'error';
-            return makeTable('<p class="error">'
-                    . $group . _b_(' : ce newsgroup n\'existe pas ou vous n\'avez pas l\'autorisation d\'y accéder')
-                    . '</p>');
+        // Generate the page
+        if (is_string($error)) {
+            return Banana::$page->kill($error);
         }
-        $artid  = empty($banana->get['artid']) ? null : strtolower($banana->get['artid']);
-        $partid = !isset($banana->get['part']) ? -1 : $banana->get['part'];
-        $action = !isset($banana->get['action']) ? null : $banana->get['action'];
-        $banana->state = Array ('group' => $group, 'artid' => $artid, 'action' => $action);
-
-        if (is_null($group)) {
-            if (isset($banana->get['subscribe'])) {
-                $banana->state['page'] = 'subscribe';
-                return makeTable($banana->action_listSubs());
-            } elseif (isset($_POST['validsubs'])) {
-                $banana->action_saveSubs();
-            }
-            $banana->state['page'] = 'forums';
-            return makeTable($banana->action_listGroups());
-
-        } elseif (is_null($artid)) {
-            if (isset($_POST['action']) && $_POST['action'] == 'new') {
-                return makeTable($banana->action_doFup($group, isset($_POST['artid']) ? intval($_POST['artid']) : -1));
-            } elseif ($action == 'new') {
-                $banana->state['page'] = 'action';
-                return makeTable($banana->action_newFup($group));
-            } else {
-                $banana->state['page'] = 'group';
-                return makeTable($banana->action_showThread($group, isset($banana->get['first']) ? intval($banana->get['first']) : 1));
-            }
-
-        } else {
-            if (isset($_POST['action']) && $_POST['action']=='cancel') {
-                $res = $banana->action_cancelArticle($group, $artid);
-            } else {
-                $res = '';
-            }
-
-            if (!is_null($action)) {
-                $banana->state['page'] = 'action';
-                switch ($action) {
-                    case 'cancel':
-                        $res .= $banana->action_showArticle($group, $artid, $partid);
-                        if ($banana->post->checkcancel()) {
-                            $form = '<p class="error">'._b_('Voulez-vous vraiment annuler ce message ?').'</p>'
-                                  . '<form action="' 
-                                  . htmlentities(makeLink(Array('group' => $group,
-                                                                'artid' => $artid)))
-                                  . '" method="post"><p>'
-                                  . '<input type="hidden" name="action" value="cancel" />'
-                                  . '<input type="submit" value="Annuler !" />'
-                                  . '</p></form>';
-                            return makeTable($form . $res);
-                        }
-                        return makeTable("" . $res);
-
-                    case 'new':
-                        return makeTable($banana->action_newFup($group, $artid));
-                }
-            }
-
-            if (isset($banana->get['pj'])) {
-                $view = false;
-                if ($action == 'view') {
-                    $view = true;
-                }
-                $att = $banana->action_getAttachment($group, $artid, $banana->get['pj'], $view);
-                return makeTable($res . $att);
-            }
-            
-            $banana->state['page'] = 'message';
-            return makeTable($banana->action_showArticle($group, $artid, $partid));
-        }
+        return Banana::$page->run();
     }
 
     /**************************************************************************/
     /* actions                                                                */
     /**************************************************************************/
-
-    function action_saveSubs()
+    protected function action_saveSubs($groups)
     {
-        return;
+        Banana::$profile['subscribe'] = $groups;
+        return true;
     }
 
-    function action_listGroups()
+    protected function action_subscribe()
     {
-        $this->_newGroup();
-        
-        $res  = $this->groups->to_html();
-        if (count($this->newgroups->overview)) {
-            $res .= '<p>'._b_('Les forums suivants ont été créés depuis ton dernier passage :').'</p>';
-            $res .= $this->newgroups->to_html();
+        Banana::$page->setPage('subscribe');
+        if (isset($_POST['validsubs'])) {
+            $this->action_saveSubs(array_keys($_POST['subscribe']));
+            Banana::$page->redirect();
         }
-
-        $this->nntp->quit();
-        return $res;
+        $groups = Banana::$protocole->getBoxList(Banana::BOXES_ALL);
+        Banana::$page->assign('groups', $groups);
+        return true;
     }
 
-    function action_listSubs()
+    protected function action_listBoxes()
     {
-        $this->_require('groups');
-        $this->groups = new BananaGroups(BANANA_GROUP_ALL);
-        
-        $res  = $this->groups->to_html(true);
-
-        $this->nntp->quit();
-        return $res;
+        Banana::$page->setPage('forums');
+        $groups    = Banana::$protocole->getBoxList(Banana::BOXES_SUB, Banana::$profile['lastnews'], true);
+        $newgroups = Banana::$protocole->getBoxList(Banana::BOXES_NEW, Banana::$profile['lastnews'], true);
+        Banana::$page->assign('groups', $groups);
+        Banana::$page->assign('newgroups', $newgroups);
+        return true;
     }
 
-    function action_showThread($group, $first)
+    protected function action_showThread($group, $first)
     {
-        if (!$this->_newSpool($group, $this->profile['display'], $this->profile['lastnews'])) {
-            return '<p class="error">'._b_('Impossible charger la liste des messages de ') . $group . '</p>';
+        Banana::$page->setPage('thread');
+        if (!$this->loadSpool($group)) {
+            return _b_('Impossible charger la liste des messages de ') . $group;
         }
-
-        if ($first > count($this->spool->overview)) {
-            $first = count($this->spool->overview);
-        }
-
-        $first = $first - ($first % $this->tmax) + 1;
-        
-        $pages = displayPages($first);
-        $res  = $pages . $this->spool->to_html($first, $first+$this->tmax) . $pages;
-
-        $this->nntp->quit();
-        
-        return $res;
+        $groups = Banana::$protocole->getBoxList(Banana::BOXES_SUB, Banana::$profile['lastnews'], true);
+        Banana::$page->assign('msgbypage', Banana::$tmax);
+        Banana::$page->assign('groups', $groups);
+        return true;
     }
 
-    function action_showArticle($group, $id, $part)
+    protected function action_showMessage($group, $artid, $partid = 'text')
     {
-        if (!$this->_newSpool($group, $this->profile['display'], $this->profile['lastnews'])) {
-            return '<p class="error">'._b_('Impossible charger la liste des messages de ') . $group . '</p>';
+        Banana::$page->setPage('message');
+        if ($partid == 'text') {
+            $this->loadSpool($group);
         }
-
-        if (!$this->_newPost($id)) {
-            if ($this->nntp->lasterrorcode == "423") {
-                $this->spool->delid($id);
+        $msg =& $this->loadMessage($group, $artid);
+        if (is_null($msg)) {
+            $this->loadSpool($group);
+            $this->removeMessage($group, $artid);
+            return _b_('Le message demandé n\'existe pas. Il est possible qu\'il ait été annulé');
+        }
+        if ($partid == 'xface') {
+            $msg->getXFace();
+            exit;
+        } elseif ($partid != 'text') {
+            $part = $msg->getPartById($partid);
+            if (!is_null($part)) {
+                $part->send(true);
             }
-            $this->nntp->quit();
-            return '<p class="error">'._b_('Impossible d\'accéder au message.   Le message a peut-être été annulé').'</p>';
+            $part = $msg->getFile($partid);
+            if (!is_null($part)) {
+                $part->send();
+            }
+            exit;
         }
-
-        $res = $this->post->to_html($part);
-
-        $this->nntp->quit();
-        
-        return $res;
+        $groups    = Banana::$protocole->getBoxList(Banana::BOXES_SUB, Banana::$profile['lastnews'], true);
+        Banana::$page->assign('groups', $groups);
+        Banana::$page->assign_by_ref('message', $msg);
+        Banana::$page->assign('headers', Banana::$show_hdr);
+        return true;
     }
 
-    function action_getAttachment($group, $id, $pjid, $action)
+    protected function action_newMessage($group, $artid)
     {
-        if (!$this->_newSpool($group, $this->profile['display'], $this->profile['lastnews'])) {
-            return '<p class="error">'._b_('Impossible charger la liste des messages').'</p>';
+        Banana::$page->setPage('new');
+        if (!Banana::$protocole->canSend()) {
+            return _b_('Vous n\'avez pas le droit de poster');
         }
-
-        if (!$this->_newPost($id)) {
-            if ($this->nntp->lasterrorcode == "423") {
-                $this->spool->delid($id);
+        $hdrs    = Banana::$protocole->requestedHeaders();
+        $headers = array();
+        foreach ($hdrs as $header) {
+            $headers[$header] = array('name' => BananaMessage::translateHeaderName($header));
+            if (isset(Banana::$profile[$header])) {
+                $headers[$header]['fixed'] = Banana::$profile[$header];
             }
-            $this->nntp->quit();
-            return '<p class="error">'._b_('Impossible d\'accéder au message.   Le message a peut-être été annulé').'</p>';
         }
-
-        $this->nntp->quit();
-        if ($this->post->get_attachment($pjid, $action)) {
-            return "";
-        } else {
-            return '<p calss="error">'._b_('Impossible d\'accéder à la pièce jointe.').'</p>';
-        }
-    }
-
-    function action_cancelArticle($group, $id)
-    {
-        if (!$this->_newSpool($group, $this->profile['display'], $this->profile['lastnews'])) {
-            return '<p class="error">'._b_('Impossible charger la liste des messages').'</p>';
-        }
-
-        if (!$this->_newPost($id)) {
-            return '<p class="error">'._b_('Impossible de trouver le message à annuler').'</p>';
-        }
-        $mid  = array_search($id, $this->spool->ids);
-
-        if (!$this->post->checkcancel()) {
-            return '<p class="error">'._b_('Vous n\'avez pas les permissions pour annuler ce message').'</p>'; 
-        }
-        $msg = 'From: '.$this->profile['name']."\n"
-             . "Newsgroups: $group\n"
-             . "Subject: cmsg $mid\n"
-             . $this->custom
-             . "Control: cancel $mid\n"
-             . "\n"
-             . "Message canceled with Banana";
-        if ($this->nntp->post($msg)) {
-            $ndx = $this->spool->getndx($artid) - 1;
-            if ($ndx > 50) {
-                $ndx = 0;
+        if (isset($_POST['sendmessage'])) {
+            $hdr_values = array();
+            foreach ($hdrs as $header) {
+                $hdr_values[$header] = isset($headers[$header]['fixed']) ? $headers[$header]['fixed'] : @$_POST[$header];
             }
-            $this->spool->delid($id);
-            $this->nntp->quit();
-            redirectInBanana(Array('group' => $group,
-                                   'first' => $ndx));
-        } else {
-            return '<p class="error">'._b_('Impossible d\'annuler le message').'</p>';
-        }
-    }
-
-    function action_newFup($group, $id = -1)
-    {
-        $subject = $body = '';
-        $target  = $group;
-        
-        if (@$_POST['action'] == 'new') {
-            $subject  = $_POST['subject'];
-            $body     = $_POST['body'];
-            $target   = $_POST['newsgroups'];
-            $followup = $_POST['followup'];
-            $this->state['page']   = 'action';
-            $this->state['group']  = $group;
-            $this->state['action'] = 'new';
-            if ($id != -1) {
-                $this->state['artid'] = $id;
+            if ($artid) {
+                $old =& $this->loadMessage($group, $artid);
+                $hdr_values['References'] = $old->getHeaderValue('references') . $old->getHeaderValue('message-id');
             }
-        } elseif ($id > 0) {
-            $this->nntp->group($group);
-            if ($this->_newPost($id)) {
-                $subject  = 'Re: ' . preg_replace("/^re\s*:\s*/i", '', $this->post->headers['subject']);
-                $body     = to_entities(utf8_encode($this->post->name." "._b_("a écrit"))." :\n"
-                                        . wrap($this->post->get_body(), "> "))
-                          . ($this->profile['sig'] ? "\n\n-- \n". $this->profile['sig'] : '');
-                $target   = isset($this->post->headers['followup-to']) ?
-                                $this->post->headers['followup-to'] : $this->post->headers['newsgroups'];
-                $followup = null;
+            $msg = null;
+            if (empty($hdr_values['Subject'])) {
+                Banana::$page->trig(_b_('Le message doit avoir un sujet'));
+            } elseif (Banana::$can_attach && isset($_FILES['attachment'])) {
+                $uploaded = $_FILES['attachment'];
+                if (!is_uploaded_file($uploaded['tmp_name'])) {
+                    Banana::$page->trig(_b_('Une erreur est survenue lors du téléchargement du fichier'));
+                } else {
+                    $msg = BananaMessage::newMessage($hdr_values, $_POST['body'], $uploaded);
+                }
+            } else {
+                $msg = BananaMessage::newMessage($hdr_values, $_POST['body']);
+            }
+            if (!is_null($msg)) {
+                if (Banana::$protocole->send($msg)) {
+                    Banana::$page->redirect(array('group' => $group, 'artid' => $artid));
+                }
+                Banana::$page->trig(_b_('Une erreur est survenue lors de l\'envoi du message :') . '<br />'
+                                   . Banana::$protocole->lastError());
             }
         } else {
-            $targe   = $group;
-            $subject = $followup = null;
-            $body    = $this->profile['sig'] ? "\n\n-- \n". $this->profile['sig'] : '';
+            if (!is_null($artid)) {
+                $msg    =& $this->loadMessage($group, $artid);
+                $body    = $msg->getSender() . _b_(' a écrit :') . "\n" . $msg->quote();
+                $subject = $msg->getHeaderValue('subject');
+                $headers['Subject']['user'] = 'Re: ' . preg_replace("/^re\s*:\s*/i", '', $subject);
+                $target  = $msg->getHeaderValue($hdrs['reply']);
+                if (empty($target)) {
+                    $target = $group;
+                }
+                $headers[$hdrs['dest']]['user'] =& $target;
+            } else {
+                $body    = '';
+                $headers[$hdrs['dest']]['user'] = $group;
+            }
+            if (Banana::$profile['sig']) {
+                $body .=  "\n\n-- \n" . Banana::$profile['sig'];
+            }
+            Banana::$page->assign('body', $body);
         }
 
-        $this->nntp->quit();
-
-        $html  = '<form enctype="multipart/form-data" action="'
-               . htmlentities(makeLink(Array('group' => $group)))
-               . '" method="post" accept-charset="utf-8">'
-               . '<table class="bicol" cellpadding="0" cellspacing="0">'
-               . '<tr><th colspan="2">' . _b_('En-têtes') . '</th></tr>'
-               . '<tr><td>' . _b_('Nom') . '</td>'
-               . '<td>' . htmlentities($this->profile['name']) . '</td></tr>'
-               . '<tr><td>' . _b_('Sujet') . '</td>'
-               . '<td><input type="text" name="subject" value="' . htmlentities($subject) . '" size="60" /></td></tr>'
-               . '<tr><td>' . _b_('Forums') . '</td>'
-               . '<td><input type="text" name="newsgroups" value="' . htmlentities($target) . '" size="60" /></td></tr>'
-               . '<tr><td>' . _b_('Suivi à') . '</td>'
-               . '<td><input type="text" name="followup" value="' . htmlentities($followup). '" size="60" /></td></tr>'
-               . '<tr><td>' . _b_('Organisation') . '</td>'
-               . '<td>' . $this->profile['org'] . '</td></tr>'
-               . '<tr><th colspan="2">' . _b_('Corps') . '</th></tr>'
-               . '<tr><td colspan="2"><textarea name="body" cols="74" rows="16">'
-               .  $body . '</textarea></td></tr>';
-        if ($this->can_attach) {
-            $html .= '<tr><th colspan="2">' . _b_('Pièce jointe') . '</th></tr>'
-                  . '<tr><td colspan="2">'
-                  . '<input type="hidden" name="MAX_FILE_SIZE" value="' . $this->maxfilesize . '" />'
-                  . '<input type="file" name="newpj" size="40"/></td></tr>';
-        }
-        $html .= '<tr><th colspan="2">';
-        if ($id != -1) {
-            $html .= '<input type="hidden" name="artid" value="' . $id . '" />';
-        }
-        $html .= '<input type="hidden" name="action" value="new" />'
-              . '<input type="submit" value="' . _b_('Envoyer le message') . '" /></th></tr>'
-              . '</table></form>';
-
-        return $html;
+        Banana::$page->assign('maxfilesize', Banana::$maxfilesize);
+        Banana::$page->assign('can_attach', Banana::$can_attach);
+        Banana::$page->assign('headers', $headers);
+        return true;
     }
 
-    function action_doFup($group, $artid = -1)
+    protected function action_cancelMessage($group, $artid)
     {
-        if ( ! (is_utf8($_POST['subject']) && is_utf8($_POST['body']))) {
-            foreach(Array('subject', 'body') as $key) {
-                $_POST[$key] = utf8_encode($_POST[$key]);
+        Banana::$page->setPage('cancel');
+        $msg =& $this->loadMessage($group, $artid);
+        if (!$msg->canCancel()) {
+            return _b_('Vous n\'avez pas les droits suffisants pour supprimer ce message');
+        }
+        if (isset($_POST['cancel'])) {
+            $this->loadSpool($group);
+            $ndx = Banana::$spool->getNdX($id) - 1;
+            if (!Banana::$protocole->cancel($msg)) {
+                return _b_('Une erreur s\'est produite lors de l\'annulation du message :') . '<br />'
+                       . Banana::$protocole->lastError();
             }
-        }
-       
-        $forums = preg_split('/\s*(,|;)\s*/', $_POST['newsgroups']);
-        $fup    = $_POST['followup'];
-        if (sizeof($forums) > 1) {
-            if (empty($fup)) {
-                $fup = $forums[0];
+            if ($ndx < 50) {
+                 $ndx = 0;
             }
+            $this->removeMessage($group, $artid);
+            Banana::$page->redirect(Array('group' => $group, 'first' => $ndx));
         }
-        $to     = implode(',', $forums);
-        
-        if (!$this->_newSpool($group, $this->profile['display'], $this->profile['lastnews'])) {
-            return '<p class="error">'._b_('Impossible charger la liste des messages').'</p>';
-        }
-        
-        $body = preg_replace("/\n\.[ \t\r]*\n/m", "\n..\n", $_POST['body']);
-        $msg  = 'From: ' . $this->profile['name'] . "\n"
-              . "Newsgroups: ". $to . "\n"
-              . "Subject: " . headerEncode($_POST['subject'], 128) . "\n"
-              . (empty($this->profile['org']) ? '' : "Organization: {$this->profile['org']}\n")
-              . (empty($fup) ? '' : 'Followup-To: ' . $fup . "\n");
-
-        if ($artid != -1) {
-            $this->_require('post');
-            $post = new BananaPost($artid);
-            if (!$post || !$post->valid) {
-                return '<p class="error">'._b_('Impossible charger le message d\'origine').'</p>';
-            }
-            $refs = ( isset($post->headers['references']) ? $post->headers['references']." " : "" );
-            $msg .= "References: $refs{$post->headers['message-id']}\n";
-        }
-
-        $body_headers  = $this->custom_plain;
-        $body          = wrap($body, "");
-
-        // include attachment in the body
-        $uploaded = $this->_upload('newpj');
-        switch ($uploaded['error']) {
-            case UPLOAD_ERR_OK:
-                $this->custom = $this->custom_mp.$this->custom;
-                $body         = $this->_make_part($body_headers, $body);
-                $file_head    = 'Content-Type: '.$uploaded['type'].'; name="'.$uploaded['name']."\"\n"
-                              . 'Content-Transfer-Encoding: '.$uploaded['encoding']."\n"
-                              . 'Content-Disposition: attachment; filename="'.$uploaded['name']."\"\n";
-                $body        .= $this->_make_part($file_head, $uploaded['data']);
-                $body        .= "\n--".$this->boundary.'--';
-                break;
-
-            case UPLOAD_ERR_INI_SIZE: case UPLOAD_ERR_FORM_SIZE:
-                return '<p class="error">'._b_('Fichier trop gros pour être envoyé : ')
-                        .$uploaded['name'].'</p>'.$this->action_showThread($group, $artid);
-
-            case UPLOAD_ERR_PARTIAL:
-                return '<p class="error">'._b_('Erreur lors de l\'upload de ')
-                        .$uploaded['name'].'</p>'.$this->action_showThread($group, $artid);
-
-            case UPLOAD_ERR_NO_FILE:
-                return '<p class="error">'._b_('Le fichier spécifié n\'existe pas : ')
-                        .$uploaded['name'].'</p>'.$this->action_showThread($group, $artid);
-
-            case UPLOAD_ERR_NO_TMP_DIR:
-                return '<p class="error">'._b_('Une erreur est survenue sur le serveur lors de l\'upload de ')
-                        .$uploaded['name'].'</p>'.$this->action_showThread($group, $artid);
-
-            default:
-                $this->custom = $body_headers.$this->custom;
-        }
-
-        // finalise and post the message
-        $msg .= $this->custom.$this->profile['customhdr']."\n".$body;
-
-        if ($this->nntp->post($msg)) {
-            $dir = Array('group' => $group);
-            if ($artid != -1) {
-                $dir['artid'] = $artid;
-            }
-            redirectInBanana($dir);
-        } else {
-            return '<p class="error">' . _b_('Impossible de poster le message. Le serveur a retourné l\'erreur :') . '</p>'
-                   . '<pre class="error">' . utf8_encode($this->nntp->lasterrortext) .'</pre>'
-                   . $this->action_newFup($group, $artid);
-        }
+        Banana::$page->assign_by_ref('message', $msg);
+        return true;
     }
 
     /**************************************************************************/
     /* Private functions                                                      */
     /**************************************************************************/
 
-    function _newSpool($group, $disp=0, $since='') {
-        $this->_require('spool');
-        if (!$this->spool || $this->spool->group != $group) {
-            $this->spool = new BananaSpool($group, $disp, $since);
-            if (!$this->spool || !$this->spool->valid) {
-                $this->spool = null;
-                return false;
-            }
-        }
-        if (count($this->profile['subscribe']) > 0) {
-            $this->_newGroup(false);
+    private function loadSpool($group)
+    {
+        Banana::load('spool');
+        if (!Banana::$spool || Banana::$spool->group != $group) {
+            if ($group == @$_SESSION['banana_group'] && isset($_SESSION['banana_spool'])) {
+                Banana::$spool = unserialize($_SESSION['banana_spool']);
+            }    
+            BananaSpool::getSpool($group, Banana::$profile['lastnews']);
+            $_SESSION['banana_group'] = $group;
+            $_SESSION['banana_spool'] = serialize(Banana::$spool);
+            Banana::$spool->setMode(Banana::$profile['display'] ? Banana::SPOOL_UNREAD : Banana::SPOOL_ALL);
         }
         return true;
     }
 
-    function _newPost($id)
+    private function &loadMessage($group, $artid)
     {
-        $this->_require('post');
-        $this->post = new BananaPost($id);
-        if (!$this->post || !$this->post->valid) {
-            $this->post = null;
-            return false;
+        Banana::load('message');
+        if ($group == @$_SESSION['banana_group'] && $artid == @$_SESSION['banana_artid']
+            && isset($_SESSION['banana_message'])) {
+            $message = unserialize($_SESSION['banana_message']);
+            Banana::$show_hdr = $_SESSION['banana_showhdr'];
+        }  else {
+            $message = Banana::$protocole->getMessage($artid);
+            $_SESSION['banana_group'] = $group;
+            $_SESSION['banana_artid'] = $artid;
+            $_SESSION['banana_message'] = serialize($message);
+            $_SESSION['banana_showhdr'] = Banana::$show_hdr;
+        }
+        Banana::$message =& $message;
+        return $message;
+    }
+
+    private function removeMessage($group, $artid)
+    {
+        Banana::$spool->delId($artid);
+        if ($group == $_SESSION['banana_group']) {
+            $_SESSION['banana_spool'] = serialize(Banana::$spool);
+            if ($artid == $_SESSION['banana_artid']) {
+                unset($_SESSION['banana_message']);
+                unset($_SESSION['banana_showhdr']);
+                unset($_SESSION['banana_artid']);
+            }
         }
         return true;
     }
 
-    function _newGroup($showNew = true)
+    static private function load($file)
     {
-        $this->_require('groups');
-        $this->groups = new BananaGroups(BANANA_GROUP_SUB);
-        if ($showNew && $this->groups->type == BANANA_GROUP_SUB) {
-            $this->newgroups = new BananaGroups(BANANA_GROUP_NEW);
+        $file = strtolower($file) . '.inc.php';
+        if (!@include_once dirname(__FILE__) . "/$file") {
+            require_once $file;
         }
-    }
-
-    function _require($file)
-    {
-        require_once (dirname(__FILE__).'/'.$file.'.inc.php');
-    }
-
-    function _upload($file)
-    {
-        if ($_FILES[$file]['name'] == "") {
-            return Array( 'error' => -1 );
-        }
-
-        // upload
-        $_FILES[$file]['tmp_name'];
-
-        // test if upload is ok
-        $file    = $_FILES[$file];
-        if ($file['size'] == 0 || $file['error'] != 0) {
-            if ($file['error'] == 0) {
-                $file['error'] = -1;
-            }
-            return $file;
-        }
-
-        // adding custum data
-        $mime    = rtrim(shell_exec('file -bi '.$file['tmp_name'])); //Because mime_content_type don't work :(
-        $encod   = 'base64';
-        if (preg_match("@([^ ]+/[^ ]+); (.*)@", $mime, $format)) {
-            $mime  = $format[1];
-            $encod = $format[2];
-        }
-        $data = fread(fopen($file['tmp_name'], 'r'), $file['size']);
-        if ($encod == 'base64') {
-            $data = chunk_split(base64_encode($data));
-        }
-        $file['name']     = basename($file['name']);
-        $file['type']     = $mime;
-        $file['encoding'] = $encod;
-        $file['data']     = $data;
-
-        return $file;
-    }
-
-    function _make_part($headers, $body)
-    {
-        return "\n--".$this->boundary."\n".$headers."\n".$body;
     }
 }
 

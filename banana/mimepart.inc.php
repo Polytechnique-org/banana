@@ -1,0 +1,514 @@
+<?php
+/********************************************************************************
+* banana/mimepart.inc.php : class for MIME parts
+* ------------------------
+*
+* This file is part of the banana distribution
+* Copyright: See COPYING files that comes with this distribution
+********************************************************************************/
+
+class BananaMimePart
+{
+    public $headers      = null; /* Should be protected */
+
+    private $id           = null;
+    private $content_type = null;
+    private $charset      = null;
+    private $encoding     = null;
+    private $disposition  = null;
+    private $boundary     = null;
+    private $filename     = null;
+    private $format       = null;
+
+    private $body         = null;
+    private $multipart    = null;
+
+    protected function __construct($data = null)
+    {
+        if (!is_null($data)) {
+            $this->fromRaw($data);
+        }   
+    }
+
+    protected function makeTextPart($body, $content_type, $encoding, $charset = null, $format = 'fixed')
+    {
+        $this->body         = $body;
+        $this->charset      = $charset;
+        $this->encoding     = $encoding;
+        $this->content_type = $content_type;
+        $this->format       = strtolower($format);
+        $this->parse();
+    }
+
+    protected function makeDataPart($body, $content_type, $encoding, $filename, $disposition, $id = null)
+    {
+        $this->body         = $body;
+        $this->content_type = $content_type;
+        $this->encoding     = $encoding;
+        $this->filename     = $filename;
+        $this->disposition  = $disposition;
+        $this->id           = $id;
+        if (is_null($content_type) || $content_type == 'application/octet-stream') {
+            $this->decodeContent();
+            $this->content_type = BananaMimePart::getMimeType($body, false);
+        }   
+    }
+
+    protected function makeFilePart($file, $content_type =null, $disposition = 'attachment')
+    {
+        $body = file_get_contents($file['tmp_name']);
+        if ($body === false || strlen($body) != $file['size']) {
+            return false;
+        }
+        if (is_null($content_type) || $content_type == 'application/octet-stream') {
+            $content_type = BananaMimePart::getMimeType($file['tmp_name']);
+        }
+        if (substr($content_type, 0, 5) == 'text/') {
+            $encoding = '8bit';
+        } else {
+            $encoding = 'base64';
+            $body     = chunk_split(base64_encode($body));
+        }
+        $this->filename     = $file['name'];
+        $this->content_type = $content_type;
+        $this->disposition  = $disposition;
+        $this->body         = $body;
+        $this->encoding     = $encoding;
+        return true;
+    }
+
+    protected function makeMultiPart($body, $content_type, $encoding, $boundary)
+    {
+        $this->body         = $body;
+        $this->content_type = $content_type;
+        $this->encoding     = $encoding;
+        $this->boundary     = $boundary;
+        $this->parse();
+    }
+
+    protected function convertToMultiPart()
+    {
+        if (!$this->isType('multipart', 'mixed')) {
+            $newpart = $this;
+            $this->content_type = 'multipart/mixed';
+            $this->encoding     = '8bit';
+            $this->multipart    = array($newpart);
+            $this->headers      = null;
+            $this->charset      = null;
+            $this->disposition  = null;
+            $this->filename     = null;
+            $this->boundary     = null;
+            $this->body         = null;
+            $this->format       = null;
+            $this->id           = null;
+        } 
+    }
+
+    public function addAttachment(array $file, $content_type = null, $disposition = 'attachment')
+    {
+        $newpart = new BananaMimePart;
+        if (!is_uploaded_file($file['tmp_name'])) {
+            return false;
+        }
+        if ($newpart->makeFilePart($file, $content_type, $disposition)) {
+            $this->convertToMultiPart();
+            $this->multipart[] = $newpart;
+            return true;
+        }
+        return false;
+    }
+
+    protected function getHeader($title, $filter = null)
+    {
+        if (!isset($this->headers[$title])) {
+            return null;
+        }
+        $header =& $this->headers[$title];
+        if (is_null($filter)) {
+            return trim($header);
+        } elseif (preg_match($filter, $header, $matches)) {
+            return trim($matches[1]);
+        }
+        return null;
+    } 
+
+    protected function fromRaw($data)
+    {
+        if (is_array($data)) {
+            if (array_key_exists('From', $data)) {
+                $this->headers = array_map(array($this, 'decodeHeader'), array_change_key_case($data));
+                return;
+            } else {
+                $lines = $data;
+            }
+        } else {
+            $lines   = explode("\n", $data);
+        }
+        $headers = BananaMimePart::parseHeaders($lines);
+        $this->headers =& $headers;
+        if (empty($headers) || empty($lines)) {
+            return;
+        }
+        $content       = join("\n", $lines);
+        $test          = trim($content);
+        if (empty($test)) {
+            return;
+        }
+
+        $content_type = strtolower($this->getHeader('content-type', '/^\s*([^ ;]+?)(;|$)/'));
+        if (empty($content_type)) {
+            $encoding     = '8bit';
+            $charset      = 'CP1252';
+            $content_type = 'text/plain';
+            $format       = strtolower($this->getHeader('x-rfc2646', '/format="?([^"]+?)"?\s*(;|$)/i'));
+        } else {
+            $encoding     = strtolower($this->getHeader('content-transfer-encoding'));
+            $disposition  = $this->getHeader('content-disposition', '/(inline|attachment)/i');
+            $boundary     = $this->getHeader('content-type', '/boundary="?([^"]+?)"?\s*(;|$)/i');
+            $charset      = strtolower($this->getHeader('content-type', '/charset="?([^"]+?)"?\s*(;|$)/i'));
+            $filename     = $this->getHeader('content-disposition', '/filename="?([^"]+?)"?\s*(;|$)/i');
+            $format       = strtolower($this->getHeader('content-type', '/format="?([^"]+?)"?\s*(;|$)/i'));
+            $id           = $this->getHeader('content-id', '/<(.*?)>/');
+            if (empty($filename)) {
+                $filename = $this->getHeader('content-type', '/name="?([^"]+)"?/');
+            }
+        } 
+        list($type, $subtype) = explode('/', $content_type);
+        switch ($type) {
+          case 'text': case 'message':
+            $this->makeTextPart($content, $content_type, $encoding, $charset, $format);
+            break;
+          case 'multipart':
+            $this->makeMultiPart($content, $content_type, $encoding, $boundary);
+            break;
+          default:
+            $this->makeDataPart($content, $content_type, $encoding, $filename, $disposition, $id);
+        }
+    }
+
+    private function parse()
+    {
+        if ($this->isType('multipart')) {
+            $this->splitMultipart();
+        } else {
+            $parts = $this->findUUEncoded();
+            if (count($parts)) {
+                $this->convertToMultiPart();
+                $this->multipart    = array_merge(array($textpart), $parts);
+            }
+        }
+    }
+
+    private function splitMultipart()
+    {
+        $this->decodeContent();
+        if (is_null($this->multipart)) {
+            $this->multipart = array();
+        }
+        $boundary =& $this->boundary;
+        $parts = preg_split("/\n--" . preg_quote($boundary, '/') . "(--|\n)/", $this->body, -1, PREG_SPLIT_NO_EMPTY);
+        foreach ($parts as &$part) {
+            $newpart = new BananaMimePart($part);
+            if (!is_null($newpart->content_type)) {
+                $this->multipart[] = $newpart;
+            }
+        }
+        $this->body = null;
+    }
+
+    public static function getMimeType($data, $is_filename = true)
+    {
+        if ($is_filename) {
+            $type = mime_content_type($arg);
+        } else {
+            $arg = escapeshellarg($data);
+            $type = preg_replace('/;.*/', '', trim(shell_exec("echo $arg | file -bi -")));
+        }
+        return empty($type) ? 'application/octet-stream' : $type;
+    }
+
+    private function findUUEncoded()
+    {
+        $this->decodeContent();
+        $parts = array(); 
+        if (preg_match_all("/\n(begin \d+ ([^\r\n]+)\r?(?:\n(?!end)[^\n]*)*\nend)/",
+            $this->body, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as &$match) {
+                $data = convert_uudecode($match[1]);
+                $mime = BananaMimePart::getMimeType($data, false);
+                if ($mime != 'application/x-empty') {
+                    $this->body = trim(str_replace($match[0], '', $this->body));
+                    $newpart = new BananaMimePart;
+                    $newpart->makeDataPart($data, $mime, '8bit', $match[2], 'attachment');
+                    $parts[] = $newpart;
+                }
+            }   
+        } 
+        return $parts;
+    }
+
+    static private function _decodeHeader($charset, $c, $str)
+    {
+        $s = ($c == 'Q' || $c == 'q') ? quoted_printable_decode($str) : base64_decode($str);
+        $s = @iconv($charset, 'UTF-8', $s);
+        return str_replace('_', ' ', $s);
+    }
+
+    static public function decodeHeader(&$val, $key)
+    {
+        if (preg_match('/[\x80-\xff]/', $val)) {
+            if (!is_utf8($val)) {
+                $val = utf8_encode($val);
+            }
+        } else {
+            $val = preg_replace('/(=\?.*?\?[bq]\?.*?\?=) (=\?.*?\?[bq]\?.*?\?=)/i', '\1\2', $val);
+            $val = preg_replace('/=\?(.*?)\?([bq])\?(.*?)\?=/ie', 'BananaMimePart::_decodeHeader("\1", "\2", "\3")', $val);
+        }    
+    }
+
+    static public function &parseHeaders(array &$lines)
+    {
+        $headers = array();
+        while (count($lines)) {
+            $line = array_shift($lines);
+            if (preg_match('/^[\t\r ]+/', $line) && isset($hdr)) {
+                $headers[$hdr] .= ' ' . trim($line);
+            } elseif (!empty($line)) {
+                if (preg_match("/:[ \t\r]*/", $line)) {
+                    list($hdr, $val) = split(":[ \t\r]*", $line, 2);
+                    $hdr = strtolower($hdr);
+                    if (in_array($hdr, Banana::$parse_hdr)) {  
+                        $headers[$hdr] = $val;
+                    } else {
+                        unset($hdr);
+                    }
+                }
+            } else {
+                break;
+            }
+        }
+        array_walk($headers, array('BananaMimePart', 'decodeHeader'));
+        return $headers;
+    }
+
+    static public function encodeHeader($value, $trim = 0)
+    {
+        if ($trim) {
+            if (strlen($value) > $trim) {
+                $value = substr($value, 0, $trim);
+            }
+        }
+        if (preg_match('/[\x80-\xff]/', $value)) {
+            return '=?UTF-8?B?' . base64_encode($value) . '?=';
+        }
+        return $value;
+    }
+
+    private function decodeContent()
+    {
+        $encodings = Array('quoted-printable' => 'quoted_printable_decode',
+                           'base64'           => 'base64_decode',
+                           'x-uuencode'       => 'convert_uudecode');
+        foreach ($encodings as $encoding => $callback) {
+            if ($this->encoding == $encoding) {
+                $this->body     = $callback($this->body);
+                $this->encoding = '8bit';
+                break;
+            }
+        }
+        if (!$this->isType('text')) {
+            return;
+        }
+
+        if (!is_null($this->charset)) {
+            $body = iconv($this->charset, 'UTF-8//IGNORE', $this->body);
+            if (empty($body)) {
+                return;
+            }
+            $this->body = $body;
+        } else {
+            $this->body = utf8_encode($this->body);
+        }
+        $this->charset = 'utf-8';
+    }
+
+    public function send($force_inline = false)
+    {
+        $this->decodeContent();
+        if ($force_inline) {
+            $dispostion =  $this->disposition;
+            $this->disposition = 'inline';
+        }
+        $headers = $this->getHeaders();
+        foreach ($headers as $key => $value) {
+            header("$key: $value");
+        }
+        if ($force_inline) {
+            $this->disposition = $disposition;
+        }
+        echo $this->body;
+        exit;
+    }
+
+    private function setBoundary()
+    {
+        if ($this->isType('multipart') && is_null($this->boundary)) {
+            $this->boundary = '--banana-bound-' . time() . rand(0, 255) . '-';
+        }
+    }
+
+    public function getHeaders()
+    {
+        $headers = array();
+        $this->setBoundary();
+        $headers['Content-Type'] = $this->content_type . ";"
+            . ($this->filename ? " name=\"{$this->filename}\";" : '')
+            . ($this->charset ? " charset=\"{$this->charset}\";" : '')
+            . ($this->boundary ? " boundary=\"{$this->boundary}\";" : "");
+        if ($this->encoding) {
+            $headers['Content-Transfer-Encoding'] = $this->encoding;
+        }
+        if ($this->disposition) {
+            $headers['Content-Disposition'] = $this->disposition
+                . ($this->filename ? "; filename=\"{$this->filename}\"" : '');
+        }
+        return array_map(array($this, 'encodeHeader'), $headers);
+    }
+
+    public function hasBody()
+    {
+        if (is_null($this->content) && !$this->isType('multipart')) {
+            return false;
+        }
+        return true;
+    }
+
+    public function get($with_headers = false)
+    {
+        $content = "";
+        if ($with_headers) {
+            foreach ($this->getHeaders() as $key => $value) {
+                $content .= "$key: $value\n"; 
+            }   
+            $content .= "\n";
+        } 
+        if ($this->isType('multipart')) {
+            $this->setBoundary();
+            foreach ($this->multipart as &$part) {
+                $content .= "\n--{$this->boundary}\n" . $part->get(true);
+            }
+            $content .= "\n--{$this->boundary}--";
+        } else {
+            $content .= $this->body;
+        }
+        return $content;
+    }
+
+    public function getText()
+    {
+        if (!$this->isType('text')) {
+            return null;
+        }
+        $this->decodeContent();
+        return $this->body;
+    }
+
+    protected function getType()
+    {
+        return explode('/', $this->content_type);
+    }
+
+    protected function isType($type, $subtype = null)
+    {
+        list($mytype, $mysub) = $this->getType();
+        return ($mytype == $type) && (is_null($subtype) || $mysub == $subtype);
+    }
+
+    public function isFlowed()
+    {
+        return $this->format == 'flowed';
+    }
+
+    public function getFilename()
+    {
+        return $this->filename;
+    }
+
+    protected function getParts($type, $subtype = null)
+    {
+        $parts = array();
+        if ($this->isType($type, $subtype)) {
+            return array($this);
+        } elseif ($this->isType('multipart')) {
+            foreach ($this->multipart as &$part) {
+                $parts = array_merge($parts, $part->getParts($type, $subtype));
+            }
+        }
+        return $parts;
+    }
+
+    public function toPlainText()
+    {
+        $parts = $this->getParts('text', 'plain');
+        return (count($parts) ? $parts[0] : null);
+    }
+
+    public function toHtml()
+    {
+        $parts = $this->getParts('text', 'html');
+        return (count($parts) ? $parts[0] : null);
+    }
+
+    public function toRichText()
+    {
+        $parts = $this->getParts('text', 'enriched');
+        return (count($parts) ? $parts[0] : null);
+    }
+
+    public function getFile($filename)
+    {
+        if ($this->filename == $filename) {
+            return $this;
+        } elseif ($this->isType('multipart')) {
+            foreach ($this->multipart as &$part) {
+                $file = $part->getFile($filename);
+                if (!is_null($file)) {
+                    return $file;
+                }
+            }
+        }
+        return null;
+    }
+
+    public function getAttachments()
+    {
+        if (!is_null($this->filename)) {
+            return array($this);
+        } elseif ($this->isType('multipart')) {
+            $parts = array();
+            foreach ($this->multipart as &$part) {
+                $parts = array_merge($parts, $part->getAttachments());
+            }
+            return $parts;
+        }
+        return array();
+    }
+
+    public function getPartById($id)
+    {
+        if ($this->id == $id) {
+            return $this;
+        } elseif ($this->isType('multipart')) {
+            foreach ($this->multipart as &$part) {
+                $res = $part->getPartById($id);
+                if (!is_null($res)) {
+                    return $res;
+                }
+            }
+        }
+        return null;
+    }
+}
+
+// vim:set et sw=4 sts=4 ts=4:
+?>

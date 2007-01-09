@@ -1,13 +1,28 @@
 <?php
 /********************************************************************************
-* banana/utf8.php : utf8 to html entities
+* banana/text.php : text tools
 * ---------------
 *
 * This file is part of the banana distribution
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-function utf8entities($source)
+function _b_($str)
+{
+    if (!is_utf8($str)) {
+        $str = utf8_encode($str);
+    }
+    return dgettext('banana', $str);
+}
+
+if (!function_exists('is_utf8')) {
+    function is_utf8($s)
+    {
+        return @iconv('utf-8', 'utf-8', $s) == $s;
+    }
+}
+
+function banana_utf8entities($source)
 {
    // array used to figure what number to decrement from character order value 
    // according to number of characters used to map unicode to ascii by utf-8
