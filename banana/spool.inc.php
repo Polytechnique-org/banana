@@ -7,20 +7,9 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-if(!function_exists('file_put_contents')) {
-    function file_put_contents($filename, $data)
-    {
-        $fp = fopen($filename, 'w');
-        if(!$fp) {
-            trigger_error('file_put_contents cannot write in file '.$filename, E_USER_ERROR);
-            return;
-        }
-        fputs($fp, $data);
-        fclose($fp);
-    }
-}
+require_once dirname(__FILE__) . '/banana.inc.php';
 
-function spoolCompare($a,$b) { return ($b->date>=$a->date); }
+define('BANANA_SPOOL_VERSION', '0.3');
 
 /** Class spoolhead
  *  class used in thread overviews
@@ -28,23 +17,26 @@ function spoolCompare($a,$b) { return ($b->date>=$a->date); }
 class BananaSpoolHead
 {
     /** date (timestamp) */
-    var $date;
+    public $date;
     /** subject */
-    var $subject;
+    public $subject;
     /** author */
-    var $from;
+    public $from;
     /** reference of parent */
-    var $parent;
+    public $parent = null;
     /** paren is direct */
-    var $parent_direct;
+    public $parent_direct;
     /** array of children */
-    var $children = Array();
+    public $children = Array();
     /** true if post is read */
-    var $isread;
+    public $isread;
     /** number of posts deeper in this branch of tree */
-    var $desc;
+    public $desc;
     /**  same as desc, but counts only unread posts */
-    var $descunread;
+    public $descunread;
+
+    /** storage data */
+    public $storage = array();
 
     /** constructor
      * @param $_date INTEGER timestamp of post
@@ -54,60 +46,139 @@ class BananaSpoolHead
      * @param $_read BOOLEAN true if read
      * @param $_descunread INTEGER descunread value (0 for a new post)
      */
-
-    function BananaSpoolHead($_date, $_subject, $_from, $_desc=1, $_read=true, $_descunread=0)
+    public function __construct(array &$message)
     {
-        $this->date       = $_date;
-        $this->subject    = $_subject;
-        $this->from       = $_from;
-        $this->desc       = $_desc;
-        $this->isread     = $_read;
-        $this->descunread = $_descunread;
+        $this->date       = $message['date'];
+        $this->subject    = stripslashes($message['subject']);
+        $this->from       = $message['from'];
+        $this->desc       = 1;
+        $this->isread     = true;
+        $this->descunread = 0;
     }
 }
 
-/** Class spool
- * builds and updates spool 
- */
-
-define("BANANA_SPOOL_VERSION", '0.2');
 
 class BananaSpool
 {
-    var $version;
-    /**  spool */
-    var $overview;
+    private $version;
+
     /**  group name */
-    var $group;
+    public $group;
+    /**  spool */
+    public $overview;
     /**  array msgid => msgnum */
-    var $ids;
+    public $ids;
     /** thread starts */
-    var $roots;
-    /** test validity */
-    var $valid = true;
+    public $roots;
+
 
     /** constructor
      * @param $_group STRING group name
      * @param $_display INTEGER 1 => all posts, 2 => only threads with new posts
      * @param $_since INTEGER time stamp (used for read/unread)
      */
-    function BananaSpool($_group, $_display=0, $_since="")
+    protected function __construct($group)
     {
-        global $banana;
-        $this->group = $_group;
-        $groupinfo   = $banana->nntp->group($_group);
-        if (!$groupinfo) {
-            $this->valid = false;
-            return null; 
+        $this->version    = BANANA_SPOOL_VERSION;
+        $this->group      = $group;
+    }
+
+    public static function getSpool($group, $since = 0)
+    {
+        if (!is_null(Banana::$spool) && Banana::$spool->group == $group) {
+            $spool = Banana::$spool;
+        } else {
+            $spool = BananaSpool::readFromFile($group);
+        }        
+        if (is_null($spool)) {
+            $spool = new BananaSpool($group);
+        }
+        Banana::$spool =& $spool;
+        $spool->build();
+        $spool->updateUnread($since);
+        return $spool;
+    }
+
+    private static function spoolFilename($group)
+    {
+        $file = dirname(dirname(__FILE__));
+        $file .= '/spool/' . Banana::$protocole->name() . '/';
+        if (!is_dir($file)) {
+            mkdir($file);
+        }
+        $url  = parse_url(Banana::$host);
+        if (isset($url['host'])) {
+            $file .= $url['host'] . '_';
+        }
+        if (isset($url['port'])) {
+            $file .= $url['port'] . '_';
+        }
+        $file .= $group;
+        return $file;
+    }
+
+    private static function readFromFile($group)
+    {
+        $file = BananaSpool::spoolFilename($group);
+        if (!file_exists($file)) {
+            return null;
+        }
+        $spool =  unserialize(file_get_contents($file));
+        if ($spool->version != BANANA_SPOOL_VERSION) {
+            return null;
+        }
+        return $spool;
+    }
+
+    private function compare($a, $b)
+    {
+        return ($b->date >= $a->date);
+    }
+
+    private function saveToFile()
+    {
+        $file = BananaSpool::spoolFilename($this->group);
+        uasort($this->overview, array($this, 'compare'));
+
+        $this->roots = Array();
+        foreach($this->overview as $id=>$msg) {
+            if (is_null($msg->parent)) {
+                $this->roots[] = $id;
+            }
         }
 
-        $this->_readFromFile();
+        file_put_contents($file, serialize($this));
+    }
 
+    private function build()
+    {
+        $threshold = 0;
+
+        // Compute the range of indexes
+        list($msgnum, $first, $last) = Banana::$protocole->getIndexes();
+        if ($last < $first) {
+            $threshold = $firt + $msgnum - $last;
+            $threshold = (int)(log($threshold)/log(2));
+            $threshold = (2 ^ ($threshold + 1)) - 1;
+        }
+        if (Banana::$maxspool && Banana::$maxspool < $msgnum) {
+            $first = $last - Banana::$maxspool;
+            if ($first < 0) {
+                $first += $threshold;
+            }
+        }
+        $clean  = $this->clean($first, $last, $msgnum);
+        $update = $this->update($first, $last, $msgnum);
+        
+        if ($clean || $update) {
+            $this->saveToFile();
+        }
+    }
+    
+    private function clean(&$first, &$last, $msgnum)
+    {
         $do_save = false;
-        $first   = $banana->maxspool ? max($groupinfo[2] - $banana->maxspool, $groupinfo[1]) : $groupinfo[1];
-        $last    = $groupinfo[2]; 
-
-        if ($this->version == BANANA_SPOOL_VERSION && is_array($this->overview)) {
+        if (is_array($this->overview)) {
             $mids = array_keys($this->overview);
             foreach ($mids as $id) {
                 if (($first <= $last && ($id < $first || $id > $last))
@@ -120,136 +191,103 @@ class BananaSpool
             if (!empty($this->overview)) {
                 $first = max(array_keys($this->overview))+1;
             }
-        } else {
-            unset($this->overview, $this->ids);
-            $this->version = BANANA_SPOOL_VERSION;
         }
-
-        if ($first<=$last && $groupinfo[0]) {
-            $do_save = true;
-            $this->_updateSpool("$first-$last");
-        }
-
-        if ($do_save) { $this->_saveToFile(); }
-
-        $this->_updateUnread($_since, $_display);
+        return $do_save;
     }
 
-    function _readFromFile()
+    private function update(&$first, &$last, $msgnum)
     {
-        $file = $this->_spoolfile();
-        if (file_exists($file)) {
-            $temp = unserialize(file_get_contents($file));
-            foreach (get_object_vars($temp) as $key=>$val) {
-                $this->$key = $val;
+        if ($first >= $last || !$msgnum) {       
+            return false;
+        }
+
+        $messages =& Banana::$protocole->getMessageHeaders($first, $last,
+            array('Date', 'Subject', 'From', 'Message-ID', 'References', 'In-Reply-To'));
+
+        if (!is_array($this->ids)) {
+            $this->ids = array();
+        }
+        foreach ($messages as $id=>&$message) {
+            $this->ids[$message['message-id']] = $id;
+        }
+
+        foreach ($messages as $id=>&$message) {
+            if (!isset($this->overview[$id])) {
+                $this->overview[$id] = new BananaSpoolHead($message);
             }
-        }
-    }
-
-    function _saveToFile()
-    {
-        $file = $this->_spoolfile();
-        uasort($this->overview, "spoolcompare");
-
-        $this->roots = Array();
-        foreach($this->overview as $id=>$msg) {
-            if (is_null($msg->parent)) {
-                $this->roots[] = $id;
-            }
-        }
-
-        file_put_contents($file, serialize($this));
-    }
-
-    function _spoolfile()
-    {
-        global $banana;
-        $url = parse_url($banana->host);
-        $file = $url['host'].'_'.$url['port'].'_'.$this->group;
-        return dirname(dirname(__FILE__)).'/spool/'.$file;
-    }
-
-    function _updateSpool($arg)
-    {
-        global $banana;
-        $dates    = array_map('strtotime',    $banana->nntp->xhdr('Date',    $arg));
-        $subjects = array_map('headerdecode', $banana->nntp->xhdr('Subject', $arg));
-        $froms    = array_map('headerdecode', $banana->nntp->xhdr('From',    $arg));
-        $msgids   = $banana->nntp->xhdr('Message-ID', $arg);
-        $refs     = $banana->nntp->xhdr('References', $arg);
-
-        if (is_array(@$this->ids)) {
-            $this->ids = array_merge($this->ids, array_flip($msgids));
-        } else {
-            $this->ids = array_flip($msgids);
-        }
-
-        foreach ($msgids as $id=>$msgid) {
-            $msg                = new BananaSpoolHead($dates[$id], $subjects[$id], $froms[$id]);
-            $refs[$id]          = str_replace('><', '> <', @$refs[$id]);
-            $msgrefs            = preg_split("/[ \t]/", strtr($refs[$id], $this->ids));
-            $parents            = preg_grep('/^\d+$/', $msgrefs);
-            $msg->parent        = array_pop($parents);
+            $msg    =& $this->overview[$id];
+            $msgrefs = BananaMessage::formatReferences($message);
+            $parents = preg_grep('/^\d+$/', $msgrefs);
+            $msg->parent = array_pop($parents);
             $msg->parent_direct = preg_match('/^\d+$/', array_pop($msgrefs));
 
-            if (isset($this->overview[$id])) {
-                $msg->desc     = $this->overview[$id]->desc;
-                $msg->children = $this->overview[$id]->children;
-            }
-            $this->overview[$id] = $msg;
-
-            if ($p = $msg->parent) {
+            if (!is_null($p = $msg->parent)) {
                 if (empty($this->overview[$p])) {
-                    $this->overview[$p] = new BananaSpoolHead($dates[$p], $subjects[$p], $froms[$p], 1);
+                    $this->overview[$p] = new BananaSpoolHead($messages[$p]);
                 }
                 $this->overview[$p]->children[] = $id;
 
-                while ($p) {
+                while (!is_null($p)) {
                     $this->overview[$p]->desc += $msg->desc;
-                    $p = $this->overview[$p]->parent;
+                    if ($p != $this->overview[$p]->parent) {
+                        $p = $this->overview[$p]->parent;
+                    } else {
+                        $p = null;
+                    }    
+                }
+            }
+        }
+        Banana::$protocole->updateSpool($messages);
+        return true;
+    }
+
+    private function updateUnread($since)
+    {
+        if (empty($since)) {
+            return;
+        }
+
+        $newpostsids = Banana::$protocole->getNewIndexes($since);
+        
+        if (empty($newpostsids)) {
+            return;
+        }
+
+        if (!is_array($this->ids)) {
+            $this->ids = array();
+        }
+        $newpostsids = array_intersect($newpostsids, array_keys($this->ids));
+        foreach ($newpostsids as $mid) {
+            $id = $this->ids[$mid];
+            if ($this->overview[$id]->isread) {
+                $this->overview[$id]->isread     = false;
+                $this->overview[$id]->descunread = 1;
+                while (isset($id)) {
+                    $this->overview[$id]->descunread ++;
+                    $id = $this->overview[$id]->parent;
                 }
             }
         }
     }
 
-    function _updateUnread($since, $mode)
+    public function setMode($mode)
     {
-        global $banana;
-        if (empty($since)) { return; }
-
-        if (is_array($newpostsids = $banana->nntp->newnews($since, $this->group))) {
-            if (!is_array($this->ids)) { $this->ids = array(); }
-            $newpostsids = array_intersect($newpostsids, array_keys($this->ids));
-            foreach ($newpostsids as $mid) {
-                $this->overview[$this->ids[$mid]]->isread     = false;
-                $this->overview[$this->ids[$mid]]->descunread = 1;
-                $parentmid = $this->ids[$mid];
-                while (isset($parentmid)) {
-                    $this->overview[$parentmid]->descunread ++;
-                    $parentmid = $this->overview[$parentmid]->parent;
+        switch ($mode) {
+          case Banana::SPOOL_UNREAD:
+            foreach ($this->roots as $k=>$i) {
+                if ($this->overview[$i]->descunread == 0) {
+                    $this->killdesc($i);
+                    unset($this->roots[$k]);
                 }
             }
-
-            if (count($newpostsids)) {
-                switch ($mode) {
-                    case 1:
-                        foreach ($this->roots as $k=>$i) {
-                            if ($this->overview[$i]->descunread==0) {
-                                $this->killdesc($i);
-                                unset($this->roots[$k]);
-                            }
-                        }
-                        break;
-                }
-            }
+            break;
         }
     }
 
     /** kill post and childrens
      * @param $_id MSGNUM of post
      */
-
-    function killdesc($_id)
+    private function killdesc($_id)
     {
         if (sizeof($this->overview[$_id]->children)) {
             foreach ($this->overview[$_id]->children as $c) {
@@ -265,8 +303,7 @@ class BananaSpool
     /** delete a post from overview
      * @param $_id MSGNUM of post
      */
-
-    function delid($_id, $write=true)
+    public function delid($_id, $write = true)
     {
         if (isset($this->overview[$_id])) {
             if (sizeof($this->overview[$_id]->parent)) {
@@ -296,8 +333,27 @@ class BananaSpool
                 unset($this->ids[$msgid]);
             }
             
-            if ($write) { $this->_saveToFile(); }
+            if ($write) {
+                $this->saveToFile();
+            }
         }
+    }
+
+    private function formatDate($stamp)
+    {
+        $today  = intval(time() / (24*3600));
+        $dday   = intval($stamp / (24*3600));
+
+        if ($today == $dday) {
+            $format = "%H:%M";
+        } elseif ($today == 1 + $dday) {
+            $format = _b_('hier')." %H:%M";
+        } elseif ($today < 7 + $dday) {
+            $format = '%a %H:%M';
+        } else {
+            $format = '%a %e %b';
+        }
+        return utf8_encode(strftime($format, $stamp));
     }
 
     /** displays children tree of a post
@@ -314,74 +370,75 @@ class BananaSpool
      * take the subject as a reference parameter, transform this subject to be displaid in the spool
      * view and return a string. This string will be put after the subject.
      */
-
-    function _to_html($_id, $_index, $_first=0, $_last=0, $_ref="", $_pfx_node="", $_pfx_end="", $_head=true)
+    private function _to_html($_id, $_index, $_first=0, $_last=0, $_ref="", $_pfx_node="", $_pfx_end="", $_head=true)
     {
-        $spfx_f   = makeImg('k1.gif',       'o', 21, 9); 
-        $spfx_n   = makeImg('k2.gif',       '*', 21, 9);
-        $spfx_Tnd = makeImg('T-direct.gif', '+', 21, 12);
-        $spfx_Lnd = makeImg('L-direct.gif', '`', 21, 12);
-        $spfx_snd = makeImg('s-direct.gif', '-', 21, 5);
-        $spfx_T   = makeImg('T.gif',        '+', 21, 12);
-        $spfx_L   = makeImg('L.gif',        '`', 21, 12);
-        $spfx_s   = makeImg('s.gif',        '-', 21, 5);
-        $spfx_e   = makeImg('e.gif',        '&nbsp;', 21, 12);
-        $spfx_I   = makeImg('I.gif',        '|', 21, 12);
+        static $spfx_f, $spfx_n, $spfx_Tnd, $spfx_Lnd, $spfx_snd, $spfx_T, $spfx_L, $spfx_s, $spfx_e, $spfx_I;
+        if (!isset($spfx_f)) {
+            $spfx_f   = Banana::$page->makeImg(Array('img' => 'k1',       'alt' => 'o', 'height' => 21,  'width' => 9)); 
+            $spfx_n   = Banana::$page->makeImg(Array('img' => 'k2',       'alt' => '*', 'height' => 21,  'width' => 9));
+            $spfx_Tnd = Banana::$page->makeImg(Array('img' => 'T-direct', 'alt' => '+', 'height' => 21, 'width' => 12));
+            $spfx_Lnd = Banana::$page->makeImg(Array('img' => 'L-direct', 'alt' => '`', 'height' => 21, 'width' => 12));
+            $spfx_snd = Banana::$page->makeImg(Array('img' => 's-direct', 'alt' => '-', 'height' => 21, 'width' => 5));
+            $spfx_T   = Banana::$page->makeImg(Array('img' => 'T',        'alt' => '+', 'height' => 21, 'width' => 12));
+            $spfx_L   = Banana::$page->makeImg(Array('img' => 'L',        'alt' => '`', 'height' => 21, 'width' => 12));
+            $spfx_s   = Banana::$page->makeImg(Array('img' => 's',        'alt' => '-', 'height' => 21, 'width' => 5));
+            $spfx_e   = Banana::$page->makeImg(Array('img' => 'e',   'alt' => '&nbsp;', 'height' => 21, 'width' => 12));
+            $spfx_I   = Banana::$page->makeImg(Array('img' => 'I',        'alt' => '|', 'height' => 21, 'width' => 12));
+        }
 
-        if ($_index + $this->overview[$_id]->desc < $_first || $_index > $_last) {
-            return;
+        $overview =& $this->overview[$_id];
+        if ($_index + $overview->desc < $_first || $_index > $_last) {
+            return '';
         }
 
         $res = '';
+        if ($_index >= $_first) {
+            $hc = empty($overview->children);
 
-        if ($_index>=$_first) {
-            $hc = empty($this->overview[$_id]->children);
-
-            $res .= '<tr class="'.($_index%2?'pair':'impair').($this->overview[$_id]->isread?'':' new')."\">\n";
-            $res .= "<td class='date'>".fancyDate($this->overview[$_id]->date)." </td>\n";
-            $res .= "<td class='subj'>"
-                ."<div class='tree'>$_pfx_node".($hc?($_head?$spfx_f:($this->overview[$_id]->parent_direct?$spfx_s:$spfx_snd)):$spfx_n)
-                ."</div>";
-            $subject = $this->overview[$_id]->subject;
-            if (strlen($subject) == 0) {
+            $res .= '<tr class="' . ($_index%2 ? 'pair' : 'impair') . ($overview->isread ? '' : ' new') . "\">\n";
+            $res .= '<td class="date">' . $this->formatDate($overview->date) . " </td>\n";
+            $res .= '<td class="subj' . ($_index == $_ref ? ' cur' : '') . '">'
+                . $_pfx_node .($hc ? ($_head ? $spfx_f : ($overview->parent_direct ? $spfx_s : $spfx_snd)) : $spfx_n);
+            $subject = $overview->subject;
+            if (empty($subject)) {
                 $subject = _b_('(pas de sujet)');
             }
             $link = null;
             if (function_exists('hook_getSubject')) {
                 $link = hook_getSubject($subject);
             }
-            $subject = formatPlainText(htmlentities($subject));
-            if ($_index == $_ref) {
-                $res .= '<span class="cur">' . $subject . $link . '</span>';
-            } else {
-                $res .= makeHREF(Array('group' => $this->group,
-                                       'artid' => $_id),
-                                 $subject,
-                                 $subject)
-                     . $link;
+            $subject = banana_catchFormats($subject);
+            if ($_index != $_ref) {
+                $subject = Banana::$page->makeLink(Array('group' => $this->group, 'artid' => $_id,
+                                                    'text'  => $subject, 'popup' => $subject));
             }
-            $res .= "</td>\n<td class='from'>".formatFrom($this->overview[$_id]->from)."</td>\n</tr>";
+            $res .= '&nbsp;' . $subject . $link;
+            $res .= "</td>\n<td class='from'>" . BananaMessage::formatFrom($overview->from) . "</td>\n</tr>";
 
-            if ($hc) { return $res; }
+            if ($hc) {
+                return $res;
+            }
         } 
 
         $_index ++;
-
-        $children = $this->overview[$_id]->children;
+        $children = $overview->children;
         while ($child = array_shift($children)) {
-            if ($_index > $_last) { return $res; }
-            if ($_index+$this->overview[$child]->desc >= $_first) {
+            $overview =& $this->overview[$child];
+            if ($_index > $_last) {
+                return $res;
+            }
+            if ($_index + $overview->desc >= $_first) {
                 if (sizeof($children)) {
                     $res .= $this->_to_html($child, $_index, $_first, $_last, $_ref,
-                            $_pfx_end.($this->overview[$child]->parent_direct?$spfx_T:$spfx_Tnd),
-                            $_pfx_end.$spfx_I, false);
+                            $_pfx_end . ($overview->parent_direct ? $spfx_T : $spfx_Tnd),
+                            $_pfx_end . $spfx_I, false);
                 } else {
                     $res .= $this->_to_html($child, $_index, $_first, $_last, $_ref,
-                            $_pfx_end.($this->overview[$child]->parent_direct?$spfx_L:$spfx_Lnd),
-                            $_pfx_end.$spfx_e, false);
+                            $_pfx_end . ($overview->parent_direct ? $spfx_L : $spfx_Lnd),
+                            $_pfx_end . $spfx_e, false);
                 }
             }
-            $_index += $this->overview[$child]->desc;
+            $_index += $overview->desc;
         }
 
         return $res;
@@ -392,64 +449,38 @@ class BananaSpool
      * @param $_last INTEGER MSGNUM of last post
      * @param $_ref STRING MSGNUM of current/selectionned post
      */
-
-    function to_html($_first=0, $_last=0, $_ref = null)
+    public function toHtml($first = 0, $overview = false)
     {
-        $res  = '<table class="bicol banana_thread" cellpadding="0" cellspacing="0">';
-       
-        if (is_null($_ref)) {
-            $next = $this->nextUnread();
-            if (!is_null($next)) {
-                $next = '<div class="banana_menu">'
-                      . makeImgLink(Array('group' => $this->group,
-                                          'artid' => $next),
-                                    'next_unread.gif',
-                                    _b_('Message non-lu suivant'), null, null, null, 'u')
-                      . '</div>';
-            }
-            $new  = '<div class="banana_action">'
-                  . makeImgLink(Array('group'  => $this->group,
-                                      'action' => 'new'),
-                                'post.gif',
-                                _b_('Nouveau message'), null, null, null, 'p')
-                  . '</div>';
+        $res = '';
 
-            $res .= '<tr><th>' . $next . _b_('Date') . '</th>';
-            $res .= '<th>' .  _b_('Sujet') . '</th>';
-            $res .= '<th>' . $new . _b_('Auteur') . '</th></tr>';
+        if (!$overview) {
+            $_first = $first;
+            $_last  = $first + Banana::$tmax - 1;
+            $_ref   = null;
         } else {
-            $res .= '<tr><th colspan="3">' . _b_('Aperçu de ')
-                 . makeHREF(Array('group' => $this->group),
-                            $this->group)
-                 . '</th></tr>';
+            $_ref   = $this->getNdx($first);
+            $_last  = $_ref + Banana::$tafter;
+            $_first = $_ref - Banana::$tbefore;
+            if ($_first < 0) {
+                $_last -= $_first;
+            }
         }
-
         $index = 1;
-        if (sizeof($this->overview)) {
-            foreach ($this->roots as $id) {
-                $res   .= $this->_to_html($id, $index, $_first, $_last, $_ref);
-                $index += $this->overview[$id]->desc ;
-                if ($index > $_last) { break; }
+        foreach ($this->roots as $id) {
+            $res   .= $this->_to_html($id, $index, $_first, $_last, $_ref);
+            $index += $this->overview[$id]->desc ;
+            if ($index > $_last) {
+                break;
             }
-        } else {
-            $res .= '<tr><td colspan="3">'._b_('Aucun message dans ce forum').'</td></tr>';
         }
-
-        global $banana;
-        if (is_object($banana->groups)) {
-            $res .= '<tr><td colspan="3" class="subs">'
-                 . $banana->groups->to_html()
-                 . '</td></tr>';
-        }
-        return $res .= '</table>';
+        return $res;
     }
 
     /** computes linear post index
      * @param $_id INTEGER MSGNUM of post
      * @return INTEGER linear index of post
      */
-
-    function getndx($_id)
+    public function getNdX($_id)
     {
         $ndx    = 1;
         $id_cur = $_id;
@@ -478,8 +509,8 @@ class BananaSpool
     /** Return root message of the given thread
      * @param id INTEGER id of a message
      */
-     function root($id)
-     {
+    public function root($id)
+    {
         $id_cur = $id;
         while (true) {
             $id_parent = $this->overview[$id_cur]->parent;
@@ -492,7 +523,7 @@ class BananaSpool
     /** Returns previous thread root index
      * @param id INTEGER message number
      */
-    function prevThread($id)
+    public function prevThread($id)
     {
         $root = $this->root($id);
         $last = null;
@@ -508,7 +539,7 @@ class BananaSpool
     /** Returns next thread root index
      * @param id INTEGER message number
      */
-    function nextThread($id)
+    public function nextThread($id)
     {
         $root = $this->root($id);
         $ok   = false;
@@ -526,7 +557,7 @@ class BananaSpool
     /** Return prev post in the thread
      * @param id INTEGER message number
      */
-    function prevPost($id)
+    public function prevPost($id)
     {
         $parent = $this->overview[$id]->parent;
         if (is_null($parent)) {
@@ -545,7 +576,7 @@ class BananaSpool
     /** Return next post in the thread
      * @param id INTEGER message number
      */
-    function nextPost($id)
+    public function nextPost($id)
     {
         if (count($this->overview[$id]->children) != 0) {
             return $this->overview[$id]->children[0];
@@ -574,7 +605,7 @@ class BananaSpool
     /** Look for an unread message in the thread rooted by the message
      * @param id INTEGER message number
      */
-    function _nextUnread($id)
+    private function _nextUnread($id)
     {
         if (!$this->overview[$id]->isread) {
             return $id;
@@ -591,7 +622,7 @@ class BananaSpool
     /** Find next unread message
      * @param id INTEGER message number
      */
-    function nextUnread($id = null)
+    public function nextUnread($id = null)
     {
         if (!is_null($id)) {
             // Look in message children
