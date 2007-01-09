@@ -1,4 +1,4 @@
-#! /usr/bin/php4
+#!/usr/bin/php5
 <?php
 /********************************************************************************
  * spoolgen.php : spool generation
@@ -22,29 +22,38 @@ EOF;
 
 class MyBanana extends Banana
 {
-    function MyBanana()
+    public function __construct()
     {
         global $opt;
-        $this->host = "http://{$opt['u']}:{$opt['p']}@localhost:119/";
-        echo $this->host;
-        parent::Banana();
+        Banana::$host = "news://{$opt['u']}:{$opt['p']}@localhost:119/\n";
+        echo Banana::$host;
+        parent::__construct();
     }
 
-    function createAllSpool()
+    private function checkErrors()
     {
-        $this->_require('groups');
-        $this->_require('spool');
-        $this->_require('misc');
+        if (Banana::$protocole->lastErrno()) {
+            echo "\nL'erreur suivante s'est produite : "
+                . Banana::$protocole->lastErrno() . " "
+                . Banana::$protocole->lastError() . "\n";
+            exit;
+        }
+    }
 
-        $groups = new BananaGroups(BANANA_GROUP_ALL);
+    public function createAllSpool()
+    {
+        $this->checkErrors();
+        $groups = Banana::$protocole->getBoxList();
+        $this->checkErrors();
 
-        foreach (array_keys($groups->overview) as $g) {
+        foreach (array_keys($groups) as $g) {
             print "Generating spool for $g : ";
-            $spool = new BananaSpool($g);
+            Banana::$group = $g;
+            $spool = $this->loadSpool($g);
+            $this->checkErrors();
             print "done.\n";
             unset($spool);
         }
-        $this->nntp->quit();
     }
 }
 

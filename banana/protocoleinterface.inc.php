@@ -13,7 +13,7 @@ interface BananaProtocoleInterface
 {
     /** Build a protocole handler plugged on the given box
      */
-    public function __construct($box = null);
+    public function __construct();
 
     /** Indicate if the Protocole handler has been succesfully built
      */

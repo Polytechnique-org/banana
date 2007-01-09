@@ -13,8 +13,6 @@ require_once dirname(__FILE__) . '/message.inc.php';
 
 class BananaMBox implements BananaProtocoleInterface
 {
-    private $boxname;
-
     private $file         = null;
     private $filesize     = null;
     private $current_id   = null;
@@ -30,10 +28,9 @@ class BananaMBox implements BananaProtocoleInterface
 
     /** Build a protocole handler plugged on the given box
      */
-    public function __construct($box = null)
+    public function __construct()
     {
-        $this->boxname = $box;
-        $filename = $this->getFileName($box);
+        $filename = $this->getFileName(Banana::$group);
         if (is_null($filename)) {
             return;
         }
@@ -61,7 +58,7 @@ class BananaMBox implements BananaProtocoleInterface
      */
     public function isValid()
     {
-        return is_null($this->boxname) || !is_null($this->file);
+        return !Banana::$group || $this->file;
     }
     
     /** Indicate last error n°
@@ -93,7 +90,7 @@ class BananaMBox implements BananaProtocoleInterface
      */
     public function getBoxList($mode = Banana::BOXES_ALL, $since = 0, $withstats = false)
     {
-        return array($this->boxname => array('desc' => '', 'msgnum' => 0, 'unread' => 0));
+        return array(Banana::$group => array('desc' => '', 'msgnum' => 0, 'unread' => 0));
     }
 
     /** Return a message
