@@ -14,7 +14,6 @@ require_once dirname(__FILE__) . '/protocoleinterface.inc.php';
 
 class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
 {
-    private $groupname = null;
     private $description = null;
     private $ingroup = null;
 
@@ -23,7 +22,7 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
 
     /** Build a protocole handler plugged on the given box
      */
-    public function __construct($box = null)
+    public function __construct()
     {
         $url = parse_url(Banana::$host);
         if ($url['scheme'] == 'nntps' || $url['scheme'] == 'snntp') {
@@ -38,7 +37,6 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
             parent::__construct($url['host'], $url['port'], 120, false);
             $this->authinfo($url['user'], $url['pass']);
         }      
-        $this->groupname = $box;
     }
 
     /** Return the descript;ion of the current box
@@ -48,9 +46,9 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
         if ($this->description) {
             return $this->description;
         }
-        $descs = $this->xgtitle($this->groupname);
-        if (isset($descs[$this->groupname])) {
-            $this->description = $descs[$this->groupname];
+        $descs = $this->xgtitle(Banana::$group);
+        if (isset($descs[Banana::$group])) {
+            $this->description = $descs[Banana::$group];
         }
         return $this->description;
     }
@@ -107,10 +105,10 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
      */
     public function getMessage($id, array $msg_headers = array(), $is_msgid = false)
     {
-        if (!$is_msgid && $this->groupname != $this->ingroup) {
+        if (!$is_msgid && Banana::$group != $this->ingroup) {
             if (is_null(Banana::$spool)) {
-                $this->group($this->groupname);
-                $this->ingroup = $this->groupname;
+                $this->group(Banana::$group);
+                $this->ingroup = Banana::$group;
             } else {
                 $id = array_search($id, Banana::$spool->ids);
             }
@@ -127,8 +125,8 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
      */
     public function getIndexes()
     {
-        list($msgnum, $first, $last, $groupname) = $this->group($this->groupname);
-        $this->ingroup = $this->groupname;
+        list($msgnum, $first, $last, $groupname) = $this->group(Banana::$group);
+        $this->ingroup = Banana::$group;
         return array($msgnum, $first, $last);
     }
 
@@ -167,7 +165,7 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
      */
     public function getNewIndexes($since)
     {
-        return $this->newnews($this->groupname, $since);
+        return $this->newnews(Banana::$group, $since);
     }
 
     /** Return true if can post
@@ -204,7 +202,7 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
     public function cancel(BananaMessage &$message)
     {
         $headers = Array('From' => Banana::$profile['From'],
-                         'Newsgroups' => $this->groupname,
+                         'Newsgroups' => Banana::$group,
                          'Subject'    => 'cmsg ' . $message->getHeaderValue('message-id'),
                          'Control'    => 'cancel ' . $message->getHeaderValue('message-id'));
         $headers = array_merge($headers, Banana::$custom_hdr);

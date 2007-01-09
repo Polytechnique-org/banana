@@ -422,7 +422,7 @@ class Banana
     /* Private functions                                                      */
     /**************************************************************************/
 
-    private function loadSpool($group)
+    protected function loadSpool($group)
     {
         Banana::load('spool');
         if (!Banana::$spool || Banana::$spool->group != $group) {
@@ -437,7 +437,7 @@ class Banana
         return true;
     }
 
-    private function &loadMessage($group, $artid)
+    protected function &loadMessage($group, $artid)
     {
         Banana::load('message');
         if ($group == @$_SESSION['banana_group'] && $artid == @$_SESSION['banana_artid']
@@ -455,7 +455,7 @@ class Banana
         return $message;
     }
 
-    private function removeMessage($group, $artid)
+    protected function removeMessage($group, $artid)
     {
         Banana::$spool->delId($artid);
         if ($group == $_SESSION['banana_group']) {
