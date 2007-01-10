@@ -11,7 +11,7 @@
             <li class="actif">{$pg.text}</li>
             {assign var=current_page value=$pg}
           {else}
-            <li>{if $name eq 'subscribe'}{link subscribe=1 text=$pg.text}
+            <li>{if $name eq 'subscribe'}{link action=subscribe text=$pg.text}
             {elseif $name eq 'forums'}{link text=$pg.text}
             {elseif $name eq 'thread'}{link group=$group text=$group}
             {elseif $name eq 'message'}{link group=$group artid=$artid text=$pg.text}
@@ -27,6 +27,7 @@
       {foreach from=$errors item=error}
       <p class="error">{$error}</p>
       {/foreach}
+      {if !$killed}
       {foreach from=$actions item=act}
       <p class="center" style="padding: 0; margin: 0 0 1em 0">{$act.text}</p>
       {/foreach}
@@ -55,6 +56,7 @@
         {include file="banana-message.inc.tpl" noactions=true}
       {elseif $current_page.template}
         {include file=$current_page.template}
+      {/if}
       {/if}
     </td>
   </tr>

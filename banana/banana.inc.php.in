@@ -145,7 +145,7 @@ class Banana
 
         // Look for the action to execute
         if (is_null(Banana::$group)) {
-            if (isset($this->params['subscribe'])) {
+            if (isset($this->params['action']) && $this->params['action'] == 'subscribe') {
                 Banana::$action = Banana::ACTION_BOX_SUBS;
             } else {
                 Banana::$action = Banana::ACTION_BOX_LIST;
@@ -171,27 +171,6 @@ class Banana
           default:
             Banana::$action = Banana::ACTION_MSG_READ;
         }
-    }
-
-    /** Register an action to show on banana page
-     * @param action_code HTML code of the action
-     * @param pages ARRAY pages where to show the action (null == every pages)
-     * @return true if success
-     */
-    public function registerAction($action_code, array $pages = null)
-    {
-        return Banana::$page->registerAction($action_code, $pages);
-    }
-
-    /** Register a new page
-     * @param name Name of the page
-     * @param text Text for the tab of the page
-     * @param template Template path for the page if null, the page is not handled by banana
-     * @return true if success
-     */
-    public function registerPage($name, $text, $template = null)
-    {
-        return Banana::$page->registerPage($name, $text, $template);
     }
 
     /** Run Banana
