@@ -28,34 +28,58 @@ class BananaPage extends Smarty
     
     }
 
+    /** Add an error message
+     * @param message STRING html code of the error to display
+     */
     public function trig($message)
     {
         $this->error[] = $message;
     }
 
+    /** Kill the current page (generate an error message and skip page generation)
+     * @param message STRING html code of the error message to display
+     @ @return XHTML code of the page
+     */
     public function kill($message)
     {
         $this->trig($message);
+        $this->assign('killed', true);
         return $this->run();
     }
 
+    /** Set the current page
+     * @param page STRING page name
+     */
     public function setPage($page)
     {
         $this->page = $page;
     }
 
+    /** Register an action to show on banana page
+     * @param action_code HTML code of the action
+     * @param pages ARRAY pages where to show the action (null == every pages)
+     * @return true if success
+     */ 
     public function registerAction($action_code, array $pages = null)
     {
         $this->actions[] = array('text' => $action_code, 'pages' => $pages);
         return true;
     }
 
+    /** Register a new page
+     * @param name Name of the page
+     * @param text Text for the tab of the page
+     * @param template Template path for the page if null, the page is not handled by banana
+     * @return true if success
+     */
     public function registerPage($name, $text, $template = null)
     {
         $this->pages[$name] = array('text' => $text, 'template' => $template);
         return true;
     }
-
+    
+    /** Generate XHTML code
+     */
     public function run()
     {
         $this->registerPage('subscribe', _b_('Abonnements'), null);
@@ -107,7 +131,22 @@ class BananaPage extends Smarty
         return $text;
     }
 
-    public function makeUrl($params, &$smarty = null)
+    /** Build a URL in Banana
+     * @param params ARRAY location datas
+     * @param smarty OBJECT Smarty instance associated (null if none)
+     * @return URL of the page associated with the given parameters
+     * 
+     * Usual parameters are :
+     * - group : the box name
+     * - artid : the current message id (index of message-id)
+     * - part  : part id to show (may be a content-id, xface or a mime-type for text)
+     * - first : first linear-index to show in spool view
+     * - action: like subscribe, cancel, new
+     * - all others params are allowed, but not parsed by the base implementation of banana
+     *
+     * smarty funciton : {url param1=... param2=...}
+     */
+    public function makeUrl(array $params, &$smarty = null)
     {
         if (function_exists('hook_makeLink')
                 && $res = hook_makeLink($params)) {
@@ -131,7 +170,21 @@ class BananaPage extends Smarty
         return $proto . $host . $file . $get;
     }
 
-    public function makeLink($params, &$smarty = null)
+    /** Build a link to a Banana page
+     * @param params ARRAY location datas
+     * @param smarty OBJECT Smarty instance associated (null if none)
+     * @return Link to the page associated with the given parameters
+     *
+     * Support all @ref makeURL parameters, but catch the following:
+     * - text     : if set, defined the text of the link (if not set, the URL is used
+     * - popup    : title of the link (showed as a tooltip on most browsers)
+     * - class    : specific style class for the markup
+     * - accesskey: keyboard key to trigger the link
+     * None of this parameters is needed
+     *
+     * Smarty function : {link param1=... param2=...}
+     */
+    public function makeLink(array $params, &$smarty = null)
     {
         $catch = array('text', 'popup', 'class', 'accesskey');
         foreach ($catch as $key) {
@@ -146,24 +199,33 @@ class BananaPage extends Smarty
             $popup .= ' (raccourci : ' . $accesskey . ')';
         }
         if (!is_null($popup)) {
-            $popup = ' title="' . $popup . '"';
+            $popup = ' title="' . banana_htmlentities($popup) . '"';
         }
         if (!is_null($class)) {
             $class = ' class="' . $class . '"';
         }
-        $target = null;
-        if (isset($params['action']) && $params['action'] == 'view') {
-            $target = ' target="_blank"';
-        }
         if (!is_null($accesskey)) {
             $accesskey = ' accesskey="' . $accesskey . '"';
         }
-        return '<a href="' . htmlentities($link) . '"'
-              . $target . $popup . $class . $accesskey
+        return '<a href="' . banana_htmlentities($link) . '"'
+              . $popup . $class . $accesskey
               . '>' . $text . '</a>';
     }
 
-    public function makeImg($params, &$smarty = null)
+    /** Build a link to one of the banana built-in images
+     * @param params ARRAY image datas
+     * @param smarty OBJECT Smarty instance associated (null if none)
+     * @return Img tag
+     *
+     * Supported parameters are
+     * - img : name of the image (without its extension)
+     * - alt : alternative text
+     * - height and width : dimensions of the images
+     * img and alt are needed
+     *
+     * Smarty function: {img img=... alt=... [height=...] [width=...]}
+     */
+    public function makeImg(array $params, &$smarty = null)
     {
         $catch = array('img', 'alt', 'height', 'width');
         foreach ($catch as $key) {
@@ -189,19 +251,35 @@ class BananaPage extends Smarty
 
         return '<img src="' . $url . '"' . $height . $width . ' alt="' . _b_($alt) . '" />';
     }
-
-    public function makeImgLink($params, &$smarty = null)
+    
+    /** Build a link with an image as text
+     * @param params ARRAY image and location data
+     * @param smarty OBJECT Smarty instance associated (null if none)
+     * @return an image within an link
+     *
+     * All @ref makeImg and @ref makeLink parameters are supported
+     * if text is set, the text will be appended after the image in the link
+     *
+     * Smarty function : {imglink img=... alt=... [param1=...]}
+     */
+    public function makeImgLink(array $params, &$smarty = null)
     {
         $params['alt'] = _b_($params['alt']);
-        $params['popup'] = $params['alt'];
-        $params['text'] = $this->makeImg($params, $smarty);
+        if (!isset($params['popup'])) {
+            $params['popup'] = $params['alt'];
+        }    
+        $img = $this->makeImg($params, $smarty);
+        if (isset($params['text'])) {
+            $img .= ' ' . $params['text'];
+        }
+        $params['text'] = $img;
         return $this->makeLink($params, $smarty);
     }
 
     /** Redirect to the page with the given parameter
-     * @ref makeLink
+     * @ref makeURL
      */
-    public function redirect($params = array())
+    public function redirect(array $params = array())
     {
         header('Location: ' . $this->makeUrl($params));
     }

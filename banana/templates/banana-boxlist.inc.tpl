@@ -1,6 +1,6 @@
 {if $groups|@count}
 {if $withsubs}
-<form action="{url subscribe=1}" method="post">
+<form action="{url action=subscribe}" method="post">
 <p style="text-align: center">
   <input type="submit" name="validsubs" value="Valider" />
 </p>

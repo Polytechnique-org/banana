@@ -197,7 +197,7 @@ class BananaSpool
 
     private function update(&$first, &$last, $msgnum)
     {
-        if ($first >= $last || !$msgnum) {       
+        if ($first > $last || !$msgnum) {       
             return false;
         }
 
