@@ -277,7 +277,7 @@ class BananaMimePart
                 if (preg_match("/:[ \t\r]*/", $line)) {
                     list($hdr, $val) = split(":[ \t\r]*", $line, 2);
                     $hdr = strtolower($hdr);
-                    if (in_array($hdr, Banana::$parse_hdr)) {  
+                    if (in_array($hdr, Banana::$msgparse_headers)) {  
                         $headers[$hdr] = $val;
                     } else {
                         unset($hdr);
