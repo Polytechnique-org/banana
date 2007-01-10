@@ -95,14 +95,12 @@ class BananaMBox implements BananaProtocoleInterface
 
     /** Return a message
      * @param id Id of the emssage (can be either an Message-id or a message index)
-     * @param msg_headers Headers to process
-     * @param is_msgid If is set, $id is en Message-Id
      * @return A BananaMessage or null if the given id can't be retreived
      */
-    public function getMessage($id, array $msg_headers = array(), $is_msgid = false)
+    public function &getMessage($id)
     {
-        if ($is_msgid || !is_numeric($id)) {
-            if (is_null(Banana::$spool)) {
+        if (!is_numeric($id)) {
+            if (!Banana::$spool) {
                 return null;
             }
             $id = Banana::$spool->ids[$id];
@@ -115,6 +113,22 @@ class BananaMBox implements BananaProtocoleInterface
         return $msg;
     }
 
+    /** Return the sources of the given message
+     */
+    public function getMessageSource($id)
+    {
+        if (!is_numeric($id)) {
+            if (!Banana::$spool) { 
+                return null;
+            }   
+            $id = Banana::$spool->ids[$id];
+        }   
+        $message = $this->readMessages(array($id));
+        return implode("\n", $message);
+    }   
+
+    /** Compute the number of messages of the box
+     */
     private function getCount()
     {
         $this->count = count(Banana::$spool->overview);
@@ -153,9 +167,9 @@ class BananaMBox implements BananaProtocoleInterface
                     $headers[$id] = array('beginning' => $message['beginning'], 'end' => $message['end']);
                 }
                 if ($header == 'date') {
-                    $headers[$id][$header] = strtotime($message['message'][$header]);
+                    $headers[$id][$header] = @strtotime($message['message'][$header]);
                 } else {
-                    $headers[$id][$header] = $message['message'][$header];
+                    $headers[$id][$header] = @$message['message'][$header];
                 }
             }
         }
@@ -404,7 +418,7 @@ class BananaMBox implements BananaProtocoleInterface
      */
     private function &readMessages(array $ids, $strip = false, $from = false)
     {
-        if (!is_null($this->messages)) {
+        if ($this->messages) {
             return $this->messages;
         }
         sort($ids);

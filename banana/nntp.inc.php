@@ -99,13 +99,11 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
 
     /** Return a message
      * @param id Id of the emssage (can be either an Message-id or a message index)
-     * @param msg_headers Headers to process
-     * @param is_msgid If is set, $id is en Message-Id
      * @return A BananaMessage or null if the given id can't be retreived
      */
-    public function getMessage($id, array $msg_headers = array(), $is_msgid = false)
+    public function &getMessage($id)
     {
-        if (!$is_msgid && Banana::$group != $this->ingroup) {
+        if (is_numeric($id) && Banana::$group != $this->ingroup) {
             if (is_null(Banana::$spool)) {
                 $this->group(Banana::$group);
                 $this->ingroup = Banana::$group;
@@ -116,6 +114,25 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
         $data = $this->article($id);
         if ($data !== false) {
             return new BananaMessage($data);
+        }
+        return null;
+    }
+
+    /** Return the sources of the message
+     */
+    public function getMessageSource($id)
+    {
+        if (is_numeric($id) && Banana::$group != $this->ingroup) {
+            if (is_null(Banana::$spool)) {
+                $this->group(Banana::$group);
+                $this->ingroup = Banana::$group;
+            } else {
+                $id = array_search($id, Banana::$spool->ids);
+            }
+        }
+        $data = $this->article($id);
+        if ($data !== false) {
+            return implode("\n", $data);
         }
         return null;
     }

@@ -41,11 +41,15 @@ interface BananaProtocoleInterface
 
     /** Return a message
      * @param id Id of the emssage (can be either an Message-id or a message index)
-     * @param msg_headers Headers to process
-     * @param is_msgid If is set, $id is en Message-Id
      * @return A BananaMessage or null if the given id can't be retreived
      */
-    public function getMessage($id, array $msg_headers = array(), $is_msgid = false);
+    public function &getMessage($id);
+
+    /** Return the sources of a message
+     * @param id Id of the emssage (can be either an Message-id or a message index)
+     * @return The sources of the message (or null)
+     */
+    public function getMessageSource($id); 
 
     /** Return the indexes of the messages presents in the Box
      * @return Array(number of messages, MSGNUM of the first message, MSGNUM of the last message)
