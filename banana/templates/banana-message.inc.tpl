@@ -54,7 +54,7 @@
   {/if}
   <tr>
     <td colspan="3" class="body">
-      {$message->getFormattedBody()}
+      {$body}
     </td>
   </tr>
 </table>

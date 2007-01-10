@@ -290,7 +290,9 @@ class Banana
     protected function action_showMessage($group, $artid, $partid = 'text')
     {
         Banana::$page->setPage('message');
-        if ($partid == 'text') {
+        $istext = $partid == 'text' || $partid == 'source'
+            || preg_match("/[-a-z0-9_]+\/[-a-z0-9_]+/", $partid);
+        if ($istext) {
             $this->loadSpool($group);
         }
         $msg =& $this->loadMessage($group, $artid);
@@ -302,7 +304,7 @@ class Banana
         if ($partid == 'xface') {
             $msg->getXFace();
             exit;
-        } elseif ($partid != 'text') {
+        } elseif (!$istext) {
             $part = $msg->getPartById($partid);
             if (!is_null($part)) {
                 $part->send(true);
@@ -312,7 +314,15 @@ class Banana
                 $part->send();
             }
             exit;
+        } elseif ($partid == 'text') {
+            Banana::$page->assign('body', $msg->getFormattedBody());
+        } elseif ($partid == 'source') {
+            Banana::$page->assign('body',
+                                  '<pre>' . banana_htmlentities(Banana::$protocole->getMessageSource($artid)) . '</pre>');
+        } else {
+            Banana::$page->assign('body', $msg->getFormattedBody($partid));
         }
+
         if (Banana::$profile['autoup']) {
             Banana::$spool->markAsRead($artid);
         }
