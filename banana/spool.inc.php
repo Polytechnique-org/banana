@@ -61,6 +61,7 @@ class BananaSpoolHead
 class BananaSpool
 {
     private $version;
+    private $mode;
 
     /**  group name */
     public $group;
@@ -80,6 +81,7 @@ class BananaSpool
     protected function __construct($group)
     {
         $this->version    = BANANA_SPOOL_VERSION;
+        $this->mode       = Banana::SPOOL_ALL;
         $this->group      = $group;
     }
 
@@ -106,15 +108,7 @@ class BananaSpool
         if (!is_dir($file)) {
             mkdir($file);
         }
-        $url  = parse_url(Banana::$host);
-        if (isset($url['host'])) {
-            $file .= $url['host'] . '_';
-        }
-        if (isset($url['port'])) {
-            $file .= $url['port'] . '_';
-        }
-        $file .= $group;
-        return $file;
+        return $file . Banana::$protocole->filename();
     }
 
     private static function readFromFile($group)
@@ -124,7 +118,7 @@ class BananaSpool
             return null;
         }
         $spool =  unserialize(file_get_contents($file));
-        if ($spool->version != BANANA_SPOOL_VERSION) {
+        if ($spool->version != BANANA_SPOOL_VERSION || $spool->mode != Banana::SPOOL_ALL) {
             return null;
         }
         return $spool;
@@ -147,7 +141,9 @@ class BananaSpool
             }
         }
 
-        file_put_contents($file, serialize($this));
+        if ($this->mode == Banana::SPOOL_ALL) {
+            file_put_contents($file, serialize($this));
+        }    
     }
 
     private function build()
@@ -161,8 +157,8 @@ class BananaSpool
             $threshold = (int)(log($threshold)/log(2));
             $threshold = (2 ^ ($threshold + 1)) - 1;
         }
-        if (Banana::$maxspool && Banana::$maxspool < $msgnum) {
-            $first = $last - Banana::$maxspool;
+        if (Banana::$spool_max && Banana::$spool_max < $msgnum) {
+            $first = $last - Banana::$spool_max;
             if ($first < 0) {
                 $first += $threshold;
             }
@@ -182,8 +178,7 @@ class BananaSpool
             $mids = array_keys($this->overview);
             foreach ($mids as $id) {
                 if (($first <= $last && ($id < $first || $id > $last))
-                        || ($first > $last && $id < $first && $id > $last))
-                {
+                        || ($first > $last && $id < $first && $id > $last)) {
                     $this->delid($id, false);
                     $do_save = true;
                 }
@@ -261,7 +256,6 @@ class BananaSpool
             $id = $this->ids[$mid];
             if ($this->overview[$id]->isread) {
                 $this->overview[$id]->isread     = false;
-                $this->overview[$id]->descunread = 1;
                 while (isset($id)) {
                     $this->overview[$id]->descunread ++;
                     $id = $this->overview[$id]->parent;
@@ -272,6 +266,7 @@ class BananaSpool
 
     public function setMode($mode)
     {
+        $this->mode = $mode;
         switch ($mode) {
           case Banana::SPOOL_UNREAD:
             foreach ($this->roots as $k=>$i) {
@@ -281,6 +276,37 @@ class BananaSpool
                 }
             }
             break;
+        }
+    }
+
+    /** Mark the given id as read
+     * @param id MSGNUM of post
+     */
+    public function markAsRead($id)
+    {
+        if (!$this->overview[$id]->isread) {
+            $this->overview[$id]->isread = true;
+            while (isset($id)) {
+                $this->overview[$id]->descunread--;
+                $id = $this->overview[$id]->parent;
+            }
+        }
+    }
+
+    /** Mark all unread messages as read
+     */
+    public function markAllAsRead(array &$array = null)
+    {
+        if (is_null($array)) {
+            $array =& $this->roots;
+        }
+        foreach ($array as $id) {
+            if (!$this->overview[$id]->isread) {
+                $this->markAsRead($id);
+            }
+            if ($this->overview[$id]->descunread) {
+                $this->markAllAsRead($this->overview[$id]->children);
+            }
         }
     }
 
@@ -455,12 +481,12 @@ class BananaSpool
 
         if (!$overview) {
             $_first = $first;
-            $_last  = $first + Banana::$tmax - 1;
+            $_last  = $first + Banana::$spool_tmax - 1;
             $_ref   = null;
         } else {
             $_ref   = $this->getNdx($first);
-            $_last  = $_ref + Banana::$tafter;
-            $_first = $_ref - Banana::$tbefore;
+            $_last  = $_ref + Banana::$spool_tafter;
+            $_first = $_ref - Banana::$spool_tbefore;
             if ($_first < 0) {
                 $_last -= $_first;
             }

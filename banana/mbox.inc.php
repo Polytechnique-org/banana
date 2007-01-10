@@ -235,6 +235,18 @@ class BananaMBox implements BananaProtocoleInterface
         return 'MBOX';
     }
 
+    /** Return the spool filename
+     */
+    public function filename()
+    {
+        @list($mail, $domain) = explode('@', Banana::$group);
+        $file = "";
+        if (isset($domain)) {
+            $file = $domain . '_';
+        }
+        return $file . $mail;
+    }
+
 #######
 # Filesystem functions
 #######
@@ -245,11 +257,7 @@ class BananaMBox implements BananaProtocoleInterface
             return null;
         }
         @list($mail, $domain) = explode('@', $box);
-        if ($mail == 'staff') {
-            return '/home/x2003bruneau/staff.polytechnique.org_innovation.mbox';
-        } else {
-            return '/var/mail/' . $mail;
-        }
+        return Banana::$mbox_path . '/' . $mail;
     }
 
 #######

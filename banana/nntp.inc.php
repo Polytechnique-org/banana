@@ -24,7 +24,7 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
      */
     public function __construct()
     {
-        $url = parse_url(Banana::$host);
+        $url = parse_url(Banana::$nntp_host);
         if ($url['scheme'] == 'nntps' || $url['scheme'] == 'snntp') {
             $url['host'] = 'ssl://' . $url['host'];
         }
@@ -205,7 +205,7 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
                          'Newsgroups' => Banana::$group,
                          'Subject'    => 'cmsg ' . $message->getHeaderValue('message-id'),
                          'Control'    => 'cancel ' . $message->getHeaderValue('message-id'));
-        $headers = array_merge($headers, Banana::$custom_hdr);
+        $headers = array_merge($headers, Banana::$msgedit_headers);
         $body   = 'Message canceled with Banana';
         $msg    = BananaMessage::newMessage($headers, $body);
         return $this->send($msg);
@@ -217,29 +217,23 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
     {
         return 'NNTP';
     }
-}
 
-/*
-require_once dirname(__FILE__) . '/spool.inc.php';
-$time = microtime(true);
-$nntp = new BananaNNTP('xorg.promo.x2002');
-if (!$nntp->isValid()) {
-    echo "Beuh !\n";
-    exit;
+    /** Return the filename for the spool
+     */
+    public function filename()
+    {
+        $url  = parse_url(Banana::$nntp_host);
+        $file = '';
+        if (isset($url['host'])) {
+            $file .= $url['host'] . '_';
+        }
+        if (isset($url['port'])) {
+            $file .= $url['port'] . '_';
+        }
+        $file .= Banana::$group;
+        return $file;
+    }
 }
-Banana::$protocole =& $nntp;
-Banana::$spool =& BananaSpool::getSpool('xorg.promo.x2002');
-$msg = $nntp->getMessage(3424);
-echo '<html><head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <link rel="stylesheet" type="text/css" href="css/banana.css"/>
-</head><body><table class="banana_msg"><tr><td>';
-//echo $msg->getFormattedBody('plain');
-echo $msg->getFormattedBody();
-echo '</td></tr></table></body></html>', "\n";
-$end = microtime(true);
-echo ($end - $time) . "s\n";
-*/ 
 
 // vim:set et sw=4 sts=4 ts=4:
 ?>

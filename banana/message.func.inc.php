@@ -73,11 +73,11 @@ function banana_unflowed($text)
 function banana_wordwrap($text, $quote_level)
 {
     if ($quote_level > 0) {
-        $length = Banana::$wrap - $quote_level - 1;
+        $length = Banana::$msgshow_wrap - $quote_level - 1;
         return banana_quote(wordwrap($text, $length), $quote_level);
     
     }
-    return wordwrap($text, Banana::$wrap);
+    return wordwrap($text, Banana::$msgshow_wrap);
 }
 
 function banana_catchFormats($text)
@@ -85,7 +85,7 @@ function banana_catchFormats($text)
     $formatting = Array('/' => 'em', // match / first in order not to match closing markups </...> <> </>
                         '_' => 'u',
                         '*' => 'strong');
-    $url = Banana::$url_regexp;
+    $url = Banana::$msgshow_url;
     preg_match_all("/$url/i", $text, $urls);
     $text = str_replace($urls[0], "&&&urls&&&", $text);
     foreach ($formatting as $limit=>$mark) {
@@ -101,8 +101,8 @@ function banana_catchFormats($text)
 function banana__cutlink($link)
 {
     $link = banana_html_entity_decode($link, ENT_QUOTES);
-    if (strlen($link) > Banana::$wrap) {
-        $link = substr($link, 0, Banana::$wrap - 3) . "...";
+    if (strlen($link) > Banana::$msgshow_wrap) {
+        $link = substr($link, 0, Banana::$msgshow_wrap - 3) . "...";
     }
     return banana_htmlentities($link, ENT_QUOTES);
 }
@@ -133,7 +133,7 @@ function banana__catchMailLink($email)
 
 function banana_catchURLs($text)
 {
-    $url  = Banana::$url_regexp;
+    $url  = Banana::$msgshow_url;
 
     $res  = preg_replace("/&(lt|gt|quot);/", " &\\1; ", $text);
     $res  = preg_replace("/$url/ie", "'\\1'.banana__cleanurl('\\2').'\\3'", $res);

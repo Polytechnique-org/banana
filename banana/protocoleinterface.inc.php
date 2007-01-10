@@ -96,6 +96,11 @@ interface BananaProtocoleInterface
     /** Return the protocole name
      */
     public function name();
+
+    /** Return the spool filename to use for the given box
+     * @param box STRING boxname
+     */
+    public function filename();
 }
 
 // vim:set et sw=4 sts=4 ts=4:

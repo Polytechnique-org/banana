@@ -22,7 +22,7 @@ final class BananaMessage extends BananaMimePart
             if (isset($this->headers['in-reply-to']) && isset($this->headers['references'])) {
                 unset($this->headers['in-reply-to']);
             }
-            Banana::$show_hdr = array_intersect(Banana::$show_hdr, array_keys($this->headers));
+            Banana::$msgshow_headers = array_intersect(Banana::$msgshow_headers, array_keys($this->headers));
             Banana::$message =& $this;
         }
     }
@@ -144,7 +144,7 @@ final class BananaMessage extends BananaMimePart
 
     public function getHeaders()
     {
-        $this->msg_headers = array_merge($this->msg_headers, Banana::$custom_hdr, Banana::$profile['custom_hdr']);
+        $this->msg_headers = array_merge($this->msg_headers, Banana::$msgedit_headers, Banana::$profile['headers']);
         $headers = array_map(array($this, 'encodeHeader'), $this->msg_headers);
         return array_merge($headers, parent::getHeaders());
     }
@@ -218,7 +218,7 @@ final class BananaMessage extends BananaMimePart
 
     public function hasXFace()
     {
-        return Banana::$formatxface && isset($this->headers['x-face']);
+        return Banana::$msgshow_xface && isset($this->headers['x-face']);
     }
 
     public function getXFace()
@@ -233,7 +233,7 @@ final class BananaMessage extends BananaMimePart
 
     public function getFormattedBody($type = null)
     {
-        $types = Banana::$body_mime;
+        $types = Banana::$msgshow_mimeparts;
         if (!is_null($type)) {
             array_unshift($types, $type);
         }
