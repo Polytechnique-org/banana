@@ -115,7 +115,8 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
         if ($data !== false) {
             return new BananaMessage($data);
         }
-        return null;
+        $data = null;
+        return $data;
     }
 
     /** Return the sources of the message
@@ -134,7 +135,8 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
         if ($data !== false) {
             return implode("\n", $data);
         }
-        return null;
+        $data = null;
+        return $data;
     }
 
     /** Return the indexes of the messages presents in the Box

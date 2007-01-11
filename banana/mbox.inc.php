@@ -99,32 +99,34 @@ class BananaMBox implements BananaProtocoleInterface
      */
     public function &getMessage($id)
     {
+        $message = null;
         if (!is_numeric($id)) {
             if (!Banana::$spool) {
-                return null;
+                return $message;
             }
             $id = Banana::$spool->ids[$id];
         }
         $message = $this->readMessages(array($id));
         if (empty($message)) {
-            return null;
+            $message = null;
+            return $message;
         }
-        $msg = new BananaMessage($message[$id]['message']);
-        return $msg;
+        return  new BananaMessage($message[$id]['message']);
     }
 
     /** Return the sources of the given message
      */
     public function getMessageSource($id)
     {
+        $message = null;
         if (!is_numeric($id)) {
             if (!Banana::$spool) { 
-                return null;
+                return $message;
             }   
             $id = Banana::$spool->ids[$id];
-        }   
+        } 
         $message = $this->readMessages(array($id));
-        return implode("\n", $message);
+        return implode("\n", $message[$id]['message']);
     }   
 
     /** Compute the number of messages of the box
