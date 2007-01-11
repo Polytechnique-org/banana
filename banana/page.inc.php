@@ -15,6 +15,7 @@ class BananaPage extends Smarty
     private $page  = null;
 
     private $pages   = array();
+    private $killed  = array();
     private $actions = array();
 
     public function __construct()
@@ -53,6 +54,7 @@ class BananaPage extends Smarty
     public function setPage($page)
     {
         $this->page = $page;
+        return true;
     }
 
     /** Register an action to show on banana page
@@ -78,6 +80,14 @@ class BananaPage extends Smarty
         return true;
     }
 
+    /** Remove a page
+     * @param page STRING page name to kill
+     */
+    public function killPage($page)
+    {
+        $this->killed[] = $page;
+    }
+
     /** Preparte the page generation
      * @return template to use
      */
@@ -98,6 +108,9 @@ class BananaPage extends Smarty
                 $this->registerPage('new', _b_('Nouveau'), null);
             }
         }
+        foreach ($this->killed as $page) {
+            unset($this->pages[$page]);
+        }
         foreach ($this->actions as $key=>&$action) {
             if (!is_null($action['pages']) && !in_array($this->page, $action['pages'])) {
                 unset($this->actions[$key]);
@@ -112,6 +125,11 @@ class BananaPage extends Smarty
     public function run()
     {
         $tpl = $this->prepare();
+        if (!isset($this->pages[$this->page])) {
+            $this->trig(_b_('La page demandée n\'existe pas'));
+            $this->actions = array();
+            $this->page = null;
+        }
 
         $this->assign('group',     Banana::$group);
         $this->assign('artid',     Banana::$artid);
@@ -126,7 +144,7 @@ class BananaPage extends Smarty
         $this->register_function('link',    array($this, 'makeLink'));
         $this->register_function('imglink', array($this, 'makeImgLink'));
         $this->register_function('img',     array($this, 'makeImg'));
-        
+
         $this->assign('errors',    $this->error);
         $this->assign('page',      $this->page);
         $this->assign('pages',     $this->pages);
