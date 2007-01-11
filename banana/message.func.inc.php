@@ -39,13 +39,9 @@ function banana_removeQuotes($line, &$quote_level, $strict = true)
 function banana_quote($line, $level, $mark = '>')
 {
     $lines = explode("\n", $line);
+    $quote = str_repeat($mark, $level);
     foreach ($lines as &$line) {
-        if ($level > 0 && substr($line, 0, strlen($mark)) != $mark) {
-            $line = ' ' . $line;
-        }
-        for ($i = 0 ; $i < $level ; $i++) {
-            $line = $mark . $line;
-        }
+        $line = $quote . $line;
     }
     return implode("\n", $lines);
 }
@@ -59,11 +55,17 @@ function banana_unflowed($text)
         $line = banana_removeQuotes($line, $level);
         while (banana_isFlowed($line)) {
             $lvl = 0;
-            if (is_null($nl = array_shift($lines))) {
+            if (empty($lines)) {
                 break;
             }
+            $nl  = $lines[0];
             $nl = banana_removeQuotes($nl, $lvl);
-            $line .= $nl;
+            if ($lvl == $level) {
+                $line .= $nl;
+                array_shift($lines);
+            } else {
+                break;
+            }
         }
         $text .= banana_quote($line, $level) . "\n";
     }
@@ -197,10 +199,12 @@ function banana_wrap($text, $base_level = 0, $strict = true)
     while (!is_null($line = array_shift($lines))) {
         $lvl = 0;
         $line = banana_removeQuotes($line, $lvl, $strict);
-        if($lvl != $level && !empty($buffer)) {
-            $text  .= banana_wordwrap(implode("\n", $buffer), $level + $base_level) . "\n";
+        if($lvl != $level) {
+            if (!empty($buffer)) {
+                $text  .= banana_wordwrap(implode("\n", $buffer), $level + $base_level) . "\n";
+                $buffer = array();
+            }    
             $level  = $lvl;
-            $buffer = array();
         }
         $buffer[] = $line;
     }

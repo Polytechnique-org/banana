@@ -77,10 +77,11 @@ class BananaPage extends Smarty
         $this->pages[$name] = array('text' => $text, 'template' => $template);
         return true;
     }
-    
-    /** Generate XHTML code
+
+    /** Preparte the page generation
+     * @return template to use
      */
-    public function run()
+    protected function prepare()
     {
         $this->registerPage('subscribe', _b_('Abonnements'), null);
         $this->registerPage('forums', _b_('Les forums'), null);
@@ -102,6 +103,16 @@ class BananaPage extends Smarty
                 unset($this->actions[$key]);
             }
         }
+
+        return 'banana-base.tpl';
+    }
+    
+    /** Generate XHTML code
+     */
+    public function run()
+    {
+        $tpl = $this->prepare();
+
         $this->assign('group',     Banana::$group);
         $this->assign('artid',     Banana::$artid);
         $this->assign('part',      Banana::$part);
@@ -111,19 +122,20 @@ class BananaPage extends Smarty
         $this->assign('spool',     Banana::$spool);
         $this->assign('protocole', Banana::$protocole);
 
+        $this->register_function('url',     array($this, 'makeUrl'));
+        $this->register_function('link',    array($this, 'makeLink'));
+        $this->register_function('imglink', array($this, 'makeImgLink'));
+        $this->register_function('img',     array($this, 'makeImg'));
+        
         $this->assign('errors',    $this->error);
         $this->assign('page',      $this->page);
         $this->assign('pages',     $this->pages);
         $this->assign('actions',   $this->actions);
 
-        $this->register_function('url',     array($this, 'makeUrl'));
-        $this->register_function('link',    array($this, 'makeLink'));
-        $this->register_function('imglink', array($this, 'makeImgLink'));
-        $this->register_function('img',     array($this, 'makeImg'));
         if (!Banana::$debug_smarty) {
             $error_level = error_reporting(0);
         }
-        $text = $this->fetch('banana-base.tpl');
+        $text = $this->fetch($tpl);
         $text = banana_utf8entities($text);
         if (!Banana::$debug_smarty) {
             error_reporting($error_level);

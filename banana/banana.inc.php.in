@@ -291,7 +291,7 @@ class Banana
     {
         Banana::$page->setPage('message');
         $istext = $partid == 'text' || $partid == 'source'
-            || preg_match("/[-a-z0-9_]+\/[-a-z0-9_]+/", $partid);
+                || preg_match('!^[-a-z0-9_]+/[-a-z0-9_]+$!', $partid);
         if ($istext) {
             $this->loadSpool($group);
         }
