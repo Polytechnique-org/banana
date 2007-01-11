@@ -49,15 +49,15 @@ final class BananaMessage extends BananaMimePart
           case 'from':          return _b_('De');
           case 'subject':       return _b_('Sujet');
           case 'newsgroups':    return _b_('Forums');
-          case 'followup-to':   return _b_('Suivi à');
-          case 'to':            return _b_('À');
-          case 'cc':            return _b_('Copie à');
-          case 'bcc':           return _b_('Copie cachée à');
-          case 'reply-to':      return _b_('Répondre à');
+          case 'followup-to':   return _b_('Suivi Ã ');
+          case 'to':            return _b_('Ã€');
+          case 'cc':            return _b_('Copie Ã ');
+          case 'bcc':           return _b_('Copie cachÃ©e Ã ');
+          case 'reply-to':      return _b_('RÃ©pondre Ã ');
           case 'date':          return _b_('Date');
           case 'organization':  return _b_('Organisation');
           case 'in-reply-to':
-          case 'references':    return _b_('Références');
+          case 'references':    return _b_('RÃ©fÃ©rences');
           case 'x-face':        return _b_('Image');
         }
         return $hdr;
@@ -281,5 +281,5 @@ final class BananaMessage extends BananaMimePart
     }
 }
 
-// vim:set et sw=4 sts=4 ts=4:
+// vim:set et sw=4 sts=4 ts=4 enc=utf-8:
 ?>

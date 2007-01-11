@@ -39,4 +39,4 @@
   </table>
 </form>
 
-{* vim:set et sts=2 ts=2 sw=2: *}
+{* vim:set et sts=2 ts=2 sw=2 enc=utf-8: *}

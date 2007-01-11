@@ -518,7 +518,7 @@ class BananaSpool
             for ($i = 0; $i < $pos ; $i++) {
                 $ndx += $this->overview[$this->overview[$id_parent]->children[$i]]->desc;
             }
-            $ndx++; //noeud père
+            $ndx++; //noeud pÃ¨re
 
             $id_cur = $id_parent;
         }
@@ -687,5 +687,5 @@ class BananaSpool
     }    
 }
 
-// vim:set et sw=4 sts=4 ts=4
+// vim:set et sw=4 sts=4 ts=4 enc=utf-8:
 ?>

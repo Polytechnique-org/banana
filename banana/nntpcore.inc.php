@@ -507,5 +507,5 @@ class BananaNNTPCore
     }
 }
 
-// vim:set et sw=4 sts=4 ts=4 
+// vim:set et sw=4 sts=4 ts=4 enc=utf-8: 
 ?>

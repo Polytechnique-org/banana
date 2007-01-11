@@ -9,9 +9,6 @@
 
 function _b_($str)
 {
-    if (!is_utf8($str)) {
-        $str = utf8_encode($str);
-    }
     return dgettext('banana', $str);
 }
 
@@ -97,5 +94,5 @@ function banana_utf8entities($source)
    return $encodedString;
 }
 
-// vim:set et sw=4 sts=4 ts=4
+// vim:set et sw=4 sts=4 ts=4 enc=utf-8:
 ?>
