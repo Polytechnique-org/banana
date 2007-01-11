@@ -88,7 +88,7 @@ function banana_catchFormats($text)
                         '_' => 'u',
                         '*' => 'strong');
     $url = Banana::$msgshow_url;
-    preg_match_all("/$url/i", $text, $urls);
+    preg_match_all("/$url/ui", $text, $urls);
     $text = str_replace($urls[0], "&&&urls&&&", $text);
     foreach ($formatting as $limit=>$mark) {
         $limit = preg_quote($limit, '/');
@@ -138,7 +138,7 @@ function banana_catchURLs($text)
     $url  = Banana::$msgshow_url;
 
     $res  = preg_replace("/&(lt|gt|quot);/", " &\\1; ", $text);
-    $res  = preg_replace("/$url/ie", "'\\1'.banana__cleanurl('\\2').'\\3'", $res);
+    $res  = preg_replace("/$url/uie", "'\\1'.banana__cleanurl('\\2').'\\3'", $res);
     $res  = preg_replace('/(["\[])?(?:mailto:|news:)?([a-z0-9.\-+_\$]+@([\-.+_]?[a-z0-9])+)(["\]])?/ie',
                          "'\\1' . banana__catchMailLink('\\2') . '\\4'",
                           $res);
@@ -415,5 +415,5 @@ function banana_formatRichText(BananaMimePart &$part)
 
 // }}}
 
-// vim:set et sw=4 sts=4 ts=4:
+// vim:set et sw=4 sts=4 ts=4 enc=utf-8:
 ?>

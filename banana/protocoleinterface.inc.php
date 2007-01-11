@@ -19,7 +19,7 @@ interface BananaProtocoleInterface
      */
     public function isValid();
     
-    /** Indicate last error n°
+    /** Indicate last error nÂ°
      */
     public function lastErrNo();
     
@@ -107,5 +107,5 @@ interface BananaProtocoleInterface
     public function filename();
 }
 
-// vim:set et sw=4 sts=4 ts=4:
+// vim:set et sw=4 sts=4 ts=4 enc=utf-8:
 ?>

@@ -102,7 +102,7 @@ class BananaPage extends Smarty
                 if ($this->page == 'cancel') {
                     $this->registerPage('cancel', _b_('Annulation'), null);
                 } elseif ($this->page == 'new') {
-                    $this->registerPage('new', _b_('Répondre'), null);
+                    $this->registerPage('new', _b_('RÃ©pondre'), null);
                 }
             } elseif ($this->page == 'new') {
                 $this->registerPage('new', _b_('Nouveau'), null);
@@ -126,7 +126,7 @@ class BananaPage extends Smarty
     {
         $tpl = $this->prepare();
         if (!isset($this->pages[$this->page])) {
-            $this->trig(_b_('La page demandée n\'existe pas'));
+            $this->trig(_b_('La page demandÃ©e n\'existe pas'));
             $this->actions = array();
             $this->page = null;
         }
@@ -340,5 +340,5 @@ function banana_trimwhitespace($source, &$smarty)
 // }}}
 
 
-// vim:set et sw=4 sts=4 ts=4:
+// vim:set et sw=4 sts=4 ts=4 enc=utf-8:
 ?>

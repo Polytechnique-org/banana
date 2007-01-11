@@ -61,7 +61,7 @@ class BananaMBox implements BananaProtocoleInterface
         return !Banana::$group || $this->file;
     }
     
-    /** Indicate last error n°
+    /** Indicate last error nÂ°
      */
     public function lastErrNo()
     {
@@ -448,5 +448,5 @@ class BananaMBox implements BananaProtocoleInterface
     }
 }
 
-// vim:set et sw=4 sts=4 ts=4:
+// vim:set et sw=4 sts=4 ts=4 enc=utf-8:
 ?>

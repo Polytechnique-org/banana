@@ -34,7 +34,7 @@
       {if $page eq 'forums'}
         {include file="banana-boxlist.inc.tpl" grouplist=$groups withstats=true}
         {if $newgroups|@count}
-        <p>Les nouveaux groupes suivants ont été créés depuis votre dernière visite</p>
+        <p>Les nouveaux groupes suivants ont Ã©tÃ© crÃ©Ã©s depuis votre derniÃ¨re visite</p>
         {include file="banana-boxlist.inc.tpl" grouplist=$newgroups withstats=true}
         {/if}
       {elseif $page eq 'subscribe'}
@@ -62,4 +62,4 @@
   </tr>
 </table>
 
-{* vim:set et sw=2 sts=2 ts=2: *}
+{* vim:set et sw=2 sts=2 ts=2 enc=utf-8: *}

@@ -6,18 +6,18 @@
         {if $spool->nextUnread($artid)}
         {imglink group=$group artid=$spool->nextUnread($artid) img=next_unread alt="Message non-lu suivant" accesskey=u}{/if}
         {if $spool->prevPost($artid)}
-        {imglink group=$group artid=$spool->prevPost($artid) img=prev alt="Message précédent" accesskey=a}{/if}
+        {imglink group=$group artid=$spool->prevPost($artid) img=prev alt="Message prÃ©cÃ©dent" accesskey=a}{/if}
         {if $spool->nextPost($artid)}
         {imglink group=$group artid=$spool->nextPost($artid) img=next alt="Message suivant" accesskey=z}{/if}
         {if $spool->prevThread($artid)}
-        {imglink group=$group artid=$spool->prevThread($artid) img=prev_thread alt="Discussion précédente" accesskey=q}{/if}
+        {imglink group=$group artid=$spool->prevThread($artid) img=prev_thread alt="Discussion prÃ©cÃ©dente" accesskey=q}{/if}
         {if $spool->nextThread($artid)}
         {imglink group=$group artid=$spool->nextThread($artid) img=next_thread alt="Discussion suivante" accesskey=s}{/if}
       </div>
       <div class="action">
         {if $message->canSend()}
         {imglink group=$group action="new" img=post alt="Nouveau messasge" accesskey=p}
-        {imglink group=$group artid=$artid action="new" img=reply alt="Répondre" accesskey=r}
+        {imglink group=$group artid=$artid action="new" img=reply alt="RÃ©pondre" accesskey=r}
         {/if}
         {if $message->canCancel()}
         {imglink group=$group artid=$artid action="cancel" img=cancel alt="Annuler" accesskey=c}
@@ -59,4 +59,4 @@
   </tr>
 </table>
 
-{* vim:set et sw=2 sts=2 ts=2: *}
+{* vim:set et sw=2 sts=2 ts=2 enc=utf-8: *}
