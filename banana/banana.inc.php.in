@@ -317,8 +317,11 @@ class Banana
         } elseif ($partid == 'text') {
             Banana::$page->assign('body', $msg->getFormattedBody());
         } elseif ($partid == 'source') {
-            Banana::$page->assign('body',
-                                  '<pre>' . banana_htmlentities(Banana::$protocole->getMessageSource($artid)) . '</pre>');
+            $text = Banana::$protocole->getMessageSource($artid);
+            if (!is_utf8($text)) {
+                $text = utf8_encode($text);
+            }
+            Banana::$page->assign('body', '<pre>' . banana_htmlentities($text) . '</pre>');
         } else {
             Banana::$page->assign('body', $msg->getFormattedBody($partid));
         }
