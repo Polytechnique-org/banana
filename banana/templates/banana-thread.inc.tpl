@@ -17,23 +17,23 @@
     <th>
       {if $spool->nextUnread()}
       <div class="menu">
-        {imglink group=$group artid=$spool->nextUnread() img=next_unread alt="Message non-lu suivant" accesskey=u}
+        {imglink group=$group artid=$spool->nextUnread() img=next_unread alt="Message non-lu suivant"|b accesskey=u}
       </div>
       {/if}
-      Date
+      {"Date"|b}
     </th>
-    <th>Sujet</th>
+    <th>{"Sujet"|b}</th>
     <th>
       {if $protocole->canSend()}
       <div class="action">
-        {imglink group=$group action=new img=post alt="Nouveau message" accesskey=p}
+        {imglink group=$group action=new img=post alt="Nouveau message"|b accesskey=p}
       </div>
       {/if}
-      Auteur
+      {"Auteur"|b}
     </th>
     {else}
     <th colspan="3">
-      {link group=$group text=$group}
+      {"Aperçu de "|b}{link group=$group text=$group}
     </th>
     {/if}
   </tr>
@@ -42,7 +42,7 @@
   {else}
   <tr>
     <td colspan="3">
-      Aucun message dans ce forum
+      {"Aucun message dans ce forum"|b}
     </td>
   </tr>
   {/if}

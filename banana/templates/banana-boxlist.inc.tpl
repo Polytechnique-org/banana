@@ -2,7 +2,7 @@
 {if $withsubs}
 <form action="{url action=subscribe}" method="post">
 <p style="text-align: center">
-  <input type="submit" name="validsubs" value="Valider" />
+  <input type="submit" name="validsubs" value="{"Valider"|b}" />
 </p>
 {/if}
 <table class="bicol">
@@ -11,11 +11,11 @@
     <th></th>
     {/if}
     {if $withstats}
-    <th>Total</th>
-    <th>Nouveaux</th>
+    <th>{"Total"|b}</th>
+    <th>{"Nouveaux"|b}</th>
     {/if}
-    <th>Nom</th>
-    <th>Description</th>
+    <th>{"Nom"|b}</th>
+    <th>{"Description"|b}</th>
   </tr>
   {foreach from=$groups key=name item=grp}
   <tr class="{cycle values="impair,pair"}">
@@ -35,7 +35,7 @@
 </table>
 {if $withsubs}
 <p style="text-align: center">
-  <input type="submit" name="validsubs" value="Valider" />
+  <input type="submit" name="validsubs" value="{"Valider"|b}" />
 </p>
 </form>
 {/if}

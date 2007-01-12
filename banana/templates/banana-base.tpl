@@ -34,7 +34,7 @@
       {if $page eq 'forums'}
         {include file="banana-boxlist.inc.tpl" grouplist=$groups withstats=true}
         {if $newgroups|@count}
-        <p>Les nouveaux groupes suivants ont été créés depuis votre dernière visite</p>
+        <p>{"Les nouveaux groupes suivants ont été créés depuis votre dernière visite"|b}</p>
         {include file="banana-boxlist.inc.tpl" grouplist=$newgroups withstats=true}
         {/if}
       {elseif $page eq 'subscribe'}
@@ -47,10 +47,10 @@
       {elseif $page eq 'new'}
         {include file="banana-newmessage.inc.tpl"}
       {elseif $page eq 'cancel'}
-        <p class="error">Voulez-vous vraiment annuler ce message ?</p>
+        <p class="error">{"Voulez-vous vraiment annuler ce message ?"|b}</p>
         <form action="{url group=$group artid=$artid action=cancel}" method="post">
           <p class="center">
-            <input type="submit" name="cancel" value="Annuler !" />
+            <input type="submit" name="cancel" value="{"Annuler !"|b}" />
           </p>
         </form>
         {include file="banana-message.inc.tpl" noactions=true}

@@ -1,7 +1,7 @@
 <form {if $can_attach}enctype="multipart/form-data"{/if} action="{url group=$group artid=$artid action=new}" method="post" accept-charset="utf-8">
   <table class="bicol">
     <tr>
-      <th colspan="2">Composer un nouveau message</th>
+      <th colspan="2">{"Composer un nouveau message"|b}</th>
     </tr>
     {foreach from=$headers key=header item=values}
     <tr>
@@ -22,7 +22,7 @@
     </tr>
     {if $can_attach}
     <tr class="pair">
-      <td>Fichier joint</td>
+      <td>{"Fichier joint"|b}</td>
       <td>
         {if $maxfilesize}
         <input type="hidden" name="MAX_FILE_SIZE" value="{$maxfilesize}" />
@@ -33,7 +33,7 @@
     {/if}
     <tr class="pair">
       <td colspan="2" class="center">
-        <input type="submit" name="sendmessage" value="Envoyer le message" />
+        <input type="submit" name="sendmessage" value="{"Envoyer le message"|b}" />
       </td>
     </tr>
   </table>
