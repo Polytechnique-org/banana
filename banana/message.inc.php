@@ -243,25 +243,25 @@ final class BananaMessage extends BananaMimePart
             if (empty($parts)) {
                 continue;
             }
-            foreach ($parts as &$part) {
-                list($type, $subtype) = $part->getType();
-                switch ($subtype) {
-                  case 'html': return banana_formatHtml($part);
-                  case 'enriched': case 'richtext': return banana_formatRichText($part);
-                  default: return banana_formatPlainText($part);
-                }
-            }
+            return $parts[0]->toHtml();
         }
         return null;
     }
 
     public function quote()
     {
-        $part = $this->toPlainText();
-        if (is_null($part)) {
-            return banana_quoteHtml($this->toHtml());
+        foreach (Banana::$msgedit_mimeparts as $type) {
+            @list($type, $subtype) = explode('/', $type);
+            $parts = $this->getParts($type, $subtype);
+            if (empty($parts)) {
+                continue;
+            }
+            if ($parts[0] === $this) {
+                return parent::quote();
+            }
+            return $parts[0]->quote();
         }
-        return banana_quotePlainText($part);
+        return null;
     }
 
     public function canCancel()

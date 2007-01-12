@@ -40,12 +40,12 @@ class Banana
 ### Message display ###
     static public $msgshow_headers   = array('from', 'newsgroups', 'followup-to', 'to', 'cc', 'reply-to',
                                        'organization', 'date', 'references', 'in-reply-to');
-    static public $msgshow_mimeparts = array('text/html', 'text/plain', 'text/enriched', 'text', 'message');
+    static public $msgshow_mimeparts = array('multipart/report', 'multipart/mixed', 'text/html', 'text/plain', 'text/enriched', 'text', 'message');
     static public $msgshow_xface     = true;
     static public $msgshow_wrap      = 78;
 
     /** Match an url
-     * Should be included in a regexp delimited using /, !, , or @ (eg: "/$url_regexp/i")
+     * Should be included in a regexp delimited using /, !, , or @ (eg: "/$url_regexp/ui")
      * If it matches, return 3 main parts :
      *  \\1 and \\3 are delimiters
      *  \\2 is the url
@@ -63,7 +63,10 @@ class Banana
     /** Global headers to use for messages
      */
     static public $msgedit_headers  = array('Mime-Version' => '1.0', 'User-Agent' => 'Banana @VERSION@');
-    
+    /** Mime type order for quoting
+     */
+    static public $msgedit_mimeparts = array('multipart/report', 'multipart/mixed', 'text/plain', 'text/enriched', 'text/html', 'text', 'message');
+
 ### Protocole ###
     /** News serveur to use
      */

@@ -413,6 +413,14 @@ function banana_formatRichText(BananaMimePart &$part)
     return banana_cleanHtml($text);
 }
 
+function banana_quoteRichtText(BananaMimePart &$part)
+{
+    $text = $part->getText();
+    $text = banana_richtextToHtml($text);
+    $text = banana_htmlToPlainText($text);
+    return banana_wrap($text, 1);
+}
+
 // }}}
 
 // vim:set et sw=4 sts=4 ts=4 enc=utf-8:
