@@ -144,6 +144,7 @@ class BananaPage extends Smarty
         $this->register_function('link',    array($this, 'makeLink'));
         $this->register_function('imglink', array($this, 'makeImgLink'));
         $this->register_function('img',     array($this, 'makeImg'));
+        $this->register_modifier('b',       '_b_');
 
         $this->assign('errors',    $this->error);
         $this->assign('page',      $this->page);

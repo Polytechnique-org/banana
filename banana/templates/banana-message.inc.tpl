@@ -4,23 +4,23 @@
       {if !$noactions}
       <div class="menu">
         {if $spool->nextUnread($artid)}
-        {imglink group=$group artid=$spool->nextUnread($artid) img=next_unread alt="Message non-lu suivant" accesskey=u}{/if}
+        {imglink group=$group artid=$spool->nextUnread($artid) img=next_unread alt="Message non-lu suivant"|b accesskey=u}{/if}
         {if $spool->prevPost($artid)}
-        {imglink group=$group artid=$spool->prevPost($artid) img=prev alt="Message précédent" accesskey=a}{/if}
+        {imglink group=$group artid=$spool->prevPost($artid) img=prev alt="Message précédent"|b accesskey=a}{/if}
         {if $spool->nextPost($artid)}
-        {imglink group=$group artid=$spool->nextPost($artid) img=next alt="Message suivant" accesskey=z}{/if}
+        {imglink group=$group artid=$spool->nextPost($artid) img=next alt="Message suivant"|b accesskey=z}{/if}
         {if $spool->prevThread($artid)}
-        {imglink group=$group artid=$spool->prevThread($artid) img=prev_thread alt="Discussion précédente" accesskey=q}{/if}
+        {imglink group=$group artid=$spool->prevThread($artid) img=prev_thread alt="Discussion précédente"|b accesskey=q}{/if}
         {if $spool->nextThread($artid)}
-        {imglink group=$group artid=$spool->nextThread($artid) img=next_thread alt="Discussion suivante" accesskey=s}{/if}
+        {imglink group=$group artid=$spool->nextThread($artid) img=next_thread alt="Discussion suivante"|b accesskey=s}{/if}
       </div>
       <div class="action">
         {if $message->canSend()}
-        {imglink group=$group action="new" img=post alt="Nouveau messasge" accesskey=p}
-        {imglink group=$group artid=$artid action="new" img=reply alt="Répondre" accesskey=r}
+        {imglink group=$group action="new" img=post alt="Nouveau message"|b accesskey=p}
+        {imglink group=$group artid=$artid action="new" img=reply alt="Répondre"|b accesskey=r}
         {/if}
         {if $message->canCancel()}
-        {imglink group=$group artid=$artid action="cancel" img=cancel alt="Annuler" accesskey=c}
+        {imglink group=$group artid=$artid action="cancel" img=cancel alt="Annuler"|b accesskey=c}
         {/if}
       </div>
       {/if}
@@ -46,7 +46,7 @@
     <td class="hdr">Fichiers joints</td>
     <td colspan="2">
       {foreach from=$files item=file name=attachs}
-      {imglink img=save alt="Enregistrer" group=$group artid=$artid part=$file->getFilename() text=$file->getFilename()}{if !$smarty.foreach.attachs.last}, {/if}
+      {imglink img=save alt="Enregistrer"|b group=$group artid=$artid part=$file->getFilename() text=$file->getFilename()}{if !$smarty.foreach.attachs.last}, {/if}
       {/foreach}
     </td>
   </tr>
