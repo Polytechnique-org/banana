@@ -106,12 +106,10 @@ class BananaMBox implements BananaProtocoleInterface
             }
             $id = Banana::$spool->ids[$id];
         }
-        $message = $this->readMessages(array($id));
-        if (empty($message)) {
-            $message = null;
-            return $message;
+        $messages = $this->readMessages(array($id));
+        if (!empty($messages)) {
+            $message = new BananaMessage($messages[$id]['message']);
         }
-        $message = new BananaMessage($message[$id]['message']);
         return $message;    
     }
 

@@ -103,6 +103,7 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
      */
     public function &getMessage($id)
     {
+        $message = null;
         if (is_numeric($id) && Banana::$group != $this->ingroup) {
             if (is_null(Banana::$spool)) {
                 $this->group(Banana::$group);
@@ -113,10 +114,9 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
         }
         $data = $this->article($id);
         if ($data !== false) {
-            return new BananaMessage($data);
+            $message = new BananaMessage($data);
         }
-        $data = null;
-        return $data;
+        return $message;
     }
 
     /** Return the sources of the message
