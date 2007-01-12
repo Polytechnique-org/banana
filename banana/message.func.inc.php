@@ -92,7 +92,7 @@ function banana_catchFormats($text)
     $text = str_replace($urls[0], "&&&urls&&&", $text);
     foreach ($formatting as $limit=>$mark) {
         $limit = preg_quote($limit, '/');
-        $text = preg_replace("/$limit\\b(.*?)\\b$limit/s",
+        $text = preg_replace("/$limit\\b(\w*?)\\b$limit/us",
                              "<$mark>\\1</$mark>", $text);
     }
     return preg_replace('/&&&urls&&&/e', 'array_shift($urls[0])', $text);
