@@ -111,7 +111,8 @@ class BananaMBox implements BananaProtocoleInterface
             $message = null;
             return $message;
         }
-        return  new BananaMessage($message[$id]['message']);
+        $message = new BananaMessage($message[$id]['message']);
+        return $message;    
     }
 
     /** Return the sources of the given message

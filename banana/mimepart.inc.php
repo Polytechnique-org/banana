@@ -406,11 +406,74 @@ class BananaMimePart
 
     public function getText()
     {
-        if (!$this->isType('text')) {
-            return null;
-        }
         $this->decodeContent();
         return $this->body;
+    }
+
+    public function toHtml()
+    {
+        list($type, $subtype) = $this->getType();
+        if ($type == 'image') {
+            $part = $this->id ? $this->id : $this->filename;
+            return '<img src="'
+                 . banana_htmlentities(Banana::$page->makeUrl(array('group' => Banana::$group,
+                                                                    'artid' => Banana::$artid,
+                                                                    'part'  => $part)))
+                 . '" alt="' . banana_htmlentities($this->filename) . '" />';
+        } elseif (!in_array($type, Banana::$msgshow_mimeparts)
+                  && !in_array($this->content_type, Banana::$msgshow_mimeparts)) {
+            $part = $this->id ? $this->id : $this->filename;
+            if (!$part) {
+                $part = $this->content_type;
+            }
+            return '[' . Banana::$page->makeImgLink(array('group' => Banana::$group,
+                                                 'artid' => Banana::$artid,
+                                                 'part'  => $part,
+                                                 'text'  => $this->filename ? $this->filename : $this->content_type,
+                                                 'img'   => 'save')) . ']';
+        } else {
+            if ($type == 'multipart' && ($subtype == 'mixed' || $subtype == 'report')) {
+                $text = '';
+                foreach ($this->multipart as &$part) {
+                    $text .= $part->toHtml();
+                }
+                return $text;
+            }
+            switch ($subtype) {
+              case 'html': return banana_formatHtml($this);
+              case 'enriched': case 'richtext': return banana_formatRichText($this);
+              default:
+                if ($type == 'message') {
+                    return '<hr />' . banana_formatPlainText($this);
+                }
+                return banana_formatPlainText($this);
+            }
+        }
+        return null;
+    }
+
+    public function quote()
+    {
+        list($type, $subtype) = $this->getType();
+        if (in_array($type, Banana::$msgedit_mimeparts) || in_array($this->content_type, Banana::$msgedit_mimeparts)) {
+            if ($type == 'multipart' && ($subtype == 'mixed' || $subtype == 'report')) {
+                $text = '';
+                foreach ($this->multipart as &$part) {
+                    $qt = $part->quote();
+                    $qt = rtrim($qt);
+                    if (!empty($text)) {
+                        $text .= "\n" . banana_quote("", 1) . "\n";
+                    }
+                    $text .= $qt;
+                }
+                return $text;
+            }
+            switch ($subtype) {
+              case 'html': return banana_quoteHtml($this);
+              case 'enriched': case 'richtext': return banana_quoteRichText($this);
+              default: return banana_quotePlainText($this);
+            }
+        }
     }
 
     protected function getType()
@@ -445,24 +508,6 @@ class BananaMimePart
             }
         }
         return $parts;
-    }
-
-    public function toPlainText()
-    {
-        $parts = $this->getParts('text', 'plain');
-        return (count($parts) ? $parts[0] : null);
-    }
-
-    public function toHtml()
-    {
-        $parts = $this->getParts('text', 'html');
-        return (count($parts) ? $parts[0] : null);
-    }
-
-    public function toRichText()
-    {
-        $parts = $this->getParts('text', 'enriched');
-        return (count($parts) ? $parts[0] : null);
     }
 
     public function getFile($filename)

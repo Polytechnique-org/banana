@@ -46,8 +46,7 @@
     <td class="hdr">Fichiers joints</td>
     <td colspan="2">
       {foreach from=$files item=file name=attachs}
-      {$file->getFilename()|htmlentities}
-      {imglink img=save alt="Enregistrer" group=$group artid=$artid part=$file->getFilename()}{if !$smarty.foreach.attachs.last}, {/if}
+      {imglink img=save alt="Enregistrer" group=$group artid=$artid part=$file->getFilename() text=$file->getFilename()}{if !$smarty.foreach.attachs.last}, {/if}
       {/foreach}
     </td>
   </tr>
