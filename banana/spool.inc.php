@@ -430,7 +430,7 @@ class BananaSpool
             if (function_exists('hook_formatDisplayHeader')) {
                 list($subject, $link) = hook_formatDisplayHeader('subject', $subject, true);
             } else {
-                $subject = banana_catchFormats(stripslashes($subject));
+                $subject = banana_catchFormats(banana_htmlentities(stripslashes($subject)));
                 $link = null;
             }
             if (empty($subject)) {
