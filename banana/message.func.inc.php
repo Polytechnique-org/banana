@@ -92,7 +92,7 @@ function banana_catchFormats($text)
     $text = str_replace($urls[0], "&&&urls&&&", $text);
     foreach ($formatting as $limit=>$mark) {
         $limit = preg_quote($limit, '/');
-        $text = preg_replace('/' . $limit . '\b([-\w]+?)\b ' . $limit . '/us',
+        $text = preg_replace('/' . $limit . '(\S+?)' . $limit . '/us',
                              "<$mark>\\1</$mark>", $text);
     }
     return preg_replace('/&&&urls&&&/e', 'array_shift($urls[0])', $text);
@@ -261,7 +261,7 @@ function banana_removeEvilAttributes($tagSource)
 function banana_cleanHtml($source)
 {
     $allowedTags = '<h1><b><i><a><ul><li><pre><hr><blockquote><img><br><font><div>'
-                 . '<p><small><big><sup><sub><code><em><strong><table><tr><td><th>';
+                 . '<u><p><small><big><sup><sub><code><em><strong><table><tr><td><th>';
     $source = strip_tags($source, $allowedTags);
     $source = preg_replace('/<(.*?)>/ie', "'<'.banana_removeEvilAttributes('\\1').'>'", $source);
         
