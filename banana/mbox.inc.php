@@ -232,7 +232,19 @@ class BananaMBox implements BananaProtocoleInterface
      */
     public function send(BananaMessage &$message)
     {
-        return true;
+        $headers = $message->getHeaders();
+        $to      = $headers['To'];
+        $subject = $headers['Subject'];
+        unset($headers['To']);
+        unset($headers['Subject']);
+        $hdrs    = '';
+        foreach ($headers as $key=>$value) {
+            if (!empty($value)) {
+                $hdrs .= "$key: $value\r\n";
+            }    
+        }
+        $body = $message->get(false);
+        return mail($to, $subject, $body, $hdrs);
     }
 
     /** Cancel a message

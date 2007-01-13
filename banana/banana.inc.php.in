@@ -443,11 +443,13 @@ class Banana
         if (!Banana::$spool || Banana::$spool->group != $group) {
             if ($group == @$_SESSION['banana_group'] && isset($_SESSION['banana_spool'])) {
                 Banana::$spool = unserialize($_SESSION['banana_spool']);
+                $clean = @(Banana::$profile['lastnews'] != $_SESSION['banana_lastnews']);
             }
-            BananaSpool::getSpool($group, Banana::$profile['lastnews'], Banana::$profile['autoup']);
+            BananaSpool::getSpool($group, Banana::$profile['lastnews'], Banana::$profile['autoup'] || $clean);
             $_SESSION['banana_group'] = $group;
             if (!Banana::$profile['display']) {
                 $_SESSION['banana_spool'] = serialize(Banana::$spool);
+                $_SESSION['banana_lastnews'] = Banana::$profile['lastnews'];
             }
             Banana::$spool->setMode(Banana::$profile['display'] ? Banana::SPOOL_UNREAD : Banana::SPOOL_ALL);
         }
