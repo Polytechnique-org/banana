@@ -388,8 +388,13 @@ class BananaMimePart
         $content = "";
         if ($with_headers) {
             foreach ($this->getHeaders() as $key => $value) {
-                $content .= "$key: $value\n"; 
-            }   
+                $line = "$key: $value"; 
+                $line = explode("\n", wordwrap($line, Banana::$msgshow_wrap));
+                for ($i = 1 ; $i < count($line) ; $i++) {
+                    $line[$i] = "\t" . $line[$i];
+                }
+                $content .= implode("\n", $line) . "\n";
+            } 
             $content .= "\n";
         } 
         if ($this->isType('multipart')) {
@@ -399,7 +404,7 @@ class BananaMimePart
             }
             $content .= "\n--{$this->boundary}--";
         } else {
-            $content .= $this->body;
+            $content .= banana_wordwrap($this->body);
         }
         return $content;
     }
