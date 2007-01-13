@@ -49,7 +49,7 @@ class BananaSpoolHead
     public function __construct(array &$message)
     {
         $this->date       = $message['date'];
-        $this->subject    = stripslashes($message['subject']);
+        $this->subject    = $message['subject'];
         $this->from       = $message['from'];
         $this->desc       = 1;
         $this->isread     = true;
@@ -395,9 +395,7 @@ class BananaSpool
      * @param $_pfx_end STRING prefix used for children of current node
      * @param $_head BOOLEAN true if first post in thread
      *
-     * If you want to analyse subject, you can define the function hook_getSubject(&$subject) which
-     * take the subject as a reference parameter, transform this subject to be displaid in the spool
-     * view and return a string. This string will be put after the subject.
+     * If you want to analyse subject, you can define the function hook_formatDisplayHeader
      */
     private function _to_html($_id, $_index, $_first=0, $_last=0, $_ref="", $_pfx_node="", $_pfx_end="", $_head=true)
     {
@@ -429,14 +427,15 @@ class BananaSpool
             $res .= '<td class="subj' . ($_index == $_ref ? ' cur' : '') . '">'
                 . $_pfx_node .($hc ? ($_head ? $spfx_f : ($overview->parent_direct ? $spfx_s : $spfx_snd)) : $spfx_n);
             $subject = $overview->subject;
+            if (function_exists('hook_formatDisplayHeader')) {
+                list($subject, $link) = hook_formatDisplayHeader('subject', $subject, true);
+            } else {
+                $subject = banana_catchFormats(stripslashes($subject));
+                $link = null;
+            }
             if (empty($subject)) {
                 $subject = _b_('(pas de sujet)');
             }
-            $link = null;
-            if (function_exists('hook_getSubject')) {
-                $link = hook_getSubject($subject);
-            }
-            $subject = banana_catchFormats($subject);
             if ($_index != $_ref) {
                 $subject = Banana::$page->makeLink(Array('group' => $this->group, 'artid' => $_id,
                                                     'text'  => $subject, 'popup' => $subject));

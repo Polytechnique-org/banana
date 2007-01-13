@@ -107,12 +107,8 @@ final class BananaMessage extends BananaMimePart
             return $rsl;
 
           case "subject":
-            $link = null;
             $text = stripslashes($text);
-            if (function_exists('hook_getSubject')) {
-                $link = hook_getSubject($text);
-            }
-            return banana_catchFormats($text) . $link;
+            return banana_catchFormats($text);
 
           default:
             return $text;
