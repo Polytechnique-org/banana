@@ -429,7 +429,10 @@ class Banana
             $this->removeMessage($group, $artid);
             Banana::$page->redirect(Array('group' => $group, 'first' => $ndx));
         }
+
         Banana::$page->assign_by_ref('message', $msg);
+        Banana::$page->assign('body', $msg->getFormattedBody());
+        Banana::$page->assign('headers', Banana::$msgshow_headers);
         return true;
     }
 

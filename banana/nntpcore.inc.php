@@ -139,6 +139,7 @@ class BananaNNTPCore
             $message = join("\n", $_message);
         }
         if ($message) {
+            $message = preg_replace("/(^|\n)\./", '\1..', $message);
             $this->putLine("$message\r\n", false);
         }
         return $this->execLine('.');
