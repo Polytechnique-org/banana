@@ -85,10 +85,10 @@ class BananaSpool
         $this->group      = $group;
     }
 
-    public static function getSpool($group, $since = 0)
+    public static function getSpool($group, $since = 0, $clean = false)
     {
         if (!is_null(Banana::$spool) && Banana::$spool->group == $group) {
-            $spool = Banana::$spool;
+            $spool =& Banana::$spool;
         } else {
             $spool = BananaSpool::readFromFile($group);
         }        
@@ -97,6 +97,9 @@ class BananaSpool
         }
         Banana::$spool =& $spool;
         $spool->build();
+        if ($clean) {
+            $spool->markAllAsRead();
+        }
         $spool->updateUnread($since);
         return $spool;
     }
@@ -243,7 +246,7 @@ class BananaSpool
         }
 
         $newpostsids = Banana::$protocole->getNewIndexes($since);
-        
+
         if (empty($newpostsids)) {
             return;
         }

@@ -444,7 +444,7 @@ class Banana
             if ($group == @$_SESSION['banana_group'] && isset($_SESSION['banana_spool'])) {
                 Banana::$spool = unserialize($_SESSION['banana_spool']);
             }
-            BananaSpool::getSpool($group, Banana::$profile['lastnews']);
+            BananaSpool::getSpool($group, Banana::$profile['lastnews'], Banana::$profile['autoup']);
             $_SESSION['banana_group'] = $group;
             if (!Banana::$profile['display']) {
                 $_SESSION['banana_spool'] = serialize(Banana::$spool);
