@@ -363,6 +363,7 @@ class BananaSpool
             }
             
             if ($write) {
+                $this->markAllAsRead();
                 $this->saveToFile();
             }
         }

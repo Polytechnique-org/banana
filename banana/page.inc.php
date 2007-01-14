@@ -139,6 +139,7 @@ class BananaPage extends Smarty
         $this->assign('profile',   Banana::$profile);
         $this->assign('spool',     Banana::$spool);
         $this->assign('protocole', Banana::$protocole);
+        $this->assign('showboxlist', Banana::$spool_boxlist);
 
         $this->register_function('url',     array($this, 'makeUrl'));
         $this->register_function('link',    array($this, 'makeLink'));

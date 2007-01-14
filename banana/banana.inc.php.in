@@ -29,6 +29,7 @@ class Banana
     static public $spool_tbefore = 5;
     static public $spool_tafter  = 5;
     static public $spool_tmax    = 50;
+    static public $spool_boxlist = true;
 
 ### Message processing ###
     static public $msgparse_headers = array('content-disposition', 'content-transfer-encoding',
@@ -55,7 +56,7 @@ class Banana
      *   $matches[2] = "http://www.polytechnique.org"
      *   $matches[3] = "]"
      */
-    static public $msgshow_url  = '(["\[])?((?:[a-z]+:\/\/|www\.)(?:[\.\,\;\!]*[a-z\@0-9~%$£µ&i#\-+=_\/\?]+)+)(["\]])?';
+    static public $msgshow_url     = '(["\[])?((?:[a-z]+:\/\/|www\.)(?:[\.\,\;\!]*[a-z\@0-9~%$£µ&i#\-+=_\/\?]+)+)(["\]])?';
 
 ### Message edition ###
     static public $msgedit_canattach  = true;
@@ -284,9 +285,11 @@ class Banana
         if (!$this->loadSpool($group)) {
             return _b_('Impossible charger la liste des messages de ') . $group;
         }
-        $groups = Banana::$protocole->getBoxList(Banana::BOXES_SUB, Banana::$profile['lastnews'], true);
+        if (Banana::$spool_boxlist) {
+            $groups = Banana::$protocole->getBoxList(Banana::BOXES_SUB, Banana::$profile['lastnews'], true);
+            Banana::$page->assign('groups', $groups);
+        }
         Banana::$page->assign('msgbypage', Banana::$spool_tmax);
-        Banana::$page->assign('groups', $groups);
         return true;
     }
 
@@ -332,8 +335,10 @@ class Banana
         if (Banana::$profile['autoup']) {
             Banana::$spool->markAsRead($artid);
         }
-        $groups    = Banana::$protocole->getBoxList(Banana::BOXES_SUB, Banana::$profile['lastnews'], true);
-        Banana::$page->assign('groups', $groups);
+        if (Banana::$spool_boxlist) {
+            $groups    = Banana::$protocole->getBoxList(Banana::BOXES_SUB, Banana::$profile['lastnews'], true);
+            Banana::$page->assign('groups', $groups);
+        }    
         Banana::$page->assign_by_ref('message', $msg);
         Banana::$page->assign('headers', Banana::$msgshow_headers);
         return true;
@@ -444,6 +449,7 @@ class Banana
     {
         Banana::load('spool');
         if (!Banana::$spool || Banana::$spool->group != $group) {
+            $clean = false;
             if ($group == @$_SESSION['banana_group'] && isset($_SESSION['banana_spool'])) {
                 Banana::$spool = unserialize($_SESSION['banana_spool']);
                 $clean = @(Banana::$profile['lastnews'] != $_SESSION['banana_lastnews']);
