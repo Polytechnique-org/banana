@@ -357,7 +357,9 @@ function banana_formatHtml(BananaMimePart &$part)
 {
     $text = $part->getText();
     $text = banana_catchHtmlSignature($text);
-    $text = banana_hideExternalImages($text);
+    if (!Banana::$msgshow_externalimages) {
+        $text = banana_hideExternalImages($text);
+    }    
     $text = banana_catchPartLinks($text);
     return banana_cleanHtml($text);
 }

@@ -45,6 +45,7 @@ class Banana
     static public $msgshow_mimeparts = array('multipart/report', 'multipart/mixed', 'text/html', 'text/plain', 'text/enriched', 'text', 'message');
     static public $msgshow_xface     = true;
     static public $msgshow_wrap      = 78;
+    static public $msgshow_externalimages = false;
     static public $msgshow_withthread = true;
 
     /** Match an url
