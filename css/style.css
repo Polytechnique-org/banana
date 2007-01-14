@@ -59,6 +59,10 @@
     border-color: #aaaa00;
     background: inherit;
 }
+.banana table.message img.multipart {
+    max-width: 200px;
+    max-height: 200px;
+}
 
 /** MISC **/
 .banana .center { text-align: center; padding: 1em; }
