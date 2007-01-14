@@ -47,7 +47,9 @@
   </tr>
   {/if}
 </table>
+{if $showboxlist}
 {include file="banana-boxlist.inc.tpl" grouplist=$groups withstats=true}
+{/if}
 {if $withtitle}
 <div class="pages">
 {if $spool->overview|@count > $msgbypage}
