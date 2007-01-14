@@ -2,6 +2,7 @@
 {* *}
 {* *}
 
+{if $withtabs}
 <table class="cadre_a_onglet" style="width: 100%" cellpadding="0" cellspacing="0">
   <tr>
     <td>
@@ -24,6 +25,9 @@
   </tr>
   <tr>
     <td class="conteneur_tab banana">
+{else}
+<div class="banana">
+{/if}
       {foreach from=$errors item=error}
       <p class="error">{$error}</p>
       {/foreach}
@@ -43,7 +47,9 @@
         {include file="banana-thread.inc.tpl" withtitle=true}
       {elseif $page eq 'message'}
         {include file="banana-message.inc.tpl"}
+        {if $withthread}
         {include file="banana-thread.inc.tpl" withtitle=false}
+        {/if}
       {elseif $page eq 'new'}
         {include file="banana-newmessage.inc.tpl"}
       {elseif $page eq 'cancel'}
@@ -58,8 +64,12 @@
         {include file=$current_page.template}
       {/if}
       {/if}
+{if $withtabs}
     </td>
   </tr>
 </table>
+{else}
+</div>
+{/if}
 
 {* vim:set et sw=2 sts=2 ts=2 enc=utf-8: *}

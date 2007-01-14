@@ -23,6 +23,7 @@ class Banana
                                     'subscribe' => array(),
                                     'autoup' => 1);
     static public $boxpattern;
+    static public $withtabs = true;
 
 ### Spool ###
     static public $spool_max     = 3000;
@@ -44,6 +45,7 @@ class Banana
     static public $msgshow_mimeparts = array('multipart/report', 'multipart/mixed', 'text/html', 'text/plain', 'text/enriched', 'text', 'message');
     static public $msgshow_xface     = true;
     static public $msgshow_wrap      = 78;
+    static public $msgshow_withthread = true;
 
     /** Match an url
      * Should be included in a regexp delimited using /, !, , or @ (eg: "/$url_regexp/ui")
