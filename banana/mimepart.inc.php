@@ -420,7 +420,7 @@ class BananaMimePart
         list($type, $subtype) = $this->getType();
         if ($type == 'image') {
             $part = $this->id ? $this->id : $this->filename;
-            return '<img src="'
+            return '<img class="multipart" src="'
                  . banana_htmlentities(Banana::$page->makeUrl(array('group' => Banana::$group,
                                                                     'artid' => Banana::$artid,
                                                                     'part'  => $part)))
