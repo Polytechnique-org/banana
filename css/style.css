@@ -6,6 +6,10 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
+.banana {
+    margin-bottom: 1em;
+}
+
 /** GROUP LIST **/
 .banana .grp { text-align: left; }
 .banana .dsc { text-align: left; }
