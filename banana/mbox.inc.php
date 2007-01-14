@@ -444,7 +444,7 @@ class BananaMBox implements BananaProtocoleInterface
             }
             if ($id != $this->current_id || !$this->at_beginning) {
                 if (!$this->goTo($id)) {
-                    continue;
+                    break;
                 }
             }
             $beginning = ftell($this->file);
