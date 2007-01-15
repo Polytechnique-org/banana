@@ -311,8 +311,8 @@ function banana__linkAttachment($cid)
 
 function banana_hideExternalImages($text)
 {
-    return preg_replace("/<img[^>]*?src=['\"](?!cid).*?>/i",
-                        Banana::$page->makeImg(array('img' => 'invalid')),
+    return preg_replace("/<img([^>]*?)src=['\"](?!cid).*?['\"](.*?)>/i",
+                        '<img\1src="invalid"\2>',
                         $text);
 }
 
