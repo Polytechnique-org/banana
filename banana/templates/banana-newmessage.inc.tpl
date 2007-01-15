@@ -4,7 +4,7 @@
       <th colspan="2">{"Composer un nouveau message"|b}</th>
     </tr>
     {foreach from=$headers key=header item=values}
-    <tr>
+    <tr class="pair">
       <td>{$values.name}</td>
       <td>
         {if $values.fixed}
@@ -15,13 +15,13 @@
       </td>
     </tr>
     {/foreach}
-    <tr class="pair">
+    <tr>
       <td colspan="2" class="center">
         <textarea name="body" cols="74" rows="16">{$body|default:$smarty.request.body}</textarea>
       </td>
     </tr>
     {if $can_attach}
-    <tr class="pair">
+    <tr>
       <td>{"Fichier joint"|b}</td>
       <td>
         {if $maxfilesize}
@@ -31,7 +31,7 @@
       </td>
     </tr>
     {/if}
-    <tr class="pair">
+    <tr>
       <td colspan="2" class="center">
         <input type="submit" name="sendmessage" value="{"Envoyer le message"|b}" />
       </td>

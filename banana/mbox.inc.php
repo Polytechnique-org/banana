@@ -30,16 +30,16 @@ class BananaMBox implements BananaProtocoleInterface
      */
     public function __construct()
     {
-        $filename = $this->getFileName(Banana::$group);
+        $filename = $this->getFileName();
         if (is_null($filename)) {
             return;
         }
-        $this->filesize = filesize($filename);
         $this->file = @fopen($filename, 'r');
         if (!$this->file) {
-            $this->_lasterrno = 1;
-            $this->_lasterror = _b_('Can\'t open file');
             $this->file = null;
+            $this->filesize = 0;
+        } else {
+            $this->filesize = filesize($filename);
         }
         $this->current_id   = 0;
         $this->at_beginning = true;
@@ -58,7 +58,8 @@ class BananaMBox implements BananaProtocoleInterface
      */
     public function isValid()
     {
-        return !Banana::$group || $this->file;
+        return true;
+        //!Banana::$group || $this->file;
     }
     
     /** Indicate last error n°
@@ -100,6 +101,9 @@ class BananaMBox implements BananaProtocoleInterface
     public function &getMessage($id)
     {
         $message = null;
+        if (is_null($this->file)) {
+            return $message;
+        }
         if (!is_numeric($id)) {
             if (!Banana::$spool) {
                 return $message;
@@ -118,6 +122,9 @@ class BananaMBox implements BananaProtocoleInterface
     public function getMessageSource($id)
     {
         $message = null;
+        if (is_null($this->file)) {
+            return $message;
+        }
         if (!is_numeric($id)) {
             if (!Banana::$spool) { 
                 return $message;
@@ -147,6 +154,9 @@ class BananaMBox implements BananaProtocoleInterface
      */
     public function getIndexes()
     {
+        if (is_null($this->file)) {
+            return array(0, 0, 0);
+        }
         if (is_null($this->count)) {
             $this->getCount();
         }
@@ -162,6 +172,9 @@ class BananaMBox implements BananaProtocoleInterface
         $messages =& $this->readMessages(range($firstid, $lastid), true);
         $msg_headers = array_map('strtolower', $msg_headers);
         $headers  = array();
+        if (is_null($this->file)) {
+            return $headers;
+        }
         foreach ($msg_headers as $header) {
             foreach ($messages as $id=>&$message) {
                 if (!isset($headers[$id])) {
@@ -196,6 +209,9 @@ class BananaMBox implements BananaProtocoleInterface
      */
     public function getNewIndexes($since)
     {
+        if (is_null($this->file)) {
+            return array();
+        }
         if (is_null($this->new_messages)) {
             $this->getCount(); 
         }
@@ -278,12 +294,12 @@ class BananaMBox implements BananaProtocoleInterface
 # Filesystem functions
 #######
 
-    protected function getFileName($box)
+    protected function getFileName()
     {
-        if (is_null($box)) {
+        if (is_null(Banana::$group)) {
             return null;
         }
-        @list($mail, $domain) = explode('@', $box);
+        @list($mail, $domain) = explode('@', Banana::$group);
         return Banana::$mbox_path . '/' . $mail;
     }
 
