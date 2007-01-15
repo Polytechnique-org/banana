@@ -445,6 +445,49 @@ class Banana
     }
 
     /**************************************************************************/
+    /* Spoolgen functions                                                     */
+    /**************************************************************************/
+
+    private function checkErrors()
+    {
+        if (Banana::$protocole->lastErrno()) {
+            echo "\nL'erreur suivante s'est produite : "
+                . Banana::$protocole->lastErrno() . " "
+                . Banana::$protocole->lastError() . "\n";
+            return false;
+        }
+        return true;
+    } 
+
+    static public function createAllSpool(array $protos)
+    {
+        foreach ($protos as $proto) {
+            $banana = new Banana(array(), $proto);
+
+            if (!$banana->checkErrors()) {
+                continue;
+            }
+            $groups = Banana::$protocole->getBoxList();
+            if (!$banana->checkErrors()) {
+                continue;
+            }
+
+            print "** $proto **\n";
+            foreach (array_keys($groups) as $g) {
+                print "Generating spool for $g : ";
+                Banana::$group = $g;
+                $spool = $banana->loadSpool($g);
+                if (!$banana->checkErrors()) {
+                    break;
+                }
+                print "done.\n";
+                unset($spool);
+            }
+            print "\n";
+        }
+    }
+
+    /**************************************************************************/
     /* Private functions                                                      */
     /**************************************************************************/
 
