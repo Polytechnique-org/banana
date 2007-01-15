@@ -13,6 +13,7 @@ require_once dirname(__FILE__) . '/message.inc.php';
 
 class BananaMBox implements BananaProtocoleInterface
 {
+    private $inbox        = null;
     private $file         = null;
     private $filesize     = null;
     private $current_id   = null;
@@ -30,28 +31,14 @@ class BananaMBox implements BananaProtocoleInterface
      */
     public function __construct()
     {
-        $filename = $this->getFileName();
-        if (is_null($filename)) {
-            return;
-        }
-        $this->file = @fopen($filename, 'r');
-        if (!$this->file) {
-            $this->file = null;
-            $this->filesize = 0;
-        } else {
-            $this->filesize = filesize($filename);
-        }
-        $this->current_id   = 0;
-        $this->at_beginning = true;
+        $this->open();
     }
 
     /** Close the file
      */
     public function __destruct()
     {
-        if ($this->file) {
-            fclose($this->file);
-        }
+        $this->close();
     }
 
     /** Indicate if the Protocole handler has been succesfully built
@@ -100,6 +87,7 @@ class BananaMBox implements BananaProtocoleInterface
      */
     public function &getMessage($id)
     {
+        $this->open();
         $message = null;
         if (is_null($this->file)) {
             return $message;
@@ -121,6 +109,7 @@ class BananaMBox implements BananaProtocoleInterface
      */
     public function getMessageSource($id)
     {
+        $this->open();
         $message = null;
         if (is_null($this->file)) {
             return $message;
@@ -139,6 +128,7 @@ class BananaMBox implements BananaProtocoleInterface
      */
     private function getCount()
     {
+        $this->open();
         $this->count = count(Banana::$spool->overview);
         $max = @max(array_keys(Banana::$spool->overview));
         if ($max && Banana::$spool->overview[$max]->storage['next'] == $this->filesize) {
@@ -154,6 +144,7 @@ class BananaMBox implements BananaProtocoleInterface
      */
     public function getIndexes()
     {
+        $this->open();
         if (is_null($this->file)) {
             return array(0, 0, 0);
         }
@@ -168,6 +159,7 @@ class BananaMBox implements BananaProtocoleInterface
      */
     public function &getMessageHeaders($firstid, $lastid, array $msg_headers = array())
     {
+        $this->open();
         $msg_headers = array_map('strtolower', $msg_headers);
         $messages =& $this->readMessages(range($firstid, $lastid), true);
         $msg_headers = array_map('strtolower', $msg_headers);
@@ -209,6 +201,7 @@ class BananaMBox implements BananaProtocoleInterface
      */
     public function getNewIndexes($since)
     {
+        $this->open();
         if (is_null($this->file)) {
             return array();
         }
@@ -306,6 +299,44 @@ class BananaMBox implements BananaProtocoleInterface
 #######
 # MBox parser
 #######
+
+    private function open()
+    {
+        if ($this->inbox == Banana::$group) {
+            return;
+        }
+        $filename = $this->getFileName();
+        if (is_null($filename)) {
+            return;
+        }
+        $this->file = @fopen($filename, 'r');
+        if (!$this->file) {
+            $this->file = null;
+            $this->filesize = 0;
+        } else {
+            $this->filesize = filesize($filename);
+        }
+        $this->current_id   = 0;
+        $this->at_beginning = true;
+        $this->inbox        = Banana::$group;
+    }
+
+    private function close()
+    {
+        if (is_null($this->file)) {
+            return;
+        }
+        fclose($this->file);
+        $this->inbox        = null;
+        $this->file         = null;
+        $this->filesize     = null;
+        $this->current_id   = null;
+        $this->at_beginning = false;
+        $this->file_cache   = null;
+        $this->count        = null;
+        $this->new_messages = null;
+        $this->messages     = null;
+    }
 
     /** Go to the given message
      */
