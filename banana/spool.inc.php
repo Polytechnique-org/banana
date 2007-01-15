@@ -303,6 +303,9 @@ class BananaSpool
         if (is_null($array)) {
             $array =& $this->roots;
         }
+        if (!is_array($this->roots)) {
+            return;
+        }
         foreach ($array as $id) {
             if (!$this->overview[$id]->isread) {
                 $this->markAsRead($id);
