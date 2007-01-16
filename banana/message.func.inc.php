@@ -316,7 +316,7 @@ function banana_cleanStyles($tag, $attributes)
  * @param string
  * @desc Strip forbidden tags and delegate tag-source check to removeEvilAttributes()
  */
-function banana_cleanHtml($source)
+function banana_cleanHtml($source, $to_xhtml = false)
 {
     if (function_exists('tidy_repair_string')) {
         $tidy_on = Array(
@@ -339,32 +339,35 @@ function banana_cleanHtml($source)
     }
 
     // To XHTML
-    // catch inline CSS
-    $css = null;
-    if (preg_match('/<head.*?>(.*?)<\/head>/is', $source, $matches)) {
-        $source = preg_replace('/<head.*?>.*?<\/head>/is', '', $source);
-        preg_match_all('/<style.*?type="text\/css".*?>(.*?)<\/style>/is', $matches[1], $matches);
-        foreach ($matches[1] as &$match) {
-            $css .= $match;
+    if ($to_xhtml) {
+        // catch inline CSS
+        $css = null;
+        if (preg_match('/<head.*?>(.*?)<\/head>/is', $source, $matches)) {
+            $source = preg_replace('/<head.*?>.*?<\/head>/is', '', $source);
+            preg_match_all('/<style.*?type="text\/css".*?>(.*?)<\/style>/is', $matches[1], $matches);
+            foreach ($matches[1] as &$match) {
+                $css .= $match;
+            }
+            $css = preg_replace("/(^|\n|,)\s*(\w+[^\{\}\<]+\{)/s", '\1.banana .message .body .html \2', $css);
+            $css = preg_replace('/ body\b/i', '', $css);
+            Banana::$page->addCssInline($css);
         }
-        $css = preg_replace("/(^|\n|,)\s*(\w+[^\{\}\<]+\{)/s", '\1.banana .message .body .html \2', $css);
-        $css = preg_replace('/ body\b/i', '', $css);
-        Banana::$page->addCssInline($css);
+
+        // clean DTD
+        $source = str_replace('<font', '<span', $source);
+        $source = preg_replace('/<u\b/', '<span style="text-decoration: underline"', $source);
+        $source = preg_replace('/<\/(font|u)>/', '</span>', $source);
+        $source = str_replace('<body', $css ? '<div class="html"' : '<div class="html default"', $source);
+        $source = str_replace('</body>', '</div>', $source);
     }
-
-    // clean DTD
-    $source = str_replace('<font', '<span', $source);
-    $source = preg_replace('/<u\b/', '<span style="text-decoration: underline"', $source);
-    $source = preg_replace('/<\/(font|u)>/', '</span>', $source);
-    $source = str_replace('<body', $css ? '<div class="html"' : '<div class="html default"', $source);
-    $source = str_replace('</body>', '</div>', $source);
-
     $allowedTags = '<h1><h2><h3><b><i><a><ul><li><pre><hr><blockquote><img><br><div><span>'
                  . '<p><small><big><sup><sub><code><em><strong><table><tr><td><th>';
     $source = strip_tags($source, $allowedTags);
 
     // Use inlined style instead of old html attributes
-    $source = preg_replace('/<(\/?\w+)(.*?)(\/?>)/ise', "'<\\1' . banana_cleanStyles('\\1', '\\2') . '\\3'", $source);
+    if ($to_xhtml) {
+        $source = preg_replace('/<(\/?\w+)(.*?)(\/?>)/ise', "'<\\1' . banana_cleanStyles('\\1', '\\2') . '\\3'", $source);
+    }    
     return preg_replace('/<(.*?)>/ie', "'<'.banana_removeEvilAttributes('\\1').'>'", $source);
 }
 
@@ -446,7 +449,7 @@ function banana_formatHtml(BananaMimePart &$part)
         $text = banana_hideExternalImages($text);
     }    
     $text = banana_catchPartLinks($text);
-    return banana_cleanHtml($text);
+    return banana_cleanHtml($text, true);
 }
 
 function banana_quoteHtml(BananaMimePart &$part)
