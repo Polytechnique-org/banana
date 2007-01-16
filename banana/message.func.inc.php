@@ -251,7 +251,65 @@ function banana_removeEvilAttributes($tagSource)
     $stripAttrib = 'javascript:|onclick|ondblclick|onmousedown|onmouseup|onmouseover|'.
                    'onmousemove|onmouseout|onkeypress|onkeydown|onkeyup';
     return stripslashes(preg_replace("/$stripAttrib/i", '', $tagSource));
-}   
+}
+
+function banana_cleanStyles($tag, $attributes)
+{
+    static $td_style, $conv, $size_conv;
+    if (!isset($td_style)) {
+        $conv = array('style' => 'style', 'width' => 'width', 'height' => 'height', 'border' => 'border-size',
+                      'size' => 'font-size', 'align' => 'text-align', 'valign' => 'vertical-align', 'face' => 'font',
+                      'bgcolor' => 'background-color', 'color' => 'color', 'style' => 'style',
+                      'cellpadding' => 'padding', 'cellspacing' => 'border-spacing');
+        $size_conv = array(1 => 'xx-small', 2 => 'x-small', 3 => 'small', 4 => 'medium', 5 => 'large',
+                           6 => 'x-large',  7 => 'xx-large',
+                           '-2' => 'xx-small', '-1' => 'x-small', '+1' => 'medium', '+2' => 'large',
+                           '+3' => 'x-large', '+4' => 'xx-large');
+        $td_style = array();
+    }
+    if ($tag == 'table') {
+        array_unshift($td_style, '');
+    }
+    if ($tag == '/table') {
+        array_shift($td_style);
+    }
+    if ($tag{0} == '/') {
+        return '';
+    }
+    if ($tag == 'td') {
+        $style = $td_style[0];
+    } else {
+        $style = '';
+    }
+    $attributes = str_replace("\n", ' ', stripslashes($attributes));
+    $attributes = str_replace('= "', '="', $attributes);
+    foreach ($conv as $att=>$stl) {
+        $pattern = '/\b' . preg_quote($att, '/') . '="(.+?)"/i';
+        if (preg_match($pattern, $attributes, $matches)) {
+            $attributes = preg_replace($pattern, '', $attributes);
+            $val = $matches[1];
+            if ($att == 'cellspacing' && strpos($style, 'border-collapse') === false) {
+                $style .= "border-collapse: separate; border-spacing: $val $val; ";
+            } elseif ($att == 'cellpadding' && $tag == 'table') {
+                $td_style[0] = "$stl: {$val}px; ";
+            } elseif ($att == 'style') {
+                $val = rtrim($val, ' ;');
+                $style .= "$val; ";
+            } elseif ($att == 'size') {
+                $val = $size_conv[$val];
+                $style .= "$stl: $val; ";
+            } elseif (is_numeric($val)) {
+                $style .= "$stl: {$val}px; ";
+            } else {
+                $style .= "$stl: $val; ";
+            }
+        }
+    }
+    if (!empty($style)) {
+        $style = 'style="' . $style . '" ';
+    }
+    return ' ' . $style . trim($attributes);
+}
     
 /**
  * @return string
@@ -260,18 +318,13 @@ function banana_removeEvilAttributes($tagSource)
  */
 function banana_cleanHtml($source)
 {
-    $allowedTags = '<h1><b><i><a><ul><li><pre><hr><blockquote><img><br><font><div>'
-                 . '<u><p><small><big><sup><sub><code><em><strong><table><tr><td><th>';
-    $source = strip_tags($source, $allowedTags);
-    $source = preg_replace('/<(.*?)>/ie', "'<'.banana_removeEvilAttributes('\\1').'>'", $source);
-        
     if (function_exists('tidy_repair_string')) {
         $tidy_on = Array(
             'drop-empty-paras', 'drop-proprietary-attributes',
             'hide-comments', 'logical-emphasis', 'output-xhtml',
-            'replace-color', 'show-body-only'
+            'replace-color',
         );
-        $tidy_off = Array('join-classes', 'clean'); // 'clean' may be a good idea, but it is too aggressive
+        $tidy_off = Array('join-classes', 'clean', 'show-body-only'); // 'clean' may be a good idea, but it is too aggressive
 
         foreach($tidy_on as $opt) {
             tidy_setopt($opt, true);
@@ -282,9 +335,37 @@ function banana_cleanHtml($source)
         tidy_setopt('alt-text', '[ inserted by TIDY ]');
         tidy_setopt('wrap', '120');
         tidy_set_encoding('utf8');
-        return tidy_repair_string($source);
+        $source = tidy_repair_string($source);
     }
-    return $source;
+
+    // To XHTML
+    // catch inline CSS
+    $css = null;
+    if (preg_match('/<head.*?>(.*?)<\/head>/is', $source, $matches)) {
+        $source = preg_replace('/<head.*?>.*?<\/head>/is', '', $source);
+        preg_match_all('/<style.*?type="text\/css".*?>(.*?)<\/style>/is', $matches[1], $matches);
+        foreach ($matches[1] as &$match) {
+            $css .= $match;
+        }
+        $css = preg_replace("/(^|\n|,)\s*(\w+[^\{\}\<]+\{)/s", '\1.banana .message .body .html \2', $css);
+        $css = preg_replace('/ body\b/i', '', $css);
+        Banana::$page->addCssInline($css);
+    }
+
+    // clean DTD
+    $source = str_replace('<font', '<span', $source);
+    $source = preg_replace('/<u\b/', '<span style="text-decoration: underline"', $source);
+    $source = preg_replace('/<\/(font|u)>/', '</span>', $source);
+    $source = str_replace('<body', $css ? '<div class="html"' : '<div class="html default"', $source);
+    $source = str_replace('</body>', '</div>', $source);
+
+    $allowedTags = '<h1><h2><h3><b><i><a><ul><li><pre><hr><blockquote><img><br><div><span>'
+                 . '<p><small><big><sup><sub><code><em><strong><table><tr><td><th>';
+    $source = strip_tags($source, $allowedTags);
+
+    // Use inlined style instead of old html attributes
+    $source = preg_replace('/<(\/?\w+)(.*?)(\/?>)/ise', "'<\\1' . banana_cleanStyles('\\1', '\\2') . '\\3'", $source);
+    return preg_replace('/<(.*?)>/ie', "'<'.banana_removeEvilAttributes('\\1').'>'", $source);
 }
 
 function banana_catchHtmlSignature($res)
@@ -318,7 +399,11 @@ function banana_hideExternalImages($text)
 
 function banana_catchPartLinks($text)
 {
-    return preg_replace('/cid:([^\'" ]+)/e', "banana__linkAttachment('\\1')", $text);
+    $article = Banana::$page->makeURL(array('group' => Banana::$group, 'artid' => Banana::$artid, 'part' => Banana::$part));
+    $article = banana_htmlentities($article);
+    $text = preg_replace('/cid:([^\'" ]+)/e', "banana__linkAttachment('\\1')", $text);
+    $text = preg_replace('/href="(#.*?)"/i', 'href="' . $article . '\1"', $text);
+    return $text;
 }
 
 // {{{ HTML to Plain Text tools

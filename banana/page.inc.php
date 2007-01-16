@@ -18,6 +18,8 @@ class BananaPage extends Smarty
     private $killed  = array();
     private $actions = array();
 
+    public $css = '';
+
     public function __construct()
     {
         $this->Smarty();
@@ -86,6 +88,14 @@ class BananaPage extends Smarty
     public function killPage($page)
     {
         $this->killed[] = $page;
+    }
+
+    /** Add Inline CSS to put in the page headers
+     * @param css CSS code
+     */
+    public function addCssInline($css)
+    {
+        $this->css .= $css;
     }
 
     /** Preparte the page generation

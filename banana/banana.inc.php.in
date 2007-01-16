@@ -251,6 +251,13 @@ class Banana
         return Banana::$page->run();
     }
 
+    /** Return the CSS code to include in the headers
+     */
+    public function css()
+    {
+        return Banana::$page->css;
+    }
+
     /**************************************************************************/
     /* actions                                                                */
     /**************************************************************************/
