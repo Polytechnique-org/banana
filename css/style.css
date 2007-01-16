@@ -67,6 +67,9 @@
     max-width: 200px;
     max-height: 200px;
 }
+.banana table.message .body .default {
+    background-color: #fff;
+}
 
 /** MISC **/
 .banana .center { text-align: center; padding: 1em; }

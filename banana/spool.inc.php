@@ -209,6 +209,9 @@ class BananaSpool
             $this->ids[$message['message-id']] = $id;
         }
 
+        if (!is_array($this->overview)) {
+            $this->overview = array();
+        }
         foreach ($messages as $id=>&$message) {
             if (!isset($this->overview[$id])) {
                 $this->overview[$id] = new BananaSpoolHead($message);
