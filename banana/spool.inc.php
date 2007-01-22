@@ -364,8 +364,12 @@ class BananaSpool
             }
             unset($this->overview[$_id]);
             $msgid = array_search($_id, $this->ids);
-            if ($msgid) {
+            if ($msgid !== false) {
                 unset($this->ids[$msgid]);
+            }
+            $msgid = array_search($_id, $this->roots);
+            if ($msgid !== false) {
+                unset($this->roots[$msgid]);
             }
             
             if ($write) {
