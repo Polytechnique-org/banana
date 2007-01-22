@@ -72,8 +72,9 @@
 }
 
 /** MISC **/
+
 .banana .center { text-align: center; padding: 1em; }
-.banana .error { color: red; background: inherit; }
+.banana .error { color: red; padding-left: 1em; }
 .banana pre.error {
     margin-left: 2em;
     font-size: 90%;
