@@ -1,4 +1,4 @@
-{if $groups|@count}
+{if $grouplist|@count}
 {if $withsubs}
 <form action="{url action=subscribe}" method="post">
 <p style="text-align: center">
@@ -17,7 +17,7 @@
     <th>{"Nom"|b}</th>
     <th>{"Description"|b}</th>
   </tr>
-  {foreach from=$groups key=name item=grp}
+  {foreach from=$grouplist key=name item=grp}
   <tr class="{cycle values="impair,pair"}">
     {if $withsubs}
     <td>
