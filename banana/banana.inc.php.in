@@ -546,7 +546,7 @@ class Banana
         if ($group == $_SESSION['banana_group']) {
             if (!Banana::$profile['display']) {
                 $_SESSION['banana_spool'] = serialize(Banana::$spool);
-            }    
+            }
             if ($artid == $_SESSION['banana_artid']) {
                 unset($_SESSION['banana_message']);
                 unset($_SESSION['banana_showhdr']);
