@@ -51,6 +51,18 @@
     </td>
   </tr>
   {/if}
+  {assign var=alter value=$message->getAlternatives()}
+  {if $alter|@count}
+  <tr class="pair">
+    <td class="hdr">{"Versions"|b}</td>
+    <td colspan="2">
+      {foreach from=$alter key=ctype item=text name=alter}
+      {if $type eq $ctype}{$text}{else}{link group=$group artid=$artid part=$ctype text=$text}{/if}
+      {if !$smarty.foreach.alter.last}&nbsp;&bull;&nbsp;{/if}
+      {/foreach}
+    </td>
+  </tr>
+  {/if}
   <tr>
     <td colspan="3" class="body">
       {$body}

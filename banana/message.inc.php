@@ -228,11 +228,11 @@ final class BananaMessage extends BananaMimePart
         exit;
     }
 
-    public function getFormattedBody($type = null)
+    public function getFormattedBody(&$reqtype = null)
     {
         $types = Banana::$msgshow_mimeparts;
-        if (!is_null($type)) {
-            array_unshift($types, $type);
+        if (!is_null($reqtype)) {
+            array_unshift($types, $reqtype);
         }
         foreach ($types as $type) {
             @list($type, $subtype) = explode('/', $type);
@@ -240,6 +240,7 @@ final class BananaMessage extends BananaMimePart
             if (empty($parts)) {
                 continue;
             }
+            $reqtype = implode('/', $parts[0]->getType());
             return $parts[0]->toHtml();
         }
         return null;

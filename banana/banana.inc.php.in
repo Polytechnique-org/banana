@@ -7,6 +7,8 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
+require_once dirname(__FILE__) . '/text.func.inc.php';
+
 class Banana
 {
 
@@ -24,6 +26,7 @@ class Banana
                                     'autoup' => 1);
     static public $boxpattern;
     static public $withtabs = true;
+    static public $mimeparts = array();
 
 ### Spool ###
     static public $spool_max     = 3000;
@@ -42,7 +45,8 @@ class Banana
 ### Message display ###
     static public $msgshow_headers   = array('from', 'newsgroups', 'followup-to', 'to', 'cc', 'reply-to',
                                        'organization', 'date', 'references', 'in-reply-to');
-    static public $msgshow_mimeparts = array('multipart/report', 'multipart/mixed', 'text/html', 'text/plain', 'text/enriched', 'text', 'message');
+    static public $msgshow_mimeparts = array('multipart/report', 'multipart/mixed', 
+                                             'text/html', 'text/plain', 'text/enriched', 'text', 'message');
     static public $msgshow_xface     = true;
     static public $msgshow_wrap      = 78;
     static public $msgshow_externalimages = false;
@@ -136,7 +140,6 @@ class Banana
      */
     public function __construct($params = null, $protocole = 'NNTP', $pageclass = 'BananaPage')
     {
-        Banana::load('text.func');
         if (is_null($params)) {
             $this->params = $_GET;
         } else {
@@ -156,6 +159,17 @@ class Banana
             Banana::load('page');
         }
         Banana::$page = new $pageclass;
+
+        $types = array('multipart/report' => _b_('Rapport d\'erreur'),
+                       'multipart/mixed'  => _b_('Composition'),
+                       'text/html'        => _b_('Texte formaté'),
+                       'text/plain'       => _b_('Texte brut'),
+                       'text/enriched'    => _b_('Texte enrichi'),
+                       'text'             => _b_('Texte'),
+                       'message/rfc822'   => _b_('Mail'),
+                       'message'          => _b_('Message'),
+                       'source'           => _b_('Source'));
+        Banana::$mimeparts = array_merge($types, Banana::$mimeparts);
     }
 
     /** Fill state vars (Banana::$group, Banana::$artid, Banana::$action, Banana;:$part, Banana::$first)
@@ -331,7 +345,8 @@ class Banana
             }
             exit;
         } elseif ($partid == 'text') {
-            Banana::$page->assign('body', $msg->getFormattedBody());
+            $partid = null;
+            Banana::$page->assign('body', $msg->getFormattedBody($partid));
         } elseif ($partid == 'source') {
             $text = Banana::$protocole->getMessageSource($artid);
             if (!is_utf8($text)) {
@@ -351,6 +366,7 @@ class Banana
         }    
         Banana::$page->assign_by_ref('message', $msg);
         Banana::$page->assign('headers', Banana::$msgshow_headers);
+        Banana::$page->assign('type', $partid);
         return true;
     }
 
