@@ -544,6 +544,43 @@ class BananaMimePart
         return array();
     }
 
+    public function getAlternatives()
+    {
+        $types =& Banana::$msgshow_mimeparts;
+        $names =& Banana::$mimeparts;
+        $source = null;
+        if (in_array('source', $types)) {
+            $source = @$names['source'] ? $names['source'] : 'source';
+        }
+        if (!$this->isType('multipart', 'alternative') && !$this->isType('multipart', 'related')) {
+            if ($source) {
+                $parts = array($this);
+            } else {
+                return array();
+            }
+        } else {
+            $parts =& $this->multipart;
+        }
+        $alt = array();
+        foreach ($parts as &$part) {
+            list($type, $subtype) = $part->getType();
+            $ct = $type . '/' . $subtype;
+            if (in_array($ct, $types) || in_array($type, $types)) {
+                if (isset($names[$ct])) {
+                    $alt[$ct] = $names[$ct];
+                } elseif (isset($names[$type])) {
+                    $alt[$ct] = $names[$type];
+                } else {
+                    $alt[$ct] = $ct;
+                }
+            }
+        }
+        if ($source) {
+            $alt['source'] = $source;
+        }
+        return $alt;
+    }
+
     public function getPartById($id)
     {
         if ($this->id == $id) {
