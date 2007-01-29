@@ -310,6 +310,19 @@ function banana_cleanStyles($tag, $attributes)
     }
     return ' ' . $style . trim($attributes);
 }
+
+function banana_filterCss($css)
+{
+    $css = preg_replace("/(^|\n|,)\s*(\w+[^\{\}\<]+\{)/s", '\1.banana .message .body .html \2', $css);
+    $css = preg_replace('/ body\b/i', '', $css);
+    if (!Banana::$msgshow_externalimages) {
+        if (preg_match("/url\(((ht|f)tps?:.*?)\)/i", $css)) {
+            $css = preg_replace("/url\(((ht|f)tps?:.*?)\)/i", 'url(invalid-image.png)', $css);
+            Banana::$msgshow_hasextimages = true;
+        }
+    }
+    return $css;
+}
     
 /**
  * @return string
@@ -348,8 +361,7 @@ function banana_cleanHtml($source, $to_xhtml = false)
             foreach ($matches[1] as &$match) {
                 $css .= $match;
             }
-            $css = preg_replace("/(^|\n|,)\s*(\w+[^\{\}\<]+\{)/s", '\1.banana .message .body .html \2', $css);
-            $css = preg_replace('/ body\b/i', '', $css);
+            $css = banana_filterCss($css);
             Banana::$page->addCssInline($css);
         }
 
@@ -395,9 +407,13 @@ function banana__linkAttachment($cid)
 
 function banana_hideExternalImages($text)
 {
-    return preg_replace("/<img([^>]*?)src=['\"](?!cid).*?['\"](.*?)>/i",
-                        '<img\1src="invalid"\2>',
-                        $text);
+    if (preg_match("/<img([^>]*?)src=['\"](?!cid).*?['\"](.*?)>/i", $text)) {
+        Banana::$msgshow_hasextimages = true;
+        return preg_replace("/<img([^>]*?)src=['\"](?!cid).*?['\"](.*?)>/i",
+                            '<img\1src="invalid"\2>',
+                            $text);
+    }
+    return $text;
 }
 
 function banana_catchPartLinks($text)

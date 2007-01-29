@@ -57,7 +57,12 @@
     <td class="hdr">{"Versions"|b}</td>
     <td colspan="2">
       {foreach from=$alter key=ctype item=text name=alter}
-      {if $type eq $ctype}{$text}{else}{link group=$group artid=$artid part=$ctype text=$text}{/if}
+      {if $type eq $ctype}
+      {$text}
+      {if $extimages}[{link group=$group artid=$artid part=$type action=showext text="Afficher les images externes"|b}]{/if}
+      {else}
+      {link group=$group artid=$artid part=$ctype text=$text}
+      {/if}
       {if !$smarty.foreach.alter.last}&nbsp;&bull;&nbsp;{/if}
       {/foreach}
     </td>

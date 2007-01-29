@@ -50,6 +50,7 @@ class Banana
     static public $msgshow_xface     = true;
     static public $msgshow_wrap      = 78;
     static public $msgshow_externalimages = false;
+    static public $msgshow_hasextimages   = false;
     static public $msgshow_withthread = true;
 
     /** Match an url
@@ -99,6 +100,7 @@ class Banana
     const ACTION_MSG_READ   = 5;
     const ACTION_MSG_NEW    = 9;
     const ACTION_MSG_CANCEL = 17;
+    const ACTION_MSG_IMAGES = 33;
 
     // Box list view
     const BOXES_ALL = 0;
@@ -206,6 +208,9 @@ class Banana
           case 'cancel':
             Banana::$action = Banana::ACTION_MSG_CANCEL;
             return;
+          case 'showext':
+            Banana::$action = Banana::ACTION_MSG_IMAGES;
+            return;
           default:
             Banana::$action = Banana::ACTION_MSG_READ;
         }
@@ -245,6 +250,8 @@ class Banana
           case Banana::ACTION_MSG_LIST:
             $error = $this->action_showThread(Banana::$group, Banana::$first);
             break;
+          case Banana::ACTION_MSG_IMAGES:
+            Banana::$msgshow_externalimages = true;
           case Banana::ACTION_MSG_READ:
             $error = $this->action_showMessage(Banana::$group, Banana::$artid, Banana::$part);
             break;
@@ -365,6 +372,7 @@ class Banana
             Banana::$page->assign('groups', $groups);
         }    
         Banana::$page->assign_by_ref('message', $msg);
+        Banana::$page->assign('extimages', Banana::$msgshow_hasextimages);
         Banana::$page->assign('headers', Banana::$msgshow_headers);
         Banana::$page->assign('type', $partid);
         return true;
