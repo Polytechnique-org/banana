@@ -29,6 +29,7 @@ class Banana
     static public $mimeparts = array();
 
 ### Spool ###
+    static public $spool_root    = '/var/spool/banana';
     static public $spool_max     = 3000;
     static public $spool_tbefore = 5;
     static public $spool_tafter  = 5;
