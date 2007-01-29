@@ -14,7 +14,7 @@ DEB_INSTALL_CHANGELOGS_ALL :=
 DEB_INSTALL_CHANGELOGS_php-banana := Changelog
 
 #directories
-DEB_INSTALL_DIRS_php-banana := var/spool/banana/
+DEB_INSTALL_DIRS_php-banana := var/spool/banana/ var/spool/banana/templates_c
 
 install/php-banana::
 	make
