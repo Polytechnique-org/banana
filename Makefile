@@ -7,7 +7,7 @@ PKG_FILES = AUTHORS Changelog COPYING README Makefile TODO
 
 PKG_DIRS = banana po css examples img
 
-VCS_FILTER = ! -name .arch-ids ! -name .arch-inventory
+VCS_FILTER = ! -name .svn
 
 # global targets
 
@@ -16,7 +16,7 @@ build: pkg-build
 dist: clean pkg-dist
 
 clean:
-	rm -rf locale banana/include/banana.inc.php
+	rm -rf locale banana/banana.inc.php
 	make -C po clean
 
 %: %.in Makefile
