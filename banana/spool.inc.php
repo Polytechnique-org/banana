@@ -106,8 +106,7 @@ class BananaSpool
 
     private static function spoolFilename($group)
     {
-        $file = dirname(dirname(__FILE__));
-        $file .= '/spool/' . Banana::$protocole->name() . '/';
+        $file = Banana::$spool_root . '/' . Banana::$protocole->name() . '/';
         if (!is_dir($file)) {
             mkdir($file);
         }
