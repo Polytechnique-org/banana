@@ -26,7 +26,7 @@ class BananaPage extends Smarty
 
         $this->compile_check = Banana::$debug_smarty;
         $this->template_dir  = dirname(__FILE__) . '/templates/';
-        $this->compile_dir   = dirname(dirname(__FILE__)) . '/spool/templates_c/';
+        $this->compile_dir   = Banana::$spool_root . '/templates_c/';
         $this->register_prefilter('banana_trimwhitespace');
     
     }
