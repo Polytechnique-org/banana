@@ -65,7 +65,7 @@ class Banana
      *   $matches[2] = "http://www.polytechnique.org"
      *   $matches[3] = "]"
      */
-    static public $msgshow_url     = '(["\[])?((?:[a-z]+:\/\/|www\.)(?:[\.\,\;\!]*[a-z\@0-9~%$£µ&i#\-+=_\/\?]+)+)(["\]])?';
+    static public $msgshow_url     = '(["\[])?((?:[a-z]+:\/\/|www\.)(?:[\.\,\;\!\:]*[a-z\@0-9~%$£µ&i#\-+=_\/\?]+)+)(["\]])?';
 
 ### Message edition ###
     static public $msgedit_canattach  = true;
