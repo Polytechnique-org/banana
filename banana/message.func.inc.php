@@ -331,24 +331,27 @@ function banana_filterCss($css)
  */
 function banana_cleanHtml($source, $to_xhtml = false)
 {
-    if (function_exists('tidy_repair_string')) {
-        $tidy_on = Array(
-            'drop-empty-paras', 'drop-proprietary-attributes',
-            'hide-comments', 'logical-emphasis', 'output-xhtml',
-            'replace-color',
-        );
-        $tidy_off = Array('join-classes', 'clean', 'show-body-only'); // 'clean' may be a good idea, but it is too aggressive
-
-        foreach($tidy_on as $opt) {
-            tidy_setopt($opt, true);
+    if (!function_exists('tidy_repair_string')) {
+        $tidy_config = array('drop-empty-paras' => true,
+                             'drop-proprietary-attributes' => true,
+                             'hide-comments' => true,
+                             'logical-emphasis' => true, 
+                             'output-xhtml' => true,
+                             'replace-color' => true,
+                             'join-classes'  => false,
+                             'clean' => false,
+                             'show-body-only' => false,
+                             'alt-text' => '[ inserted by TIDY ]',
+                             'wrap' => 120);
+        if (function_exists('tidy_setopt')) { // Tidy 1.0
+            foreach ($tidy_config as $field=>$value) {
+                tidy_setopt($field, $value);
+            }
+            tidy_set_encoding('utf8');
+            $source = tidy_repair_string($source);
+        } else { // Tidy 2.0
+            $source = tidy_repair_string($source, $tidy_config, 'utf8');
         }
-        foreach($tidy_off as $opt) {
-            tidy_setopt($opt, false);
-        }
-        tidy_setopt('alt-text', '[ inserted by TIDY ]');
-        tidy_setopt('wrap', '120');
-        tidy_set_encoding('utf8');
-        $source = tidy_repair_string($source);
     }
 
     // To XHTML
