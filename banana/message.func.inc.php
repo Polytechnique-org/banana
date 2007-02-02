@@ -284,10 +284,10 @@ function banana_cleanStyles($tag, $attributes)
     $attributes = str_replace("\n", ' ', stripslashes($attributes));
     $attributes = str_replace('= "', '="', $attributes);
     foreach ($conv as $att=>$stl) {
-        $pattern = '/\b' . preg_quote($att, '/') . '="(.+?)"/i';
+        $pattern = '/\b' . preg_quote($att, '/') . '=([\'"])?(.+?)(?(1)\1|(?:$| ))/i';
         if (preg_match($pattern, $attributes, $matches)) {
             $attributes = preg_replace($pattern, '', $attributes);
-            $val = $matches[1];
+            $val = $matches[2];
             if ($att == 'cellspacing' && strpos($style, 'border-collapse') === false) {
                 $style .= "border-collapse: separate; border-spacing: $val $val; ";
             } elseif ($att == 'cellpadding' && $tag == 'table') {
@@ -381,7 +381,7 @@ function banana_cleanHtml($source, $to_xhtml = false)
 
     // Use inlined style instead of old html attributes
     if ($to_xhtml) {
-        $source = preg_replace('/<(\/?\w+)(.*?)(\/?>)/ise', "'<\\1' . banana_cleanStyles('\\1', '\\2') . '\\3'", $source);
+        $source = preg_replace('/<(\/?\w+)(.*?)(\/?>)/uise', "'<\\1' . banana_cleanStyles('\\1', '\\2') . '\\3'", $source);
     }    
     return preg_replace('/<(.*?)>/ie', "'<'.banana_removeEvilAttributes('\\1').'>'", $source);
 }
