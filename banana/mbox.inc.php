@@ -305,6 +305,7 @@ class BananaMBox implements BananaProtocoleInterface
         if ($this->inbox == Banana::$group) {
             return;
         }
+        $this->close();
         $filename = $this->getFileName();
         if (is_null($filename)) {
             return;
