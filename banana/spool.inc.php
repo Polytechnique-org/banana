@@ -392,7 +392,7 @@ class BananaSpool
         } else {
             $format = '%a %e %b';
         }
-        return utf8_encode(strftime($format, $stamp));
+        return strftime($format, $stamp);
     }
 
     /** displays children tree of a post
