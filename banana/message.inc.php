@@ -108,7 +108,7 @@ final class BananaMessage extends BananaMimePart
 
           case "subject":
             $text = stripslashes($text);
-            $text = html_entities($text);
+            $text = banana_htmlentities($text);
             return banana_catchFormats($text);
 
           default:
