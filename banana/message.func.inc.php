@@ -331,7 +331,7 @@ function banana_filterCss($css)
  */
 function banana_cleanHtml($source, $to_xhtml = false)
 {
-    if (!function_exists('tidy_repair_string')) {
+    if (function_exists('tidy_repair_string')) {
         $tidy_config = array('drop-empty-paras' => true,
                              'drop-proprietary-attributes' => true,
                              'hide-comments' => true,

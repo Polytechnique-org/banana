@@ -7,9 +7,16 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-function _b_($str)
-{
-    return dgettext('banana', $str);
+if (function_exists('dgettext')) {
+    function _b_($str)
+    {
+        return dgettext('banana', $str);
+    }
+} else {
+    function _b_($str)
+    {
+        return $str;
+    }
 }
 
 if (!function_exists('is_utf8')) {
