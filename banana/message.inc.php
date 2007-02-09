@@ -174,7 +174,7 @@ final class BananaMessage extends BananaMimePart
 
     static public function formatDate($text)
     {
-        return utf8_encode(strftime("%A %d %B %Y, %H:%M (fuseau serveur)", strtotime($text)));
+        return strftime("%A %d %B %Y, %H:%M (fuseau serveur)", strtotime($text));
     }
 
     public function translateHeaders()

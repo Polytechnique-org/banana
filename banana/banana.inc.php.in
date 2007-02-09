@@ -21,7 +21,7 @@ class Banana
                                     'headers' => array('From' => 'Anonymous <anonymouse@example.com>'),
                                     'display' => 0,
                                     'lastnews' => 0,
-                                    'locale'  => 'fr_FR',
+                                    'locale'  => 'fr_FR.UTF-8',
                                     'subscribe' => array(),
                                     'autoup' => 1);
     static public $boxpattern;
@@ -304,9 +304,11 @@ class Banana
     {
         Banana::$page->setPage('forums');
         $groups    = Banana::$protocole->getBoxList(Banana::BOXES_SUB, Banana::$profile['lastnews'], true);
-        $newgroups = Banana::$protocole->getBoxList(Banana::BOXES_NEW, Banana::$profile['lastnews'], true);
         Banana::$page->assign('groups', $groups);
-        Banana::$page->assign('newgroups', $newgroups);
+        if (empty(Banana::$profile['subscribe']) || Banana::$profile['lastnews']) {
+            $newgroups = Banana::$protocole->getBoxList(Banana::BOXES_NEW, Banana::$profile['lastnews'], true);
+            Banana::$page->assign('newgroups', $newgroups);
+        }
         return true;
     }
 
