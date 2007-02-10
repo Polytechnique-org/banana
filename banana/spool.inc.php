@@ -434,8 +434,9 @@ class BananaSpool
 
             $res .= '<tr class="' . ($_index%2 ? 'pair' : 'impair') . ($overview->isread ? '' : ' new') . "\">\n";
             $res .= '<td class="date">' . $this->formatDate($overview->date) . " </td>\n";
-            $res .= '<td class="subj' . ($_index == $_ref ? ' cur' : '') . '">'
-                . $_pfx_node .($hc ? ($_head ? $spfx_f : ($overview->parent_direct ? $spfx_s : $spfx_snd)) : $spfx_n);
+            $res .= '<td class="subj' . ($_index == $_ref ? ' cur' : '') . '"><div class="tree">'
+                . $_pfx_node .($hc ? ($_head ? $spfx_f : ($overview->parent_direct ? $spfx_s : $spfx_snd)) : $spfx_n)
+                . '</div>';
             $subject = $overview->subject;
             if (function_exists('hook_formatDisplayHeader')) {
                 list($subject, $link) = hook_formatDisplayHeader('subject', $subject, true);
@@ -530,7 +531,7 @@ class BananaSpool
             for ($i = 0; $i < $pos ; $i++) {
                 $ndx += $this->overview[$this->overview[$id_parent]->children[$i]]->desc;
             }
-            $ndx++; //noeud pÃ¨re
+            $ndx++; //noeud père
 
             $id_cur = $id_parent;
         }
