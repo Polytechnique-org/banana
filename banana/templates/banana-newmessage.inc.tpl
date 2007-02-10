@@ -10,7 +10,7 @@
         {if $values.fixed}
         {$values.fixed|htmlentities}
         {else}
-        <input type="text" name="{$header}" value="{$values.user|default:$smarty.request[$header]}" size="50" />
+        <input type="text" name="{$header}" value="{$values.user|default:$smarty.request.$header}" size="50" />
         {/if}
       </td>
     </tr>
