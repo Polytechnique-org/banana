@@ -164,7 +164,7 @@ class Banana
         Banana::$page = new $pageclass;
         $types = array('multipart/report' => _b_('Rapport d\'erreur'),
                        'multipart/mixed'  => _b_('Composition'),
-                       'text/html'        => _b_('Texte formaté'),
+                       'text/html'        => _b_('Texte formatÃ©'),
                        'text/plain'       => _b_('Texte brut'),
                        'text/enriched'    => _b_('Texte enrichi'),
                        'text'             => _b_('Texte'),
@@ -226,7 +226,7 @@ class Banana
         
         // Check if the state is valid
         if (Banana::$protocole->lastErrNo()) {
-            return Banana::$page->kill(_b_('Une erreur a été rencontrée lors de la connexion au serveur') . '<br />'
+            return Banana::$page->kill(_b_('Une erreur a Ã©tÃ© rencontrÃ©e lors de la connexion au serveur') . '<br />'
                                       . Banana::$protocole->lastError());
         }
         if (!Banana::$protocole->isValid()) {
@@ -235,7 +235,7 @@ class Banana
         if (Banana::$action & Banana::ACTION_BOX_NEEDED) {
             if(Banana::$boxpattern && !preg_match('/' . Banana::$boxpattern . '/i', $group)) {
                 Banana::$page->setPage('group');        
-                return Banana::$page->kill(_b_("Ce newsgroup n'existe pas ou vous n'avez pas l'autorisation d'y accéder"));
+                return Banana::$page->kill(_b_("Ce newsgroup n'existe pas ou vous n'avez pas l'autorisation d'y accÃ©der"));
             }
         }
 
@@ -262,7 +262,7 @@ class Banana
             $error = $this->action_cancelMessage(Banana::$group, Banana::$artid);
             break;
           default:
-            $error = _b_("L'action demandée n'est pas supportée par Banana");
+            $error = _b_("L'action demandÃ©e n'est pas supportÃ©e par Banana");
         }
 
         // Generate the page
@@ -338,7 +338,7 @@ class Banana
         if (is_null($msg)) {
             $this->loadSpool($group);
             $this->removeMessage($group, $artid);
-            return _b_('Le message demandé n\'existe pas. Il est possible qu\'il ait été annulé');
+            return _b_('Le message demandÃ© n\'existe pas. Il est possible qu\'il ait Ã©tÃ© annulÃ©');
         }
         if ($partid == 'xface') {
             $msg->getXFace();
@@ -409,7 +409,7 @@ class Banana
             } elseif (Banana::$msgedit_canattach && isset($_FILES['attachment'])) {
                 $uploaded = $_FILES['attachment'];
                 if (!is_uploaded_file($uploaded['tmp_name'])) {
-                    Banana::$page->trig(_b_('Une erreur est survenue lors du téléchargement du fichier'));
+                    Banana::$page->trig(_b_('Une erreur est survenue lors du tÃ©lÃ©chargement du fichier'));
                 } else {
                     $msg = BananaMessage::newMessage($hdr_values, $_POST['body'], $uploaded);
                 }
@@ -426,7 +426,7 @@ class Banana
         } else {
             if (!is_null($artid)) {
                 $msg    =& $this->loadMessage($group, $artid);
-                $body    = $msg->getSender() . _b_(' a écrit :') . "\n" . $msg->quote();
+                $body    = $msg->getSender() . _b_(' a Ã©crit :') . "\n" . $msg->quote();
                 $subject = $msg->getHeaderValue('subject');
                 $headers['Subject']['user'] = 'Re: ' . preg_replace("/^re\s*:\s*/i", '', $subject);
                 $target  = $msg->getHeaderValue($hdrs['reply']);
