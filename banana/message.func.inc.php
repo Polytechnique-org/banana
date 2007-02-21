@@ -311,13 +311,20 @@ function banana_cleanStyles($tag, $attributes)
     return ' ' . $style . trim($attributes);
 }
 
+function banana__filterCss($text)
+{
+    $text = preg_replace("/(,[\s\n\r]*)/s", '\1 .banana .message .body .html ', $text);
+    return '.banana .message .body .html ' . $text;
+}
+
 function banana_filterCss($css)
 {
-    $css = preg_replace("/(^|\n|,)\s*(\w+[^\{\}\<]+\{)/s", '\1.banana .message .body .html \2', $css);
+    preg_match_all("/(^|\n|,\s*)\s*([\#\.@\w][^;\{\}\<]*?[\{])/s", $css, $matches);
+    $css = preg_replace("/(^|\n)\s*([\#\.@\w][^;\{\}\<]*?)([\{])/se", '"\1" . banana__filterCss("\2") . "\3"', $css);
     $css = preg_replace('/ body\b/i', '', $css);
     if (!Banana::$msgshow_externalimages) {
-        if (preg_match("/url\(((ht|f)tps?:.*?)\)/i", $css)) {
-            $css = preg_replace("/url\(((ht|f)tps?:.*?)\)/i", 'url(invalid-image.png)', $css);
+        if (preg_match('!url\([^:\)]+:(//|\\\).*?\)!i', $css)) {
+            $css = preg_replace('!url\([^:\)]+:(//|\\\).*?\)!i', 'url(invalid-image.png)', $css);
             Banana::$msgshow_hasextimages = true;
         }
     }
@@ -360,7 +367,7 @@ function banana_cleanHtml($source, $to_xhtml = false)
         $css = null;
         if (preg_match('/<head.*?>(.*?)<\/head>/is', $source, $matches)) {
             $source = preg_replace('/<head.*?>.*?<\/head>/is', '', $source);
-            preg_match_all('/<style.*?type="text\/css".*?>(.*?)<\/style>/is', $matches[1], $matches);
+            preg_match_all('/<style(?:.*?type="text\/css".*?)?>(.*?)<\/style>/is', $matches[1], $matches);
             foreach ($matches[1] as &$match) {
                 $css .= $match;
             }

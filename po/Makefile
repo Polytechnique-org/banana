@@ -10,10 +10,14 @@ all: banana.pot ${LANGS:=.lang}
 clean:
 	rm -f *.po~ *.lang
 
-banana.pot: ../banana/*.php
+banana.pot:
 	@echo Parsing Tree for new messages
 	@echo
-	@xgettext --from-code=iso-8859-15 -j -k_b_ -o banana.pot $<
+	@echo "<?php " > template.php
+	@grep "|b" ../banana/templates/*.tpl | sed 's/\(.*\)\("[^"]*"\)|b\(.*\)/$var = _b_(\2);/g' >> template.php
+	@echo "?>" >> template.php
+	@xgettext --from-code=UTF-8 -j -k_b_ -o banana.pot ../banana/*.php ./template.php
+	@rm template.php
 
 %.lang: banana.pot ../banana/*.php %.po
 	@echo Generating $(@:.lang=.po)

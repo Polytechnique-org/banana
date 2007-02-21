@@ -160,14 +160,14 @@ class BananaMimePart
             $encoding     = '8bit';
             $charset      = 'CP1252';
             $content_type = 'text/plain';
-            $format       = strtolower($this->getHeader('x-rfc2646', '/format="?([^"]+?)"?\s*(;|$)/i'));
+            $format       = strtolower($this->getHeader('x-rfc2646', '/format="?([^ w@"]+?)"?\s*(;|$)/i'));
         } else {
             $encoding     = strtolower($this->getHeader('content-transfer-encoding'));
             $disposition  = $this->getHeader('content-disposition', '/(inline|attachment)/i');
-            $boundary     = $this->getHeader('content-type', '/boundary="?([^"]+?)"?\s*(;|$)/i');
-            $charset      = strtolower($this->getHeader('content-type', '/charset="?([^"]+?)"?\s*(;|$)/i'));
-            $filename     = $this->getHeader('content-disposition', '/filename="?([^"]+?)"?\s*(;|$)/i');
-            $format       = strtolower($this->getHeader('content-type', '/format="?([^"]+?)"?\s*(;|$)/i'));
+            $boundary     = $this->getHeader('content-type', '/boundary="?([^ "]+?)"?\s*(;|$)/i');
+            $charset      = strtolower($this->getHeader('content-type', '/charset="?([^ "]+?)"?\s*(;|$)/i'));
+            $filename     = $this->getHeader('content-disposition', '/filename="?([^ "]+?)"?\s*(;|$)/i');
+            $format       = strtolower($this->getHeader('content-type', '/format="?([^ "]+?)"?\s*(;|$)/i'));
             $id           = $this->getHeader('content-id', '/<(.*?)>/');
             if (empty($filename)) {
                 $filename = $this->getHeader('content-type', '/name="?([^"]+)"?/');
@@ -269,16 +269,16 @@ class BananaMimePart
     static public function &parseHeaders(array &$lines)
     {
         $headers = array();
-        while (count($lines)) {
+        while ($lines) {
             $line = array_shift($lines);
-            if (preg_match('/^[\t\r ]+/', $line) && isset($hdr)) {
+            if (isset($hdr) && $line && ctype_space($line{0})) {
                 $headers[$hdr] .= ' ' . trim($line);
             } elseif (!empty($line)) {
-                if (preg_match("/:[ \t\r]*/", $line)) {
-                    list($hdr, $val) = split(":[ \t\r]*", $line, 2);
+                if (strpos($line, ':') !== false) {
+                    list($hdr, $val) = explode(":", $line, 2);
                     $hdr = strtolower($hdr);
                     if (in_array($hdr, Banana::$msgparse_headers)) {  
-                        $headers[$hdr] = $val;
+                        $headers[$hdr] = ltrim($val);
                     } else {
                         unset($hdr);
                     }
@@ -448,8 +448,8 @@ class BananaMimePart
               case 'html': return banana_formatHtml($this);
               case 'enriched': case 'richtext': return banana_formatRichText($this);
               default:
-                if ($type == 'message') {
-                    return '<hr />' . banana_formatPlainText($this);
+                if ($type == 'message') { // we have a raw source of data (no specific pre-formatting)
+                    return '<hr />' . utf8_encode(banana_formatPlainText($this));
                 }
                 return banana_formatPlainText($this);
             }

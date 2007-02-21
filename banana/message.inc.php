@@ -206,7 +206,7 @@ final class BananaMessage extends BananaMimePart
         if (isset($refs['references'])) {
             $text = str_replace('><', '> <', $refs['references']);
             return preg_split('/\s/', strtr($text, Banana::$spool->ids));
-        } elseif (isset($refs['in-reply-to'])) {
+        } elseif (isset($refs['in-reply-to']) && isset(Banana::$spool->ids[$refs['in-reply-to']])) {
             return array(Banana::$spool->ids[$refs['in-reply-to']]);
         } else {
             return array();

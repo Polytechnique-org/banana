@@ -13,36 +13,16 @@ require_once dirname(__FILE__) . '/message.inc.php';
 
 class BananaMBox implements BananaProtocoleInterface
 {
-    private $inbox        = null;
-    private $file         = null;
-    private $filesize     = null;
-    private $current_id   = null;
-    private $at_beginning = false;
-    private $file_cache   = null;
-
+    private $debug      = false;
+    
     private $_lasterrno = 0;
     private $_lasterror = null;
-
-    private $count        = null;
-    private $new_messages = null;
-    private $messages     = null;
-
-    /** Build a protocole handler plugged on the given box
-     */
+    
     public function __construct()
     {
-        $this->open();
+        $this->debug = Banana::$debug_mbox;
     }
-
-    /** Close the file
-     */
-    public function __destruct()
-    {
-        $this->close();
-    }
-
-    /** Indicate if the Protocole handler has been succesfully built
-     */
+    
     public function isValid()
     {
         return true;
@@ -81,62 +61,67 @@ class BananaMBox implements BananaProtocoleInterface
         return array(Banana::$group => array('desc' => '', 'msgnum' => 0, 'unread' => 0));
     }
 
+    private function &getRawMessage($id)
+    {
+        $message = null;
+        if (!is_numeric($id)) {
+            if (!Banana::$spool) { 
+                return $message;
+            }
+            $id = Banana::$spool->ids[$id];
+        }
+        $options = array ('-m ' . $id);
+        if (Banana::$spool->overview) {
+            if (Banana::$spool->overview[$id]) {
+               $options[] = '-p ' . $id . ':' . Banana::$spool->overview[$id]->storage['offset'];
+            } else {
+                $key       = max(array_keys(Banana::$spool->overview));
+                if ($key < $id) {
+                    $options[] = '-p ' . $key . ':' . Banana::$spool->overview[$key]->storage['offset'];
+                }
+            }
+        }
+        return $this->callHelper('-b', $options);
+    }
+
     /** Return a message
      * @param id Id of the emssage (can be either an Message-id or a message index)
      * @return A BananaMessage or null if the given id can't be retreived
      */
     public function &getMessage($id)
     {
-        $this->open();
-        $message = null;
-        if (is_null($this->file)) {
-            return $message;
+        $messages =& $this->getRawMessage($id);
+        if ($messages) {
+            $messages = new BananaMessage($messages);
         }
-        if (!is_numeric($id)) {
-            if (!Banana::$spool) {
-                return $message;
-            }
-            $id = Banana::$spool->ids[$id];
-        }
-        $messages = $this->readMessages(array($id));
-        if (!empty($messages)) {
-            $message = new BananaMessage($messages[$id]['message']);
-        }
-        return $message;    
+        return $messages;    
     }
 
     /** Return the sources of the given message
      */
     public function getMessageSource($id)
-    {
-        $this->open();
-        $message = null;
-        if (is_null($this->file)) {
-            return $message;
+    { 
+        $message =& $this->getRawMessage($id);
+        if ($message) {
+            $message = implode("\n", $message); 
         }
-        if (!is_numeric($id)) {
-            if (!Banana::$spool) { 
-                return $message;
-            }   
-            $id = Banana::$spool->ids[$id];
-        } 
-        $message = $this->readMessages(array($id));
-        return implode("\n", $message[$id]['message']);
+        return $message;
     }   
 
     /** Compute the number of messages of the box
      */
     private function getCount()
     {
-        $this->open();
-        $this->count = count(Banana::$spool->overview);
-        $max = @max(array_keys(Banana::$spool->overview));
-        if ($max && Banana::$spool->overview[$max]->storage['next'] == $this->filesize) {
-            $this->new_messages = 0;
-        } else {
-            $this->new_messages = $this->countMessages($this->count);
-            $this->count += $this->new_messages;
-        }    
+        $options = array();
+        if (Banana::$spool->overview) {
+            $key       = max(array_keys(Banana::$spool->overview));
+            $options[] = '-p ' . $key . ':' . Banana::$spool->overview[$key]->storage['offset'];
+        }
+        $val =& $this->callHelper('-c', $options);
+        if (!$val) {
+            return 0;
+        }
+        return intval(trim($val[0]));
     }
 
     /** Return the indexes of the messages presents in the Box
@@ -144,14 +129,8 @@ class BananaMBox implements BananaProtocoleInterface
      */
     public function getIndexes()
     {
-        $this->open();
-        if (is_null($this->file)) {
-            return array(0, 0, 0);
-        }
-        if (is_null($this->count)) {
-            $this->getCount();
-        }
-        return array($this->count, 0, $this->count - 1);
+        $count = $this->getCount();
+        return array($count, 0, $count - 1);
     }
 
     /** Return the message headers (in BananaMessage) for messages from firstid to lastid
@@ -159,28 +138,57 @@ class BananaMBox implements BananaProtocoleInterface
      */
     public function &getMessageHeaders($firstid, $lastid, array $msg_headers = array())
     {
-        $this->open();
-        $msg_headers = array_map('strtolower', $msg_headers);
-        $messages =& $this->readMessages(range($firstid, $lastid), true);
-        $msg_headers = array_map('strtolower', $msg_headers);
-        $headers  = array();
-        if (is_null($this->file)) {
-            return $headers;
-        }
-        foreach ($msg_headers as $header) {
-            foreach ($messages as $id=>&$message) {
-                if (!isset($headers[$id])) {
-                    $headers[$id] = array('beginning' => $message['beginning'], 'end' => $message['end']);
-                }
-                if ($header == 'date') {
-                    $headers[$id][$header] = @strtotime($message['message'][$header]);
-                } else {
-                    $headers[$id][$header] = @$message['message'][$header];
+        $headers = null;
+        $options = array();
+        $options[] = "-m $firstid:$lastid";
+        if (Banana::$spool->overview) {
+            if (isset(Banana::$spool->overview[$firstid])) {
+               $options[] = '-p ' . $firstid . ':' . Banana::$spool->overview[$firstid]->storage['offset'];
+            } else {
+                $key       = max(array_keys(Banana::$spool->overview));
+                if ($key < $firstid) {
+                    $options[] = '-p ' . $key . ':' . Banana::$spool->overview[$key]->storage['offset'];
                 }
             }
         }
-        unset($this->messages);
-        unset($messages);
+        $lines =& $this->callHelper('-d', $options, $msg_headers);
+        if (!$lines) {
+            return $headers;
+        }
+        $headers = array();
+        while ($lines) {
+            $id = array_shift($lines);
+            if ($id === '') {
+                continue;
+            }
+            $offset = array_shift($lines);
+            if ($offset === '') {
+                continue;
+            }
+            $id     = intval($id);
+            $headers[$id] = array('beginning' => intval($offset));
+            while (true) {
+                $hname = array_shift($lines);
+                if ($hname === '') {
+                    break;
+                }
+                $hval  = array_shift($lines);
+                if ($hval === '') {
+                    break;
+                }
+                if ($hname == 'date') {
+                    $headers[$id][$hname] = @strtotime($hval);
+                } else {
+                    $headers[$id][$hname] = $hval;
+                }
+            }
+            if (!isset($headers[$id]['date'])) {
+                print_r($id);
+                print_r($offset);
+                print_r($headers[$id]);
+            }
+        }
+        array_walk_recursive($headers, array('BananaMimePart', 'decodeHeader'));
         return $headers;
     }
 
@@ -191,7 +199,6 @@ class BananaMBox implements BananaProtocoleInterface
         foreach ($messages as $id=>&$data) {
             if (isset(Banana::$spool->overview[$id])) {
                 Banana::$spool->overview[$id]->storage['offset'] = $data['beginning'];
-                Banana::$spool->overview[$id]->storage['next']   = $data['end'];
             }
         }
     }
@@ -300,214 +307,26 @@ class BananaMBox implements BananaProtocoleInterface
 # MBox parser
 #######
 
-    private function open()
+    private function &callHelper($action, array $options = array(), array $headers = array())
     {
-        if ($this->inbox == Banana::$group) {
-            return;
+        $action .= ' -f ' . $this->getFileName();
+        $cmd = Banana::$mbox_helper . " $action " . implode(' ', $options) . ' ' . implode(' ', $headers);
+        if ($this->debug) {
+            echo $cmd . '<br />';
+            $start = microtime(true);
         }
-        $this->close();
-        $filename = $this->getFileName();
-        if (is_null($filename)) {
-            return;
+        exec($cmd, $out, $return);
+        if ($this->debug) {
+            echo '&nbsp;&nbsp;Execution : ' . (microtime(true) - $start) . 's<br />';
+            echo "&nbsp;&nbsp;Retour : $return<br />";
+            echo '&nbsp;&nbsp;Sortie : ' . count($out) . ' ligne(s)<br />';
         }
-        $this->file = @fopen($filename, 'r');
-        if (!$this->file) {
-            $this->file = null;
-            $this->filesize = 0;
-        } else {
-            $this->filesize = filesize($filename);
+        if ($return != 0) {
+            $this->_lasterrorno = 1;
+            $this->_lasterrorcode = "Helper failed";
+            $out = null;
         }
-        $this->current_id   = 0;
-        $this->at_beginning = true;
-        $this->inbox        = Banana::$group;
-    }
-
-    private function close()
-    {
-        if (is_null($this->file)) {
-            return;
-        }
-        fclose($this->file);
-        $this->inbox        = null;
-        $this->file         = null;
-        $this->filesize     = null;
-        $this->current_id   = null;
-        $this->at_beginning = false;
-        $this->file_cache   = null;
-        $this->count        = null;
-        $this->new_messages = null;
-        $this->messages     = null;
-    }
-
-    /** Go to the given message
-     */
-    private function goTo($id)
-    {
-        if ($this->current_id == $id && $this->at_beginning) {
-            return true;
-        }
-        if ($id == 0) {
-            fseek($this->file, 0);
-            $this->current_id   = 0;
-            $this->at_beginning = true;
-            return true;
-        } elseif (isset(Banana::$spool->overview[$id]) || isset($this->messages[$id])) {
-            if (isset(Banana::$spool->overview[$id])) {
-                $pos = Banana::$spool->overview[$id]->storage['offset'];
-            } else {
-                $pos = $this->messages[$id]['beginning'];
-            }
-            if (fseek($this->file, $pos) == 0) {
-                $this->current_id   = $id;
-                $this->at_beginning = true;
-                return true;
-            } else {
-                $this->current_id = null;
-                $this->_lasterrno = 2;
-                $this->_lasterror = _b_('Can\'t find message ') . $id;
-                return false;
-            }
-        } else {
-            $max = @max(array_keys(Banana::$spool->overview));
-            if (is_null($max)) {
-                $max = 0;
-            }
-            if ($id <= $max && $max != 0) {
-                $this->current_id = null;
-                $this->_lasterrno = 3;
-                $this->_lasterror = _b_('Invalid message index ') . $id;
-                return false;
-            }
-            if (!$this->goTo($max)) {
-                return false;
-            }
-            if (feof($this->file)) {
-                $this->current_id = null;
-                $this->_lasterrno = 4;
-                $this->_lasterror = _b_('Requested index does not exists or file has been truncated');
-                return false;
-            }
-            while ($this->readCurrentMessage(true) && $this->current_id < $id);
-            if ($this->current_id == $id) {
-                return true;
-            }
-            $this->current_id = null;
-            $this->_lasterrno = 5;
-            $this->_lasterror = _b_('Requested index does not exists or file has been truncated');
-            return false;
-        }
-    }
-
-    private function countMessages($from = 0)
-    {
-        $this->messages =& $this->readMessages(array($from), true, true);
-        return count($this->messages);
-    }
-
-    /** Read the current message (identified by current_id)
-     * @param needFrom_ BOOLEAN is true if the first line *must* be a From_ line
-     * @param alignNext BOOLEAN is true if the buffer must be aligned at the beginning of the next From_ line
-     * @return message sources (without storage data)
-     */
-    private function &readCurrentMessage($stripBody = false, $needFrom_ = true, $alignNext = true)
-    {
-        $file_cache =& $this->file_cache;
-        if ($file_cache && $file_cache != ftell($this->file)) {
-            $file_cache = null;
-        }
-        $msg        = array();
-        $canFrom_   = false;
-        $inBody     = false;
-        while(!feof($this->file)) {
-            // Process file cache
-            if ($file_cache) { // this is a From_ line
-                $needFrom_ = false;
-                $this->at_beginning = false;
-                $file_cache   = null;
-                continue;
-            }
-
-            // Read a line
-            $line    = rtrim(fgets($this->file), "\r\n");
-            
-            // Process From_ line
-            if ($needFrom_ || !$msg || $canFrom_) {
-                if (substr($line, 0, 5) == 'From ') { // this is a From_ line
-                    if ($needFrom_) {
-                        $needFrom = false;
-                    } elseif (!$msg) {
-                        continue;
-                    } else {
-                        $this->current_id++; // we are finally in the next message
-                        if ($alignNext) {  // align the file pointer at the beginning of the new message
-                            $this->at_beginning = true;
-                            $file_cache = ftell($this->file);
-                        }
-                        break;
-                    }
-                } elseif ($needFrom_) {
-                    return $msg;
-                }
-            }
-
-            // Process non-From_ lines
-            if (substr($line, 0, 6) == '>From ') { // remove inline From_ quotation
-                $line = substr($line, 1);
-            }
-            if (!$stripBody || !$inBody) {
-                $msg[] = $line; // add the line to the message source
-            }
-            $canFrom_ = empty($line); // check if next line can be a From_ line
-            if ($canFrom_ && !$inBody && $stripBody) {
-                $inBody = true;
-            }
-            $this->at_beginning = false;
-        }
-        if (!feof($this->file) && !$canFrom_) {
-            $msg = array();
-        }
-        return $msg;
-    }
-
-    /** Read message with the given ids
-     * @param ids ARRAY of ids to look for
-     * @param strip BOOLEAN if true, only headers are retrieved
-     * @param from BOOLEAN if true, process all messages from max(ids) to the end of the mbox
-     * @return Array(Array('message' => message sources (or parsed message headers if $strip is true),
-     *                     'beginning' => offset of message beginning,
-     *                     'end' => offset of message end))
-     */
-    private function &readMessages(array $ids, $strip = false, $from = false)
-    {
-        if ($this->messages) {
-            return $this->messages;
-        }
-        sort($ids);
-        $messages = array();
-        while ((count($ids) || $from) && !feof($this->file)) {
-            if (count($ids)) {
-                $id = array_shift($ids);
-            } else {
-                $id++;
-            }
-            if ($id != $this->current_id || !$this->at_beginning) {
-                if (!$this->goTo($id)) {
-                    if (count($ids)) {
-                        continue;
-                    } else {
-                        break;
-                    }
-                }
-            }
-            $beginning = ftell($this->file);
-            $message   =& $this->readCurrentMessage($strip, false);
-            if ($strip) {
-                $message =& BananaMimePart::parseHeaders($message);
-            }
-            $end       = ftell($this->file);
-            $messages[$id] = array('message' => $message, 'beginning' => $beginning, 'end' => $end);
-        }
-        return $messages;
+        return $out;
     }
 }
 
