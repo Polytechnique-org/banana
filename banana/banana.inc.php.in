@@ -83,6 +83,7 @@ class Banana
     static public $nntp_host   = 'news://localhost:119/';
 
     static public $mbox_path   = '/var/mail';
+    static public $mbox_helper = './mbox-helper';
 
 ### Debug ###
     static public $debug_nntp   = false;
