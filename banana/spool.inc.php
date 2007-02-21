@@ -302,10 +302,9 @@ class BananaSpool
      */
     public function markAllAsRead(array &$array = null)
     {
-        if (is_null($array)) {
+        if (is_null($array) && is_array($this->roots)) {
             $array =& $this->roots;
-        }
-        if (!is_array($this->roots)) {
+        } elseif (is_null($array)) {
             return;
         }
         foreach ($array as $id) {
