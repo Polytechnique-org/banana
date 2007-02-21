@@ -21,6 +21,7 @@ clean:
 	make -C mbox-helper clean
 
 %: %.in Makefile
+	-rm $@
 	sed -e 's,@VERSION@,$(VERSION) The Bearded Release,g' $< > $@
 
 # banana package targets
