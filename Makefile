@@ -18,16 +18,17 @@ dist: clean pkg-dist
 clean:
 	rm -rf locale banana/banana.inc.php
 	make -C po clean
+	make -C mbox-helper clean
 
 %: %.in Makefile
 	sed -e 's,@VERSION@,$(VERSION) The Bearded Release,g' $< > $@
-
 
 # banana package targets
 
 pkg-build: banana/banana.inc.php
 	make -C po
 	make -C po clean
+	make -C mbox-helper
 
 pkg-dist: pkg-build
 	rm -rf $(PKG_DIST) $(PKG_DIST).tar.gz

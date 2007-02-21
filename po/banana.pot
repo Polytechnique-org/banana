@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-09-18 21:50+0200\n"
+"POT-Creation-Date: 2007-02-21 17:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,203 +16,187 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../banana/banana.inc.php:54 ../banana/banana.inc.php:119
-msgid "Impossible de contacter le serveur"
-msgstr ""
-
-#: ../banana/banana.inc.php:93 ../banana/banana.inc.php:169
-msgid "Voulez-vous vraiment annuler ce message ?"
-msgstr ""
-
-#: ../banana/banana.inc.php:124
-msgid "Les forums de Banana"
-msgstr ""
-
-#: ../banana/banana.inc.php:126 ../banana/banana.inc.php:215
-msgid "Les forums suivants ont été créés depuis ton dernier passage :"
-msgstr ""
-
-#: ../banana/banana.inc.php:140 ../banana/misc.inc.php:150
-msgid "Abonnements"
-msgstr ""
-
-#: ../banana/banana.inc.php:175 ../banana/banana.inc.php:265
-#: ../banana/banana.inc.php:286
-msgid "Impossible d'accéder au message.   Le message a peut-être été annulé"
-msgstr ""
-
-#: ../banana/banana.inc.php:179
-msgid "Message"
-msgstr ""
-
-#: ../banana/banana.inc.php:194 ../banana/banana.inc.php:309
-msgid "Vous n'avez pas les permissions pour annuler ce message"
-msgstr ""
-
-#: ../banana/banana.inc.php:208 ../banana/banana.inc.php:328
-msgid "Impossible d'annuler le message"
-msgstr ""
-
-#: ../banana/banana.inc.php:222 ../banana/banana.inc.php:352
-msgid "a écrit"
-msgstr ""
-
-#: ../banana/banana.inc.php:230 ../banana/misc.inc.php:156
-msgid "Nouveau message"
-msgstr ""
-
-#: ../banana/banana.inc.php:233 ../banana/post.inc.php:100
-#: ../banana/banana.inc.php:371
-msgid "En-têtes"
-msgstr ""
-
-#: ../banana/banana.inc.php:234 ../banana/groups.inc.php:93
-#: ../banana/banana.inc.php:372
-msgid "Nom"
-msgstr ""
-
-#: ../banana/banana.inc.php:235 ../banana/misc.inc.php:34
-#: ../banana/spool.inc.php:360 ../banana/banana.inc.php:374
-msgid "Sujet"
-msgstr ""
-
-#: ../banana/banana.inc.php:236 ../banana/misc.inc.php:35
-#: ../banana/banana.inc.php:376
-msgid "Forums"
-msgstr ""
-
-#: ../banana/banana.inc.php:237 ../banana/banana.inc.php:378
-msgid "Suivi à"
-msgstr ""
-
-#: ../banana/banana.inc.php:238 ../banana/misc.inc.php:38
-#: ../banana/banana.inc.php:380
-msgid "Organisation"
-msgstr ""
-
-#: ../banana/banana.inc.php:239 ../banana/post.inc.php:111
-#: ../banana/banana.inc.php:382
-msgid "Corps"
-msgstr ""
-
-#: ../banana/banana.inc.php:275 ../banana/banana.inc.php:283
-msgid "Impossible de poster le message"
-msgstr ""
-
-#: ../banana/groups.inc.php:87
-msgid "Total"
-msgstr ""
-
-#: ../banana/groups.inc.php:89
-msgid "Abo."
-msgstr ""
-
-#: ../banana/groups.inc.php:91
-msgid "Nouveaux"
-msgstr ""
-
-#: ../banana/groups.inc.php:93
-msgid "Description"
-msgstr ""
-
-#: ../banana/misc.inc.php:33
+#: ../banana/message.inc.php:49
 msgid "De"
 msgstr ""
 
-#: ../banana/misc.inc.php:36
-msgid "Suivi-à"
+#: ../banana/message.inc.php:50 template.php:27
+msgid "Sujet"
 msgstr ""
 
-#: ../banana/misc.inc.php:37 ../banana/spool.inc.php:359
+#: ../banana/message.inc.php:51
+msgid "Forums"
+msgstr ""
+
+#: ../banana/message.inc.php:52
+msgid "Suivi à"
+msgstr ""
+
+#: ../banana/message.inc.php:53
+msgid "À"
+msgstr ""
+
+#: ../banana/message.inc.php:54
+msgid "Copie à"
+msgstr ""
+
+#: ../banana/message.inc.php:55
+msgid "Copie cachée à"
+msgstr ""
+
+#: ../banana/message.inc.php:56
+msgid "Répondre à"
+msgstr ""
+
+#: ../banana/message.inc.php:57 template.php:26
 msgid "Date"
 msgstr ""
 
-#: ../banana/misc.inc.php:39
+#: ../banana/message.inc.php:58
+msgid "Organisation"
+msgstr ""
+
+#: ../banana/message.inc.php:60
 msgid "Références"
 msgstr ""
 
-#: ../banana/misc.inc.php:40
+#: ../banana/message.inc.php:61
 msgid "Image"
 msgstr ""
 
-#: ../banana/misc.inc.php:115
-msgid "hier"
+#: ../banana/page.inc.php:106
+msgid "Abonnements"
 msgstr ""
 
-#: ../banana/misc.inc.php:148
-msgid "Liste des forums"
+#: ../banana/page.inc.php:107
+msgid "Les forums"
 msgstr ""
 
-#: ../banana/misc.inc.php:171
+#: ../banana/page.inc.php:111
+msgid "Message"
+msgstr ""
+
+#: ../banana/page.inc.php:113
+msgid "Annulation"
+msgstr ""
+
+#: ../banana/page.inc.php:115 template.php:17
 msgid "Répondre"
 msgstr ""
 
-#: ../banana/misc.inc.php:174
-msgid "Annuler ce message"
+#: ../banana/page.inc.php:118
+msgid "Nouveau"
 msgstr ""
 
-#: ../banana/post.inc.php:114
-msgid "apercu"
+#: ../banana/page.inc.php:139
+msgid "La page demandée n'existe pas"
 msgstr ""
 
-#: ../banana/spool.inc.php:361
-msgid "Auteur"
+#: ../banana/page.inc.php:311
+msgid "alt"
 msgstr ""
 
-#: ../banana/spool.inc.php:372
-msgid "Aucun message dans ce forum"
+#: ../banana/spool.inc.php:389
+msgid "hier"
 msgstr ""
 
-#: ../banana/banana.inc.php:127
+#: ../banana/spool.inc.php:448
+msgid "(pas de sujet)"
+msgstr ""
+
+#: template.php:2
 msgid ""
-" : ce newsgroup n'existe pas ou vous n'avez pas l'autorisation d'y accéder"
+"Les nouveaux groupes suivants ont été créés depuis votre dernière visite"
 msgstr ""
 
-#: ../banana/banana.inc.php:237 ../banana/banana.inc.php:257
-msgid "Impossible charger la liste des messages de "
+#: template.php:3
+msgid "Voulez-vous vraiment annuler ce message ?"
 msgstr ""
 
-#: ../banana/banana.inc.php:278 ../banana/banana.inc.php:300
-#: ../banana/banana.inc.php:420
-msgid "Impossible charger la liste des messages"
+#: template.php:4
+msgid "Annuler !"
 msgstr ""
 
-#: ../banana/banana.inc.php:293
-msgid "Impossible d'accéder à la pièce jointe."
+#: template.php:5 template.php:10
+msgid "Valider"
 msgstr ""
 
-#: ../banana/banana.inc.php:304
-msgid "Impossible de trouver le message à annuler"
+#: template.php:6
+msgid "Total"
 msgstr ""
 
-#: ../banana/banana.inc.php:386
-msgid "Pièce jointe"
+#: template.php:7
+msgid "Nouveaux"
 msgstr ""
 
-#: ../banana/banana.inc.php:396
+#: template.php:8
+msgid "Nom"
+msgstr ""
+
+#: template.php:9
+msgid "Description"
+msgstr ""
+
+#: template.php:11 template.php:25
+msgid "Message non-lu suivant"
+msgstr ""
+
+#: template.php:12
+msgid "Message précédent"
+msgstr ""
+
+#: template.php:13
+msgid "Message suivant"
+msgstr ""
+
+#: template.php:14
+msgid "Discussion précédente"
+msgstr ""
+
+#: template.php:15
+msgid "Discussion suivante"
+msgstr ""
+
+#: template.php:16 template.php:28
+msgid "Nouveau message"
+msgstr ""
+
+#: template.php:18
+msgid "Annuler"
+msgstr ""
+
+#: template.php:19
+msgid "Enregistrer"
+msgstr ""
+
+#: template.php:20
+msgid "Versions"
+msgstr ""
+
+#: template.php:21
+msgid "Afficher les images externes"
+msgstr ""
+
+#: template.php:22
+msgid "Composer un nouveau message"
+msgstr ""
+
+#: template.php:23
+msgid "Fichier joint"
+msgstr ""
+
+#: template.php:24
 msgid "Envoyer le message"
 msgstr ""
 
-#: ../banana/banana.inc.php:434
-msgid "Impossible charger le message d'origine"
+#: template.php:29
+msgid "Auteur"
 msgstr ""
 
-#: ../banana/banana.inc.php:457
-msgid "Fichier trop gros pour être envoyé : "
+#: template.php:30
+msgid "Aperçu de "
 msgstr ""
 
-#: ../banana/banana.inc.php:461
-msgid "Erreur lors de l'upload de "
-msgstr ""
-
-#: ../banana/banana.inc.php:465
-msgid "Le fichier spécifié n'existe pas : "
-msgstr ""
-
-#: ../banana/banana.inc.php:469
-msgid "Une erreur est survenue sur le serveur lors de l'upload de "
-msgstr ""
-
-#: ../banana/banana.inc.php:486
-msgid "Impossible de poster le message. Le serveur a retourné l'erreur :"
+#: template.php:31
+msgid "Aucun message dans ce forum"
 msgstr ""
