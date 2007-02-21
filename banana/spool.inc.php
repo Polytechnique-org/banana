@@ -9,7 +9,7 @@
 
 require_once dirname(__FILE__) . '/banana.inc.php';
 
-define('BANANA_SPOOL_VERSION', '0.3');
+define('BANANA_SPOOL_VERSION', '0.4');
 
 /** Class spoolhead
  *  class used in thread overviews
@@ -72,6 +72,7 @@ class BananaSpool
     /** thread starts */
     public $roots;
 
+    private $unreadnb = 0;
 
     /** constructor
      * @param $_group STRING group name
@@ -123,6 +124,7 @@ class BananaSpool
         if ($spool->version != BANANA_SPOOL_VERSION || $spool->mode != Banana::SPOOL_ALL) {
             return null;
         }
+        $spool->markAllAsRead();
         return $spool;
     }
 
@@ -260,9 +262,10 @@ class BananaSpool
         foreach ($newpostsids as $mid) {
             $id = $this->ids[$mid];
             if ($this->overview[$id]->isread) {
-                $this->overview[$id]->isread     = false;
+                $this->overview[$id]->isread = false;
+                $this->unreadnb++;
                 while (isset($id)) {
-                    $this->overview[$id]->descunread ++;
+                    $this->overview[$id]->descunread++;
                     $id = $this->overview[$id]->parent;
                 }
             }
@@ -291,6 +294,7 @@ class BananaSpool
     {
         if (!$this->overview[$id]->isread) {
             $this->overview[$id]->isread = true;
+            $this->unreadnb--;
             while (isset($id)) {
                 $this->overview[$id]->descunread--;
                 $id = $this->overview[$id]->parent;
@@ -302,6 +306,9 @@ class BananaSpool
      */
     public function markAllAsRead(array &$array = null)
     {
+        if (!$this->unreadnb) {
+            return;
+        }
         if (is_null($array) && is_array($this->roots)) {
             $array =& $this->roots;
         } elseif (is_null($array)) {
@@ -310,6 +317,9 @@ class BananaSpool
         foreach ($array as $id) {
             if (!$this->overview[$id]->isread) {
                 $this->markAsRead($id);
+                if (!$this->unreadnb) {
+                    return;
+                }
             }
             if ($this->overview[$id]->descunread) {
                 $this->markAllAsRead($this->overview[$id]->children);
@@ -339,27 +349,31 @@ class BananaSpool
     public function delid($_id, $write = true)
     {
         if (isset($this->overview[$_id])) {
-            if (sizeof($this->overview[$_id]->parent)) {
-                $this->overview[$this->overview[$_id]->parent]->children = 
-                    array_diff($this->overview[$this->overview[$_id]->parent]->children, array($_id));
-                if (sizeof($this->overview[$_id]->children)) {
-                    $this->overview[$this->overview[$_id]->parent]->children = 
-                        array_merge($this->overview[$this->overview[$_id]->parent]->children, $this->overview[$_id]->children);
-                    foreach ($this->overview[$_id]->children as $c) {
-                        $this->overview[$c]->parent        = $this->overview[$_id]->parent;
+            $overview =& $this->overview[$_id];
+            if (!$overview->isread) {
+                $this->markAsRead($_id);
+            }
+            if ($overview->parent) {
+                $p      =  $overview->parent;
+                $parent =& $this->overview[$p];
+                $parent->children = array_diff($parent->children, array($_id));
+                if (sizeof($overview->children)) {
+                    $parent->children = array_merge($parent->children, $overview->children);
+                    foreach ($overview->children as $c) {
+                        $this->overview[$c]->parent        = $p;
                         $this->overview[$c]->parent_direct = false;
                     }
                 }
-                $p = $this->overview[$_id]->parent;
-                while ($p) {
+                while (isset($p)) {
                     $this->overview[$p]->desc--;
                     $p = $this->overview[$p]->parent;
                 }
-            } elseif (sizeof($this->overview[$_id]->children)) {
-                foreach ($this->overview[$_id]->children as $c) {
+            } elseif ($overview->children) {
+                foreach ($overview->children as $c) {
                     $this->overview[$c]->parent = null;
                 }
             }
+            unset($overview);
             unset($this->overview[$_id]);
             $msgid = array_search($_id, $this->ids);
             if ($msgid !== false) {
@@ -371,7 +385,6 @@ class BananaSpool
             }
             
             if ($write) {
-                $this->markAllAsRead();
                 $this->saveToFile();
             }
         }
@@ -662,6 +675,10 @@ class BananaSpool
      */
     public function nextUnread($id = null)
     {
+        if (!$this->unreadnb) {
+            return null;
+        }
+
         if (!is_null($id)) {
             // Look in message children
             foreach ($this->overview[$id]->children as $child) {
