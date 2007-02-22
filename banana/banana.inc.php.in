@@ -281,6 +281,16 @@ class Banana
         return Banana::$page->css;
     }
 
+    /** Return the execution backtrace of the current BananaProtocole
+     */
+    public function backtrace()
+    {
+        if (Banana::$protocole) {
+            return Banana::$protocole->backtrace();
+        }
+        return null;
+    }
+
     /**************************************************************************/
     /* actions                                                                */
     /**************************************************************************/
