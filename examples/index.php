@@ -34,6 +34,8 @@ setcookie('banana_lastnews', time());
 
 $banana = new MyBanana();
 $res = $banana->run();
+$css = $banana->css();
+$bt  = $banana->backtrace();
 
 session_write_close();
 
@@ -45,6 +47,11 @@ session_write_close();
     <meta name="description" content="WebForum2/Banana">
     <link href="css/style.css" type="text/css" rel="stylesheet" media="screen">
     <link href="css/banana.css" type="text/css" rel="stylesheet" media="screen">
+<?php if ($css) { ?>
+    <style type="text/css">
+        <?php echo $css; ?>
+    </style>
+<?php } ?>
     <title>
       Banana, a NNTP<->Web Gateway 
     </title>
@@ -58,6 +65,19 @@ session_write_close();
         Developed under GPL License for <a href="http://www.polytechnique.org">Polytechnique.org</a>
         Use <em>silk</em> icons from <a href="http://www.famfamfam.com/lab/icons/silk/">www.famfamfam.com</a>
       </div>
+<?php
+    if ($bt) {
+        echo "<div class=\"backtrace\">";
+        foreach ($bt as &$entry) {
+            echo "<div><pre>" . $entry['action'] . "</pre>";
+            echo "<p style=\"padding-left: 4em;\">"
+                 . "Exécution en " . sprintf("%.3fs", $entry['time']) . "<br />"
+                 . "Retour : " . $entry['code'] . "<br />"
+                 . "Lignes : " . $entry['response'] . "</p></div>";
+        }
+        echo "</div>";
+    }
+?>
     </div>
   </body>
 </html>
