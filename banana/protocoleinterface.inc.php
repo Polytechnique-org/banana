@@ -105,6 +105,14 @@ interface BananaProtocoleInterface
      * @param box STRING boxname
      */
     public function filename();
+
+    /** Return the execution backtrace of the protocole
+     * @return array(trace1, trace2, ...)
+     * a trace has the following structure:
+     *  array('action' => action, 'time' => microtime, 'code' => return code, 'response' => size of the response)
+     * if no backtrace is available, return null
+     */
+    public function backtrace();
 }
 
 // vim:set et sw=4 sts=4 ts=4 enc=utf-8:

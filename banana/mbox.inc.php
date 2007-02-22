@@ -14,7 +14,8 @@ require_once dirname(__FILE__) . '/message.inc.php';
 class BananaMBox implements BananaProtocoleInterface
 {
     private $debug      = false;
-    
+    private $bt         = array();
+
     private $_lasterrno = 0;
     private $_lasterror = null;
     
@@ -290,6 +291,17 @@ class BananaMBox implements BananaProtocoleInterface
         return $file . $mail;
     }
 
+    /** Return the execution backtrace
+     */
+    public function backtrace()
+    {
+        if ($this->debug) {
+            return $this->bt;
+        } else {
+            return null;
+        }
+    }
+
 #######
 # Filesystem functions
 #######
@@ -312,14 +324,12 @@ class BananaMBox implements BananaProtocoleInterface
         $action .= ' -f ' . $this->getFileName();
         $cmd = Banana::$mbox_helper . " $action " . implode(' ', $options) . ' ' . implode(' ', $headers);
         if ($this->debug) {
-            echo $cmd . '<br />';
             $start = microtime(true);
         }
         exec($cmd, $out, $return);
         if ($this->debug) {
-            echo '&nbsp;&nbsp;Execution : ' . (microtime(true) - $start) . 's<br />';
-            echo "&nbsp;&nbsp;Retour : $return<br />";
-            echo '&nbsp;&nbsp;Sortie : ' . count($out) . ' ligne(s)<br />';
+            $this->bt[] = array('action' => $cmd, 'time' => (microtime(true) - $start),
+                                'code' => $return, 'response' => count($out));
         }
         if ($return != 0) {
             $this->_lasterrorno = 1;
