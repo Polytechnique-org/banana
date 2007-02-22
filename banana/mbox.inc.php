@@ -72,16 +72,7 @@ class BananaMBox implements BananaProtocoleInterface
             $id = Banana::$spool->ids[$id];
         }
         $options = array ('-m ' . $id);
-        if (Banana::$spool->overview) {
-            if (Banana::$spool->overview[$id]) {
-               $options[] = '-p ' . $id . ':' . Banana::$spool->overview[$id]->storage['offset'];
-            } else {
-                $key       = max(array_keys(Banana::$spool->overview));
-                if ($key < $id) {
-                    $options[] = '-p ' . $key . ':' . Banana::$spool->overview[$key]->storage['offset'];
-                }
-            }
-        }
+        $this->getMBoxPosition($options, $id);
         return $this->callHelper('-b', $options);
     }
 
@@ -114,10 +105,7 @@ class BananaMBox implements BananaProtocoleInterface
     private function getCount()
     {
         $options = array();
-        if (Banana::$spool->overview) {
-            $key       = max(array_keys(Banana::$spool->overview));
-            $options[] = '-p ' . $key . ':' . Banana::$spool->overview[$key]->storage['offset'];
-        }
+        $this->getMBoxPosition($options);
         $val =& $this->callHelper('-c', $options);
         if (!$val) {
             return 0;
@@ -142,16 +130,7 @@ class BananaMBox implements BananaProtocoleInterface
         $headers = null;
         $options = array();
         $options[] = "-m $firstid:$lastid";
-        if (Banana::$spool->overview) {
-            if (isset(Banana::$spool->overview[$firstid])) {
-               $options[] = '-p ' . $firstid . ':' . Banana::$spool->overview[$firstid]->storage['offset'];
-            } else {
-                $key       = max(array_keys(Banana::$spool->overview));
-                if ($key < $firstid) {
-                    $options[] = '-p ' . $key . ':' . Banana::$spool->overview[$key]->storage['offset'];
-                }
-            }
-        }
+        $this->getMboxPosition($options, $firstid);
         $lines =& $this->callHelper('-d', $options, $msg_headers);
         if (!$lines) {
             return $headers;
@@ -318,6 +297,25 @@ class BananaMBox implements BananaProtocoleInterface
 #######
 # MBox parser
 #######
+    
+    /** Add the '-p' optioin for callHelper
+     */
+    private function getMBoxPosition(array &$option, $id = null)
+    {
+        if (Banana::$spool->overview) {
+            if (!is_null($id) && Banana::$spool->overview[$id]) {
+                $key = $id;
+            } else {
+                $key       = max(array_keys(Banana::$spool->overview));
+                if (!is_null($id) && $key >= $id) {
+                    return;
+                }
+            }
+            if (isset(Banana::$spool->overview[$key]->storage['offset'])) { 
+                $options[] = '-p ' . $key . ':' . Banana::$spool->overview[$key]->storage['offset'];
+            }
+        }
+    }
 
     private function &callHelper($action, array $options = array(), array $headers = array())
     {
@@ -329,7 +327,7 @@ class BananaMBox implements BananaProtocoleInterface
         exec($cmd, $out, $return);
         if ($this->debug) {
             $this->bt[] = array('action' => $cmd, 'time' => (microtime(true) - $start),
-                                'code' => $return, 'response' => count($out));
+                                'code' => $return, 'response' => count($out), 'error' => $return ? "Helper failed" : null);
         }
         if ($return != 0) {
             $this->_lasterrorno = 1;
