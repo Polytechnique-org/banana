@@ -161,7 +161,7 @@ void readHeaders(MBox *mbox, char **headers, int hdrsize)
     if (!readFrom_(mbox)) {
         return;
     }
-    printf("%d\n%d\n", mbox->messageId, mbox->messageBeginning);
+    printf("%d\n%d\n", (int)mbox->messageId, (int)mbox->messageBeginning);
     while (readLine(mbox)) {
         if (mbox->isFrom_ || !strlen(mbox->line)) {
             break;
@@ -320,7 +320,7 @@ int main(int argc, char *argv[])
     int pmid = 0, pos = 0;
     char *filename = NULL;
     char **headers = NULL;
-    char action;
+    char action = 0;
     int headerNb   = 0;
     char *endptr;
     MBox *mbox;
@@ -406,7 +406,7 @@ int main(int argc, char *argv[])
         while (!feof(mbox->fp)) {
             readLine(mbox);
         }
-        printf("%d\n", mbox->messageId + 1);
+        printf("%d\n", (int)(mbox->messageId + 1));
         break;
       case 'd':
         if (fmid == -1) {
