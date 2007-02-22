@@ -378,6 +378,7 @@ int main(int argc, char *argv[])
     mbox = openMBox(filename);
     if (!mbox) {
         fprintf(stderr, "can't open file '%s'", filename);
+        return 1;
     }
     if ((fmid >= pmid || fmid == -1) && pos) {
         if (!goToOffset(mbox, pos, pmid)) {
