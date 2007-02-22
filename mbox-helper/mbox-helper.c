@@ -8,17 +8,13 @@
 #include <string.h>
 #include <ctype.h>
 #include <locale.h>
+#include <stdbool.h>
+#include <getopt.h>
 
 /** Macros
  */
 #define LTRIM(pos)              while (isspace(*pos)) { pos++; }
 #define STRTOLOWER(str, ptr)    for (ptr = str ; *ptr ; ptr++) { *ptr = tolower(*ptr); }
-
-/** Boolean
- */
-typedef char bool;
-#define TRUE ((bool)(-1))
-#define FALSE ((bool)(0))
 
 /** MBox pointer
  */
@@ -37,7 +33,7 @@ MBox;
 
 /** Open a mbox
  */
-MBox *openMBox(char *filename)
+static MBox *openMBox(char *filename)
 {
     FILE *fp;
     MBox *mbox;
@@ -54,13 +50,13 @@ MBox *openMBox(char *filename)
     mbox->messageId        = 0;
     mbox->messageBeginning = 0;
     mbox->line             = NULL;
-    mbox->isFrom_          = FALSE;
+    mbox->isFrom_          = false;
     return mbox;
 }
 
 /** Close a mbox
  */
-void closeMBox(MBox *mbox)
+static void closeMBox(MBox *mbox)
 {
     if (!mbox) {
         return;
@@ -74,12 +70,12 @@ void closeMBox(MBox *mbox)
 
 /** Read a line in a file
  */
-char *readLine(MBox *mbox)
+static char *readLine(MBox *mbox)
 {
     int length;
     mbox->lastLine    = mbox->currentLine;
     mbox->currentLine = ftell(mbox->fp);
-    mbox->isFrom_ = FALSE;
+    mbox->isFrom_ = false;
     
     if (!mbox->line) {
         mbox->line = (char*)malloc(1001);
@@ -106,33 +102,32 @@ char *readLine(MBox *mbox)
     return mbox->line;
 }
 
+#if 0 /* unused right now */
 /** Return to the last line
  */
-bool lastLine(MBox *mbox)
+static bool lastLine(MBox *mbox)
 {
     if (mbox->lastLine != -1) {
         fseek(mbox->fp, mbox->lastLine, SEEK_SET);
         mbox->lastLine = -1;
         readLine(mbox);
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
+#endif
 
-bool readFrom_(MBox *mbox)
+static bool readFrom_(MBox *mbox)
 {
     if (!mbox->isFrom_) {
         readLine(mbox);
     }
-    if (!mbox->isFrom_) {
-        return FALSE;
-    }
-    return TRUE; 
+    return !!mbox->isFrom_;
 }
 
 /** Read a message
  */
-void readMessage(MBox *mbox, bool display)
+static void readMessage(MBox *mbox, bool display)
 {
     if (!readFrom_(mbox)) {
         return;
@@ -153,7 +148,7 @@ void readMessage(MBox *mbox, bool display)
 
 /** Read the headers of a message
  */
-void readHeaders(MBox *mbox, char **headers, int hdrsize)
+static void readHeaders(MBox *mbox, char **headers, int hdrsize)
 {
     char *current = NULL;
     char *pos, *ptr;
@@ -183,7 +178,7 @@ void readHeaders(MBox *mbox, char **headers, int hdrsize)
             }
             size = pos - mbox->line;
             for (i = 0 ; i < hdrsize ; i++) {
-                if (strlen(headers[i]) == size && strcasestr(mbox->line, headers[i]) == mbox->line) {
+                if ((int)strlen(headers[i]) == size && strcasestr(mbox->line, headers[i]) == mbox->line) {
                     current = (char*)malloc(size + 1);
                     strcpy(current, headers[i]);
                     current[size] = '\0'; 
@@ -213,7 +208,7 @@ void readHeaders(MBox *mbox, char **headers, int hdrsize)
 
 /** Go back to the beginning of the file
  */
-void rewindMBox(MBox *mbox)
+static void rewindMBox(MBox *mbox)
 {
     fseek(mbox->fp, 0, SEEK_SET);
     mbox->messageId = 0;
@@ -223,10 +218,10 @@ void rewindMBox(MBox *mbox)
 
 /** Go back to the beginning of the message
  */
-bool rewindMessage(MBox *mbox)
+static bool rewindMessage(MBox *mbox)
 {
     if (mbox->isFrom_) {
-        return TRUE;
+        return true;
     }
     fseek(mbox->fp, mbox->messageBeginning, SEEK_SET);
     mbox->currentLine = -1;
@@ -237,50 +232,50 @@ bool rewindMessage(MBox *mbox)
 
 /** Move to the given offset
  */
-bool goToOffset(MBox *mbox, int offset, int index)
+static bool goToOffset(MBox *mbox, int offset, int idx)
 {
     fseek(mbox->fp, offset, SEEK_SET);
     mbox->currentLine = -1;
     mbox->lastLine    = -1;
     mbox->messageBeginning = offset;
-    mbox->messageId   = index;
+    mbox->messageId   = idx;
     readLine(mbox);
     if (!mbox->isFrom_) {
-        return FALSE;
+        return false;
     }
-    return TRUE;
+    return true;
 }
 
 /** Move to the given message number
  */
-bool goToMessage(MBox *mbox, int index)
+static bool goToMessage(MBox *mbox, int idx)
 {
-    if (mbox->messageId > index) {
+    if (mbox->messageId > idx) {
         rewindMBox(mbox); 
-    } else if(mbox->messageId == index) {
+    } else if(mbox->messageId == idx) {
         rewindMessage(mbox);
-        return TRUE;
+        return true;
     } else if (!mbox->isFrom_) {
         while (!feof(mbox->fp) && !mbox->isFrom_) {
             readLine(mbox);
         }
         if (feof(mbox->fp)) {
-            return FALSE;
+            return false;
         }
     }
-    while (mbox->messageId < index && !feof(mbox->fp)) {
-        readMessage(mbox, FALSE);
+    while (mbox->messageId < idx && !feof(mbox->fp)) {
+        readMessage(mbox, false);
     }
-    if (mbox->messageId == index) {
-        return TRUE;
+    if (mbox->messageId == idx) {
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
 
 /** Display the program help
  */
-void help(void)
+static void help(void)
 {
     printf("Usage: mbox-helper [action] [options] -f filename [header1 [header2 ...]]\n"
            "Actions: only the last action given is applied\n"
@@ -305,7 +300,7 @@ void help(void)
 /** Display an error message
  * This function display the giver error, then show the program help and exit the program
  */
-void error(char *message)
+static void error(const char *message)
 {
     fprintf(stderr, "Invalid parameters: %s\n", message);
     help();
@@ -325,10 +320,6 @@ int main(int argc, char *argv[])
     int headerNb   = 0;
     char *endptr;
     MBox *mbox;
-    
-    /* getopt variables */
-    extern char *optarg;
-    extern int optind, optopt;
 
     while ((c = getopt(argc, argv, ":bcdp:hm:f:")) != -1) {
         switch (c) {
@@ -401,7 +392,7 @@ int main(int argc, char *argv[])
             break;
         }
         goToMessage(mbox, fmid);
-        readMessage(mbox, TRUE);
+        readMessage(mbox, true);
         break;
       case 'c':
         while (!feof(mbox->fp)) {
