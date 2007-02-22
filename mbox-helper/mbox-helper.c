@@ -331,7 +331,7 @@ int main(int argc, char *argv[])
             if (endptr == optarg) {
                 error("invalid message id");
             }
-            if (*endptr != ':') {
+            if (*endptr != ':' || !*(endptr+1)) {
                 lmid = fmid;
             } else {
                 lmid = atoi(endptr + 1);
@@ -340,7 +340,7 @@ int main(int argc, char *argv[])
           case 'p':
             if ((endptr = strchr(optarg, ':')) != NULL) {
                 pmid = strtol(optarg, &endptr, 10);
-                if (*endptr != ':') {
+                if (*endptr != ':' || !*(endptr+1)) {
                    error("invalid position couple given");
                 }
                 pos = atoi(endptr + 1);
