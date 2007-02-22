@@ -84,15 +84,15 @@ function banana_wordwrap($text, $quote_level)
 
 function banana_catchFormats($text)
 {
-    $formatting = Array('/' => 'em', // match / first in order not to match closing markups </...> <> </>
-                        '_' => 'u',
-                        '*' => 'strong');
+    $formatting = Array('em' => array('\B\/\b', '\b\/\B'),
+                        'u' =>  array('\b_', '_\b'),
+                        'strong' => array('\B\*\b', '\b\*\B'));
     $url = Banana::$msgshow_url;
     preg_match_all("/$url/ui", $text, $urls);
     $text = str_replace($urls[0], "&&&urls&&&", $text);
-    foreach ($formatting as $limit=>$mark) {
-        $limit = preg_quote($limit, '/');
-        $text = preg_replace('/' . $limit . '(\S+?)' . $limit . '/us',
+    foreach ($formatting as $mark=>$limit) {
+        list($ll, $lr) = $limit;
+        $text = preg_replace('/' . $ll . '(\w+?)' . $lr . '/us',
                              "<$mark>\\1</$mark>", $text);
     }
     return preg_replace('/&&&urls&&&/e', 'array_shift($urls[0])', $text);
