@@ -75,6 +75,7 @@ class BananaFeed
             }
             $this->messages[$key] = $array;
         }
+        uasort($this->messages, Array('BananaFeed', 'compare'));
         $this->writeToFile();
     }
 
@@ -156,20 +157,29 @@ class BananaFeed
             return $master;
         }
         $messages = array();
-        $m1       = reset($master->messages);
-        $m2       = reset($slave->messages);
+        $m1       = end($master->messages);
+        $m2       = end($slave->messages);
         for ($i = 0 ; $i < 2 * Banana::$feed_size && ($m1 || $m2) ; $i++) {
             if ($m2 && (!$m1 || $m1['date'] < $m2['date'])) {
                 $m2['title'] = '[' . $feed2->group . '] ' . $m2['title'];
                 $messages[$slave->group . '-' . key($slave->messages)] = $m2;
-                $m2 = next($slave->messages);
+                $m2 = prev($slave->messages);
             } else {
                 $messages[key($master->messages)] = $m1;
-                $m1 = next($master->messages);
+                $m1 = prev($master->messages);
             }
         }
+        uasort($messages, array('BananaFeed', 'compare'));
         $master->messages =& $messages;
         return $master;
+    }
+
+    static function compare($a, $b)
+    {
+        if ($a['date'] == $b['date']) {
+            return 0;
+        }
+        return $a['date'] < $b['date'] ? -1  : 1;
     }
 
     /** Generate the feed xml

@@ -4,7 +4,7 @@
     <title>{$title_prefix}{$feed->group}</title>
     <language>{$language}</language>
     <link>{url group=$group}</link>
-    <description>{$feed->description}</description>
+    <description><![CDATA[{$feed->description}]]></description>
     {foreach from=$feed->messages key=id item=message}
     <item>
       <title><![CDATA[{$message.title}]]></title>
