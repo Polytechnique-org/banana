@@ -86,12 +86,12 @@ class BananaSpool
         $this->group      = $group;
     }
 
-    public static function getSpool($group, $since = 0, $clean = false)
+    public static function &getSpool($group, $since = 0, $clean = false)
     {
         if (!is_null(Banana::$spool) && Banana::$spool->group == $group) {
             $spool =& Banana::$spool;
         } else {
-            $spool = BananaSpool::readFromFile($group);
+            $spool =& BananaSpool::readFromFile($group);
         }        
         if (is_null($spool)) {
             $spool = new BananaSpool($group);
@@ -114,15 +114,17 @@ class BananaSpool
         return $file . Banana::$protocole->filename();
     }
 
-    private static function readFromFile($group)
+    private static function &readFromFile($group)
     {
+        $spool = null;
         $file = BananaSpool::spoolFilename($group);
         if (!file_exists($file)) {
-            return null;
+            return $spool;
         }
         $spool =  unserialize(file_get_contents($file));
         if ($spool->version != BANANA_SPOOL_VERSION || $spool->mode != Banana::SPOOL_ALL) {
-            return null;
+            $spool = null;
+            return $spool;
         }
         $spool->markAllAsRead();
         return $spool;

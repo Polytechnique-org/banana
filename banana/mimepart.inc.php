@@ -417,7 +417,7 @@ class BananaMimePart
 
     public function toHtml()
     {
-        list($type, $subtype) = $this->getType();
+        @list($type, $subtype) = $this->getType();
         if ($type == 'image') {
             $part = $this->id ? $this->id : $this->filename;
             return '<img class="multipart" src="'
