@@ -81,7 +81,9 @@ class Banana
     static public $feed_active         = true;
     static public $feed_format         = 'rss2';
     static public $feed_updateOnDemand = false; // Update the feed each time sbd check it
-    static public $feed_copyright      = null;
+    static public $feed_copyright      = null;  // Global copyright informations
+    static public $feed_generator      = 'Banana @VERSION@'; // Feed generator
+    static public $feed_email          = null;  // Admin e-mail
     static public $feed_namePrefix     = 'Banana :: ';
     static public $feed_size           = 15;    // Number of messages in the feed
 

@@ -3,8 +3,12 @@
   <channel>
     <title>{$title_prefix}{$feed->group}</title>
     <language>{$language}</language>
+    {if $copyright}<copyright><![CDATA[{$copyright}]]></copyright>{/if}
+    {if $email}<webMaster>{$email}</webMaster>{/if}
+    {if $generator}<generator>{$generator}</generator>{/if}
+    <lastBuildDate>{$feed->lastupdate|rss_date}</lastBuildDate>
     <link>{url group=$group}</link>
-    <description><![CDATA[{$feed->description}]]></description>
+    <description><![CDATA[{$feed->description|default:"-"}]]></description>
     {foreach from=$feed->messages key=id item=message}
     <item>
       <title><![CDATA[{$message.title}]]></title>

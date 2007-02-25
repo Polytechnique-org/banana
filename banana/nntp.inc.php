@@ -14,7 +14,6 @@ require_once dirname(__FILE__) . '/protocoleinterface.inc.php';
 
 class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
 {
-    private $description = null;
     private $ingroup = null;
 
     private $mode = null;
@@ -43,14 +42,11 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
      */
     public function getDescription()
     {
-        if ($this->description) {
-            return $this->description;
-        }
         $descs = $this->xgtitle(Banana::$group);
         if (isset($descs[Banana::$group])) {
-            $this->description = $descs[Banana::$group];
+            return trim(utf8_encode($descs[Banana::$group]));
         }
-        return $this->description;
+        return null;
     }
 
     /** Return the list of the boxes

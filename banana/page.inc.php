@@ -151,17 +151,19 @@ class BananaPage extends Smarty
         @list($lg) = explode('_', Banana::$profile['locale']);
         $tpl = 'banana-feed-' . Banana::$feed_format . '.tpl';
         $this->assign('copyright', Banana::$feed_copyright);
+        $this->assign('generator', Banana::$feed_generator);
+        $this->assign('email',     Banana::$feed_email);
         $this->assign('title_prefix', Banana::$feed_namePrefix);
         $this->assign('language', $lg);
         $this->register_function('rss_date', 'rss_date');
         header('Content-Type: application/rss+xml; charset=utf-8');
-        echo $this->_run($tpl);
+        echo $this->_run($tpl, false);
         exit;
     }
 
     /** Code generation
      */
-    private function _run($tpl)
+    private function _run($tpl, $ent = true)
     {
         $this->assign('group',     Banana::$group);
         $this->assign('artid',     Banana::$artid);
@@ -192,7 +194,9 @@ class BananaPage extends Smarty
             $error_level = error_reporting(0);
         }
         $text = $this->fetch($tpl);
-        $text = banana_utf8entities($text);
+        if ($ent) {
+            $text = banana_utf8entities($text);
+        }
         if (!Banana::$debug_smarty) {
             error_reporting($error_level);
         }
