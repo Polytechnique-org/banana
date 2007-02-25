@@ -155,10 +155,7 @@ final class BananaMessage extends BananaMimePart
         $mailto = '<a href="mailto:';
     
         $result = banana_htmlentities($text);
-        if (preg_match("/^([^ ]+@[^ ]+)$/", $text, $regs)) {
-            $result = $mailto . $regs[1] . '">' . banana_htmlentities($regs[1]) . '</a>';
-        }
-        if (preg_match("/^<(.+@.+)>$/", $text, $regs)) {
+        if (preg_match("/^<?([^< ]+@[^> ]+)>?$/", $text, $regs)) {
             $result = $mailto . $regs[1] . '">' . banana_htmlentities($regs[1]) . '</a>';
         }
         if (preg_match("/^([^ ]+@[^ ]+) \((.*)\)$/", $text, $regs)) {
@@ -170,6 +167,31 @@ final class BananaMessage extends BananaMimePart
             $result = $mailto . $regs[2] . '">' . banana_htmlentities($nom) . '</a>';
         }
         return preg_replace("/\\\(\(|\))/","\\1",$result);
+    }
+
+    public function getAuthorName()
+    {
+        $text = $this->getHeaderValue('From');
+        $name = null;
+        if (preg_match("/^([^ ]+@[^ ]+) \((.*)\)$/", $text, $regs)) {
+            $name = $regs[2];
+        }   
+        if (preg_match("/^\"?([^<>\"]+)\"? +<(.+@.+)>$/", $text, $regs)) {
+            $name = preg_replace("/^'(.*)'$/", '\1', $regs[1]);
+            $name = stripslashes($name);
+        }
+        if ($name) {
+            return preg_replace("/\\\(\(|\))/","\\1", $name);
+        }
+
+        if (function_exists('hook_getAuthorName') && $name = hook_getAuthorName($this)) {
+            return $name;
+        }
+
+        if (preg_match("/([^< ]+)@([^> ]+)/", $text, $regs)) {
+            return $regs[1];
+        }
+        return 'Anonymous';
     }
 
     static public function formatDate($text)

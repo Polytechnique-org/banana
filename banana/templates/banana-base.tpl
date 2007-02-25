@@ -36,7 +36,7 @@
       <p class="center" style="padding: 0; margin: 0 0 1em 0">{$act.text}</p>
       {/foreach}
       {if $page eq 'forums'}
-        {include file="banana-boxlist.inc.tpl" grouplist=$groups withstats=true}
+        {include file="banana-boxlist.inc.tpl" grouplist=$groups withstats=true withfeed=$feed_active}
         {if $newgroups|@count}
         <p>{"Les nouveaux groupes suivants ont été créés depuis votre dernière visite"|b}</p>
         {include file="banana-boxlist.inc.tpl" grouplist=$newgroups withstats=true}

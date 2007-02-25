@@ -15,7 +15,14 @@
     <th>{"Nouveaux"|b}</th>
     {/if}
     <th>{"Nom"|b}</th>
-    <th>{"Description"|b}</th>
+    <th>
+      {if $withfeed}
+      <div class="action">
+        {imglink action=$feed_format img=feed alt="Flux"|b accesskey=f}
+      </div>
+      {/if}
+      {"Description"|b}
+    </th>
   </tr>
   {foreach from=$grouplist key=name item=grp}
   <tr class="{cycle values="impair,pair"}">

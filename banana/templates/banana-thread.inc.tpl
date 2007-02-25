@@ -27,6 +27,7 @@
       {if $protocole->canSend()}
       <div class="action">
         {imglink group=$group action=new img=post alt="Nouveau message"|b accesskey=p}
+        {if $feed_active}{imglink group=$group action=$feed_format img=feed alt="Flux"|b accesskey=f}{/if}
       </div>
       {/if}
       {"Auteur"|b}

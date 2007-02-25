@@ -49,7 +49,7 @@ class Banana
     static public $msgshow_mimeparts = array('multipart/report', 'multipart/mixed', 
                                              'text/html', 'text/plain', 'text/enriched', 'text', 'message');
     static public $msgshow_xface     = true;
-    static public $msgshow_wrap      = 78;
+    static public $msgshow_wrap      = 80;
     static public $msgshow_externalimages = false;
     static public $msgshow_hasextimages   = false;
     static public $msgshow_withthread = true;
@@ -77,6 +77,14 @@ class Banana
      */
     static public $msgedit_mimeparts = array('multipart/report', 'multipart/mixed', 'text/plain', 'text/enriched', 'text/html', 'text', 'message');
 
+### Feed configuration ###
+    static public $feed_active         = true;
+    static public $feed_format         = 'rss2';
+    static public $feed_updateOnDemand = false; // Update the feed each time sbd check it
+    static public $feed_copyright      = null;
+    static public $feed_namePrefix     = 'Banana :: ';
+    static public $feed_size           = 15;    // Number of messages in the feed
+
 ### Protocole ###
     /** News serveur to use
      */
@@ -99,6 +107,7 @@ class Banana
     const ACTION_BOX_NEEDED = 1; // mask
     const ACTION_BOX_LIST   = 2;
     const ACTION_BOX_SUBS   = 4;
+    const ACTION_BOX_FEED   = 8;
     const ACTION_MSG_LIST   = 3;
     const ACTION_MSG_READ   = 5;
     const ACTION_MSG_NEW    = 9;
@@ -185,16 +194,26 @@ class Banana
         Banana::$first = isset($this->params['first']) ? $this->params['first'] : null;
         Banana::$part  = isset($this->params['part']) ? $this->params['part'] : 'text';
 
+        $action = @$this->params['action'];
+        if ($action == 'rss' || $action == 'rss2' || $action == 'atom') {
+            if ($action == 'rss') {
+                $action = 'rss2';
+            }
+            Banana::$feed_format = $action;
+            Banana::$action = Banana::ACTION_BOX_FEED;
+            return;
+        }
+    
         // Look for the action to execute
         if (is_null(Banana::$group)) {
-            if (isset($this->params['action']) && $this->params['action'] == 'subscribe') {
+            if ($action  == 'subscribe') {
                 Banana::$action = Banana::ACTION_BOX_SUBS;
             } else {
                 Banana::$action = Banana::ACTION_BOX_LIST;
             }
             return;
         }
-        $action = isset($this->params['action']) ? $this->params['action'] : null; 
+        
         if (is_null(Banana::$artid)) {
             if ($action == 'new') {
                 Banana::$action = Banana::ACTION_MSG_NEW;
@@ -249,6 +268,8 @@ class Banana
           case Banana::ACTION_BOX_LIST:
             $error = $this->action_listBoxes();
             break;
+          case Banana::ACTION_BOX_FEED:
+            return $this->action_feed(); // generate its own xml
           case Banana::ACTION_MSG_LIST:
             $error = $this->action_showThread(Banana::$group, Banana::$first);
             break;
@@ -279,6 +300,16 @@ class Banana
     public function css()
     {
         return Banana::$page->css;
+    }
+
+    /** Return the Link to the feed of the page
+     */
+    public function feed()
+    {
+        if (!Banana::$feed_active) {
+            return null;
+        }
+        return Banana::$page->makeURL(array('group' => Banana::$group, 'action' => Banana::$feed_format));
     }
 
     /** Return the execution backtrace of the current BananaProtocole
@@ -322,6 +353,28 @@ class Banana
             Banana::$page->assign('newgroups', $newgroups);
         }
         return true;
+    }
+
+    protected function action_feed()
+    {
+        Banana::load('feed');
+        if (Banana::$group) {
+            $feed =& BananaFeed::getFeed();
+            return $feed->toXML();
+        }
+        if (Banana::$profile['subscribe']) {
+            $subfeed = null;
+            foreach (Banana::$profile['subscribe'] as $group) {
+                Banana::$group = $group;
+                if (Banana::$feed_updateOnDemand) {
+                    $this->loadSpool($group);
+                }
+                $feed =& BananaFeed::getFeed();
+                $subfeed =& BananaFeed::merge($subfeed, $feed, _b_('Abonnements'), _b_('Mes abonnements Banana'));
+            }
+            return $subfeed->toXML();
+        }
+        return Banana::$page->feed();
     }
 
     protected function action_showThread($group, $first)
@@ -502,7 +555,7 @@ class Banana
             return false;
         }
         return true;
-    } 
+    }
 
     static public function createAllSpool(array $protos)
     {
@@ -519,7 +572,7 @@ class Banana
 
             print "** $proto **\n";
             foreach (array_keys($groups) as $g) {
-                print "Generating spool for $g : ";
+                print "Generating spool for $g: ";
                 Banana::$group = $g;
                 $spool = $banana->loadSpool($g);
                 if (!$banana->checkErrors()) {
@@ -527,11 +580,45 @@ class Banana
                 }
                 print "done.\n";
                 unset($spool);
+                Banana::$spool = null;
             }
             print "\n";
         }
     }
 
+    static public function refreshAllFeeds(array $protos)
+    {
+        Banana::load('feed');
+        Banana::$feed_updateOnDemand = true; // In order to force update
+        foreach ($protos as $proto) {
+            $banana = new Banana(array(), $proto);
+
+            if (!$banana->checkErrors()) {
+                continue;
+            }
+            $groups = Banana::$protocole->getBoxList();
+            if (!$banana->checkErrors()) {
+                continue;
+            }
+
+            print "** $proto **\n";
+            foreach (array_keys($groups) as $g) {
+                print "Generating feed cache for $g: ";
+                Banana::$group = $g;
+                $spool = $banana->loadSpool($g);
+                if (!$banana->checkErrors()) {
+                    break;
+                }
+                $feed  =& BananaFeed::getFeed();
+                print "done.\n";
+                unset($feed);
+                unset($spool);
+                Banana::$spool = null;
+            }
+            print "\n";
+        }
+    }
+ 
     /**************************************************************************/
     /* Private functions                                                      */
     /**************************************************************************/

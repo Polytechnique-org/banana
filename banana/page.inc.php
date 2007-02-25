@@ -141,6 +141,26 @@ class BananaPage extends Smarty
             $this->page = null;
         }
 
+        return $this->_run($tpl);
+    }
+
+    /** Generate feed XML code
+     */
+    public function feed()
+    {
+        @list($lg) = explode('_', Banana::$profile['locale']);
+        $tpl = 'banana-feed-' . Banana::$feed_format . '.tpl';
+        $this->assign('copyright', Banana::$feed_copyright);
+        $this->assign('title_prefix', Banana::$feed_namePrefix);
+        $this->assign('language', $lg);
+        $this->register_function('rss_date', 'rss_date');
+        return $this->_run($tpl);
+    }
+
+    /** Code generation
+     */
+    private function _run($tpl)
+    {
         $this->assign('group',     Banana::$group);
         $this->assign('artid',     Banana::$artid);
         $this->assign('part',      Banana::$part);
@@ -152,6 +172,8 @@ class BananaPage extends Smarty
         $this->assign('showboxlist', Banana::$spool_boxlist);
         $this->assign('showthread',  Banana::$msgshow_withthread);
         $this->assign('withtabs'   , Banana::$withtabs);
+        $this->assign('feed_format', Banana::$feed_format);
+        $this->assign('feed_active', Banana::$feed_active);
 
         $this->register_function('url',     array($this, 'makeUrl'));
         $this->register_function('link',    array($this, 'makeLink'));
@@ -308,15 +330,18 @@ class BananaPage extends Smarty
      */
     public function makeImgLink(array $params, &$smarty = null)
     {
-        $params['alt'] = _b_($params['alt']);
         if (!isset($params['popup'])) {
-            $params['popup'] = $params['alt'];
+            $params['popup'] = @$params['alt'];
         }    
         $img = $this->makeImg($params, $smarty);
         if (isset($params['text'])) {
             $img .= ' ' . $params['text'];
         }
         $params['text'] = $img;
+        unset($params['alt']);
+        unset($params['img']);
+        unset($params['width']);
+        unset($params['height']);
         return $this->makeLink($params, $smarty);
     }
 
@@ -352,7 +377,14 @@ function banana_trimwhitespace($source, &$smarty)
 }
 
 // }}}
+// {{{ function rss_date
 
+function rss_date($t)
+{
+    return date('r', $t);
+}
+
+// }}}
 
 // vim:set et sw=4 sts=4 ts=4 enc=utf-8:
 ?>
