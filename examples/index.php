@@ -57,10 +57,10 @@ session_write_close();
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="description" content="WebForum2/Banana">
-    <link href="css/style.css" type="text/css" rel="stylesheet" media="screen">
-    <link href="css/banana.css" type="text/css" rel="stylesheet" media="screen">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="description" content="WebForum2/Banana" />
+    <link href="css/style.css" type="text/css" rel="stylesheet" media="screen" />
+    <link href="css/banana.css" type="text/css" rel="stylesheet" media="screen" />
 <?php if ($feed) { ?>
     <link rel="alternate" type="application/rss+xml" title="Banana :: Abonnements" href="<?php echo htmlentities($feed); ?>" />
 <?php } ?>
