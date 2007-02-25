@@ -32,13 +32,17 @@ class BananaFeed
      */
     public $messages = array();
 
+    /** Last update time
+     */
+    public $lastupdate = 0;
+
     /** Create an empty feed
      */
     private function __construct()
     {
         $this->version     = BANANA_FEED_VERSION;
         $this->group       = Banana::$group;
-        $this->description = Banana::$protocole->getDescription();
+        $this->description = trim(Banana::$protocole->getDescription());
     }
 
     /** Update the feed, using current settings of Banana
@@ -76,6 +80,7 @@ class BananaFeed
             $this->messages[$key] = $array;
         }
         uasort($this->messages, Array('BananaFeed', 'compare'));
+        $this->lastupdate = time();
         $this->writeToFile();
     }
 
@@ -171,6 +176,7 @@ class BananaFeed
         }
         uasort($messages, array('BananaFeed', 'compare'));
         $master->messages =& $messages;
+        $master->lastupdate = time();
         return $master;
     }
 
