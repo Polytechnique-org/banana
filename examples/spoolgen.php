@@ -10,18 +10,29 @@
 
 require_once("banana/banana.inc.php");
 
-$opt = getopt('u:p:h');
+$opt = getopt('u:P:p:hfr:');
 
 if(isset($opt['h'])) {
     echo <<<EOF
-usage: spoolgen.php [ -u user ] [ -p pass ]
+usage: spoolgen.php [-h] [-f] [ -u user ] [ -p pass ] [ -P port ] [ -r spool_root ]
     create all spools, using user user and pass pass
+    if -f is set, also refresh the RSS feed
 EOF;
     exit;
 }
 
-Banana::$nntp_host = "news://{$opt['u']}:{$opt['p']}@localhost:119/\n";
-Banana::createAllSpool(array('NNTP'));
+if (!isset($opt['P'])) {
+    $opt['P'] = '119';
+}
 
+Banana::$nntp_host = "news://{$opt['u']}:{$opt['p']}@localhost:{$opt['P']}/\n";
+if (isset($opt['r'])) {
+    Banana::$spool_root = $opt['r'];
+}
+if (isset($opt['f'])) {
+    Banana::createAllSpool(array('NNTP'));
+} else {
+    Banana::refreshAllFeeds(array('NNTP'));
+}
 // vim:set et sw=4 sts=4 ts=4
 ?>

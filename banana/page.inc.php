@@ -154,7 +154,9 @@ class BananaPage extends Smarty
         $this->assign('title_prefix', Banana::$feed_namePrefix);
         $this->assign('language', $lg);
         $this->register_function('rss_date', 'rss_date');
-        return $this->_run($tpl);
+        header('Content-Type: application/rss+xml; charset=utf-8');
+        echo $this->_run($tpl);
+        exit;
     }
 
     /** Code generation
