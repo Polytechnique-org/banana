@@ -1,6 +1,6 @@
 <?php
 /********************************************************************************
-* index.php : main page (newsgroups list)
+* index.php : Banana NNTP client example
 * -----------
 *
 * This file is part of the banana distribution
@@ -11,34 +11,48 @@ require_once("banana/banana.inc.php");
 
 session_start();
 
+// Some configuration
+Banana::$nntp_host  = 'news://user:password@host:119/'; // where is the news server
+Banana::$spool_root  = dirname(__FILE__) . '/spool'; // where to store cache files
+Banana::$debug_nntp   = false; // if true, show the NNTP backtrace
+Banana::$debug_smarty = false; // if true, shos php-error in page generation
+Banana::$feed_active  = true;  // Activate RSS feed
+
+// Implement a Banana which stores subscription list in a cookie
 class MyBanana extends Banana
 {
     protected function action_saveSubs($groups)
     {
         parent::action_saveSubs($groups);
-        setcookie('banana_subs', serialize(Banana::$profile['subscribe']));
+        setcookie('banana_subs', serialize(Banana::$profile['subscribe']), time() + 25920000);
         return true;
     }
 }
 
+// Restore subscription list
 if (isset($_COOKIE['banana_subs'])) {
     Banana::$profile['subscribe'] = unserialize($_COOKIE['banana_subs']);
 }
+
+// Compute and set last visit time
 if (!isset($_SESSION['banana_lastnews']) && isset($_COOKIE['banana_lastnews'])) {
     $_SESSION['banana_lastnews'] = $_COOKIE['banana_lastnews'];
+} else if (!isset($_SESSION['banana_lastnews'])) {
+    $_SESSION['banana_lastnews'] = 0;
 }
-if (isset($_SESSION['banana_lastnews'])) {
-    Banana::$profile['lastnews'] = $_SESSION['banana_lastnews'];
-}
-setcookie('banana_lastnews', time());
+Banana::$profile['lastnews'] = $_SESSION['banana_lastnews'];
+setcookie('banana_lastnews', time(),  time() + 25920000);
 
-$banana = new MyBanana();
-$res = $banana->run();
-$css = $banana->css();
-$bt  = $banana->backtrace();
+// Run Bananan
+$banana = new MyBanana();    // Create the instance of Banana
+$res  = $banana->run();       // Run banana, and generate the XHTML output
+$css  = $banana->css();       // Get the CSS code to add in my page headers
+$feed = $banana->feed();      // Get a link to banana's feed. You need to use Banana::refreshAllFeeds in a cron or enable Banana::$feed_updateOnDemand in order to keep up-to-date feeds
+$bt   = $banana->backtrace(); // Get protocole execution backtrace
 
 session_write_close();
 
+// Genererate the page
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -47,6 +61,9 @@ session_write_close();
     <meta name="description" content="WebForum2/Banana">
     <link href="css/style.css" type="text/css" rel="stylesheet" media="screen">
     <link href="css/banana.css" type="text/css" rel="stylesheet" media="screen">
+<?php if ($feed) { ?>
+    <link rel="alternate" type="application/rss+xml" title="Banana :: Abonnements" href="<?php echo htmlentities($feed); ?>" />
+<?php } ?>
 <?php if ($css) { ?>
     <style type="text/css">
         <?php echo $css; ?>
@@ -66,6 +83,7 @@ session_write_close();
         Use <em>silk</em> icons from <a href="http://www.famfamfam.com/lab/icons/silk/">www.famfamfam.com</a>
       </div>
 <?php
+    // Generate the protocole Backtrace at the bottom of the page
     if ($bt) {
         echo "<div class=\"backtrace\">";
         foreach ($bt as &$entry) {

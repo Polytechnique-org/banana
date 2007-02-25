@@ -269,7 +269,8 @@ class Banana
             $error = $this->action_listBoxes();
             break;
           case Banana::ACTION_BOX_FEED:
-            return $this->action_feed(); // generate its own xml
+            $this->action_feed(); // generate its own xml
+            break;
           case Banana::ACTION_MSG_LIST:
             $error = $this->action_showThread(Banana::$group, Banana::$first);
             break;
@@ -360,7 +361,7 @@ class Banana
         Banana::load('feed');
         if (Banana::$group) {
             $feed =& BananaFeed::getFeed();
-            return $feed->toXML();
+            $feed->toXML();
         }
         if (Banana::$profile['subscribe']) {
             $subfeed = null;
@@ -372,9 +373,9 @@ class Banana
                 $feed =& BananaFeed::getFeed();
                 $subfeed =& BananaFeed::merge($subfeed, $feed, _b_('Abonnements'), _b_('Mes abonnements Banana'));
             }
-            return $subfeed->toXML();
+            $subfeed->toXML();
         }
-        return Banana::$page->feed();
+        Banana::$page->feed();
     }
 
     protected function action_showThread($group, $first)
