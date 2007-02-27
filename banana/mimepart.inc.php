@@ -298,9 +298,7 @@ class BananaMimePart
                 $value = substr($value, 0, $trim);
             }
         }
-        if (preg_match('/[\x80-\xff]/', $value)) {
-            return '=?UTF-8?B?' . base64_encode($value) . '?=';
-        }
+        $value = preg_replace('/([\x80-\xff]+)/e', '"=?UTF-8?B?" . base64_encode("\1") . "?="', $value);
         return $value;
     }
 
