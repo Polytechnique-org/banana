@@ -5,7 +5,9 @@
     </tr>
     {foreach from=$headers key=header item=values}
     <tr class="pair">
-      <td>{$values.name}</td>
+      <td>
+        {$values.name|htmlentities}
+      </td>
       <td>
         {if $values.fixed}
         {$values.fixed|htmlentities}
