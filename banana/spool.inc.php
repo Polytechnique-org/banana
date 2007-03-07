@@ -245,7 +245,7 @@ class BananaSpool
         return true;
     }
 
-    private function updateUnread($since)
+    public function updateUnread($since)
     {
         if (empty($since)) {
             return;
@@ -571,6 +571,33 @@ class BananaSpool
             $id_cur = $id_parent;
         }
         return $id_cur;
+    }
+
+    /** Return the last post id with the given subject
+     * @param subject
+     */
+    public function getPostId($subject)
+    {
+        $subject = trim($subject);
+        $id = max(array_keys($this->overview));
+        while (isset($this->overview[$id])) {
+            $test = $this->overview[$id]->subject;
+            if (function_exists('hook_formatDisplayHeader')) {
+                $val = hook_formatDisplayHeader('subject', $test, true);
+                if (is_array($val)) {
+                    $test = $val[0];
+                } else {
+                    $test = $val;
+                }
+            }
+            $test = trim($test);
+            echo $test . " - " . $subject . "\n";
+            if ($test == $subject) {
+                return $id;
+            }
+            $id--;
+        }
+        return -1;
     }
 
     /** Returns previous thread root index

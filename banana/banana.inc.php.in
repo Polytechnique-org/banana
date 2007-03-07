@@ -298,6 +298,27 @@ class Banana
         return Banana::$page->run();
     }
 
+    /** Build and post a new message
+     * @return postid (or -1 if the message has not been found)
+     */
+    public function post($dest, $reply, $subject, $body)
+    {
+        $hdrs = Banana::$protocole->requestedHeaders();
+        $headers                 = Banana::$profile['headers'];
+        $headers[$hdrs['dest']]  = $dest;
+        if ($reply) {
+            $headers[$hdrs['reply']] = $reply;
+        } 
+        $headers['Subject']      = $subject;
+        $msg = BananaMessage::newMessage($headers, $body);
+        if (Banana::$protocole->send($msg)) {
+            Banana::$group = ($reply ? $reply : $dest);
+            $this->loadSpool(Banana::$group);
+            return Banana::$spool->getPostId($subject);
+        }
+        return -1;
+    }
+
     /** Return the CSS code to include in the headers
      */
     public function css()
@@ -466,6 +487,9 @@ class Banana
             $hdr_values = array();
             foreach ($hdrs as $header) {
                 $hdr_values[$header] = isset($headers[$header]['fixed']) ? $headers[$header]['fixed'] : @$_POST[$header];
+                if ($headers != 'Subject') {
+                    $hdr_values[$header] = str_replace(', ', ',', $hdr_values[$header]);
+                }
             }
             if ($artid) {
                 $old =& $this->loadMessage($group, $artid);
@@ -486,7 +510,8 @@ class Banana
             }
             if (!is_null($msg)) {
                 if (Banana::$protocole->send($msg)) {
-                    Banana::$page->redirect(array('group' => $group, 'artid' => $artid));
+                    $newid = Banana::$spool->updateUnread(Banana::$profile['lastnews']);
+                    Banana::$page->redirect(array('group' => $group, 'artid' => $newid ? $newid : $artid));
                 }
                 Banana::$page->trig(_b_('Une erreur est survenue lors de l\'envoi du message :') . '<br />'
                                    . Banana::$protocole->lastError());
