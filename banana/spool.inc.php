@@ -591,7 +591,6 @@ class BananaSpool
                 }
             }
             $test = trim($test);
-            echo $test . " - " . $subject . "\n";
             if ($test == $subject) {
                 return $id;
             }
