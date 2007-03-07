@@ -72,7 +72,7 @@ function banana_unflowed($text)
     return $text;
 }
 
-function banana_wordwrap($text, $quote_level)
+function banana_wordwrap($text, $quote_level = 0)
 {
     if ($quote_level > 0) {
         $length = Banana::$msgshow_wrap - $quote_level - 1;
