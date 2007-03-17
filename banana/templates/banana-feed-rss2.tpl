@@ -14,7 +14,10 @@
       <title><![CDATA[{$message.title}]]></title>
       <guid isPermaLink="false">{$id}</guid>
       <link>{$message.link}</link>
-      <description><![CDATA[{$message.body}]]></description>
+      <description><![CDATA[{$message.body}
+        <div>
+          <a href="{$message.reply}">{img img=reply alt="Répondre"|b} {"Répondre"|b}</a>
+      </div>]]></description>
       <author>{$message.author}</author>
       <pubDate>{$message.date|rss_date}</pubDate>
     </item>

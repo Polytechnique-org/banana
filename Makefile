@@ -11,6 +11,11 @@ VCS_FILTER = ! -name .svn
 
 # global targets
 
+all: build
+
+# build for development (prepare spool
+devel: spool spool/templates_c
+
 build: pkg-build
 
 dist: clean pkg-dist
@@ -23,6 +28,10 @@ clean:
 %: %.in Makefile
 	-rm $@
 	sed -e 's,@VERSION@,$(VERSION) The Bearded Release,g' $< > $@
+
+spool spool/templates_c:
+	mkdir -p $@
+	chmod o+w $@
 
 # banana package targets
 
