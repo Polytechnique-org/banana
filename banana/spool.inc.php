@@ -421,7 +421,7 @@ class BananaSpool
      *
      * If you want to analyse subject, you can define the function hook_formatDisplayHeader
      */
-    private function _to_html($_id, $_index, $_first=0, $_last=0, $_ref="", $_pfx_node="", $_pfx_end="", $_head=true)
+    private function _to_html($_id, $_index, $_first=0, $_last=0, $_ref="", $_pfx_node="", $_pfx_end="", $_head=true, $_pfx_id="")
     {
         static $spfx_f, $spfx_n, $spfx_Tnd, $spfx_Lnd, $spfx_snd, $spfx_T, $spfx_L, $spfx_s, $spfx_e, $spfx_I;
         if (!isset($spfx_f)) {
@@ -446,7 +446,7 @@ class BananaSpool
         if ($_index >= $_first) {
             $hc = empty($overview->children);
 
-            $res .= '<tr class="' . ($_index%2 ? 'pair' : 'impair') . ($overview->isread ? '' : ' new') . "\">\n";
+            $res .= '<tr id="'.$_pfx_id.$_id.'" class="' . ($_index%2 ? 'pair' : 'impair') . ($overview->isread ? '' : ' new') . "\">\n";
             $res .= '<td class="date">' . $this->formatDate($overview->date) . " </td>\n";
             $res .= '<td class="subj' . ($_index == $_ref ? ' cur' : '') . '"><div class="tree">'
                 . $_pfx_node .($hc ? ($_head ? $spfx_f : ($overview->parent_direct ? $spfx_s : $spfx_snd)) : $spfx_n)
@@ -484,11 +484,11 @@ class BananaSpool
                 if (sizeof($children)) {
                     $res .= $this->_to_html($child, $_index, $_first, $_last, $_ref,
                             $_pfx_end . ($overview->parent_direct ? $spfx_T : $spfx_Tnd),
-                            $_pfx_end . $spfx_I, false);
+                            $_pfx_end . $spfx_I, false,$_id.'_');
                 } else {
                     $res .= $this->_to_html($child, $_index, $_first, $_last, $_ref,
                             $_pfx_end . ($overview->parent_direct ? $spfx_L : $spfx_Lnd),
-                            $_pfx_end . $spfx_e, false);
+                            $_pfx_end . $spfx_e, false,$_id.'_');
                 }
             }
             $_index += $overview->desc;
@@ -504,7 +504,8 @@ class BananaSpool
      */
     public function toHtml($first = 0, $overview = false)
     {
-        $res = '';
+        $res = Banana::$page->makeJs('jquery');
+        $res .= Banana::$page->makeJs('spool_toggle');
 
         if (!$overview) {
             $_first = $first;

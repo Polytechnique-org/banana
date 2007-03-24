@@ -5,7 +5,7 @@ PKG_DIST = banana-$(VERSION)
 
 PKG_FILES = AUTHORS Changelog COPYING README Makefile TODO
 
-PKG_DIRS = banana po css examples img
+PKG_DIRS = banana po css examples img javascript
 
 VCS_FILTER = ! -name .svn
 
@@ -22,6 +22,7 @@ dist: clean pkg-dist
 
 clean:
 	rm -rf locale banana/banana.inc.php
+	rm javascript/jquery.js
 	make -C po clean
 	make -C mbox-helper clean
 
@@ -29,13 +30,16 @@ clean:
 	-rm $@
 	sed -e 's,@VERSION@,$(VERSION) The Bearded Release,g' $< > $@
 
+javascript/jquery.js: 
+	wget "http://jquery.com/src/jquery-latest.pack.js" -O $@
+
 spool spool/templates_c:
 	mkdir -p $@
 	chmod o+w $@
 
 # banana package targets
 
-pkg-build: banana/banana.inc.php
+pkg-build: banana/banana.inc.php javascript/jquery.js
 	make -C po
 	make -C po clean
 	make -C mbox-helper
