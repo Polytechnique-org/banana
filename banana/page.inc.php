@@ -325,6 +325,25 @@ class BananaPage extends Smarty
         return '<img src="' . $url . '"' . $height . $width . ' alt="' . _b_($alt) . '" />';
     }
     
+    /** Build a link to one of the banana built-in javascript
+     * @param src STRING javascript name
+     * @return Javascript tag
+     */
+    public function makeJs(array $src)
+    {
+        if (function_exists('hook_makeJs')
+                && $res = hook_makeJs($src)) {
+            return $res;
+        }
+
+        $proto = empty($_SERVER['HTTPS']) ? 'http://' : 'https://';
+        $host  = $_SERVER['HTTP_HOST'];
+        $file  = dirname($_SERVER['PHP_SELF']) . '/javascript/' . $src . '.js';
+        $url   = $proto . $host . $file;
+
+        return '<script type="text/javascript" src="' . $url . '"/></script>';
+    }
+    
     /** Build a link with an image as text
      * @param params ARRAY image and location data
      * @param smarty OBJECT Smarty instance associated (null if none)
