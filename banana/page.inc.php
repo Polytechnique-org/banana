@@ -329,7 +329,7 @@ class BananaPage extends Smarty
      * @param src STRING javascript name
      * @return Javascript tag
      */
-    public function makeJs(array $src)
+    public function makeJs($src)
     {
         if (function_exists('hook_makeJs')
                 && $res = hook_makeJs($src)) {
