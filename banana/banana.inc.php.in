@@ -256,7 +256,7 @@ class Banana
             return Banana::$page->kill(_b_('Connexion non-valide'));
         }
         if (Banana::$action & Banana::ACTION_BOX_NEEDED) {
-            if(Banana::$boxpattern && !preg_match('/' . Banana::$boxpattern . '/i', $group)) {
+            if(Banana::$boxpattern && !preg_match('/' . Banana::$boxpattern . '/i', Banana::$group)) {
                 Banana::$page->setPage('group');        
                 return Banana::$page->kill(_b_("Ce newsgroup n'existe pas ou vous n'avez pas l'autorisation d'y accéder"));
             }
