@@ -487,6 +487,9 @@ class Banana
             $hdr_values = array();
             foreach ($hdrs as $header) {
                 $hdr_values[$header] = isset($headers[$header]['fixed']) ? $headers[$header]['fixed'] : @$_POST[$header];
+                if (!is_utf8($hdr_values[$header])) {
+                    $hdr_values[$header] = utf8_encode($hdr_values[$header]);
+                }
                 if ($headers != 'Subject') {
                     $hdr_values[$header] = str_replace(', ', ',', $hdr_values[$header]);
                 }
@@ -496,6 +499,9 @@ class Banana
                 $hdr_values['References'] = $old->getHeaderValue('references') . $old->getHeaderValue('message-id');
             }
             $msg = null;
+            if (isset($_POST['body']) && !is_utf8($_POST['body'])) {
+                $_POST['body'] = utf8_encode($_POST['body']);
+            }
             if (empty($hdr_values['Subject'])) {
                 Banana::$page->trig(_b_('Le message doit avoir un sujet'));
             } elseif (Banana::$msgedit_canattach && isset($_FILES['attachment'])) {
