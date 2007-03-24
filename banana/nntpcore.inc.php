@@ -352,7 +352,7 @@ class BananaNNTPCore
         $groups = array();
         foreach ($list as $result) {
             list($group, $last, $first, $p) = explode(' ', $result, 4);
-            if (!is_null(Banana::$boxpattern) || preg_match('@' . Banana::$boxpattern . '@i', $group)) {
+            if (!Banana::$boxpattern || preg_match('@' . Banana::$boxpattern . '@i', $group)) {
                 $groups[$group] = array(intval($last), intval($first), $p);
             }
         }
