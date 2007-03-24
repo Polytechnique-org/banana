@@ -516,6 +516,7 @@ class Banana
             }
             if (!is_null($msg)) {
                 if (Banana::$protocole->send($msg)) {
+                    $this->loadSpool($group);
                     $newid = Banana::$spool->updateUnread(Banana::$profile['lastnews']);
                     Banana::$page->redirect(array('group' => $group, 'artid' => $newid ? $newid : $artid));
                 }
