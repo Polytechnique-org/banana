@@ -586,9 +586,9 @@ class BananaSpool
             if (function_exists('hook_formatDisplayHeader')) {
                 $val = hook_formatDisplayHeader('subject', $test, true);
                 if (is_array($val)) {
-                    $test = $val[0];
+                    $test = banana_html_entity_decode($val[0]);
                 } else {
-                    $test = $val;
+                    $test = banana_html_entity_decode($val);
                 }
             }
             $test = trim($test);
