@@ -98,7 +98,7 @@ class BananaNNTPCore
      */
     private function getLine()
     {
-        return rtrim(fgets($this->ns, 1200));
+        return rtrim(@fgets($this->ns, 1200));
     }
 
     /** fetch data (and on delimitor)
@@ -141,7 +141,7 @@ class BananaNNTPCore
             $db_line = preg_replace('/PASS .*/', 'PASS *******', $line);
             $this->bt[] = array('action' => $db_line, 'time' => microtime(true));
         }
-        return fputs($this->ns, $line, strlen($line));
+        return @fputs($this->ns, $line, strlen($line));
     }
 
     /** put a message (multiline)
