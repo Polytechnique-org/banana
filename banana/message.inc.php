@@ -87,7 +87,7 @@ final class BananaMessage extends BananaMimePart
             return substr($res,0, -2);
 
           case "from":
-            return BananaMessage::formatFrom($text);
+            return BananaMessage::formatFrom($text, $this->headers['subject']);
 
           case "references": case "in-reply-to":
             $rsl     = "";
@@ -146,25 +146,28 @@ final class BananaMessage extends BananaMimePart
         return array_merge($headers, parent::getHeaders());
     }
 
-    static public function formatFrom($text)
+    static public function formatFrom($text, $subject = '')
     {
 #     From: mark@cbosgd.ATT.COM
 #     From: <mark@cbosgd.ATT.COM>
 #     From: mark@cbosgd.ATT.COM (Mark Horton)
 #     From: Mark Horton <mark@cbosgd.ATT.COM>
         $mailto = '<a href="mailto:';
-    
+
         $result = banana_htmlentities($text);
+        if ($subject) {
+           $subject = '?subject=' . banana_htmlentities(_b_('Re: ') . $subject, ENT_QUOTES);
+        }
         if (preg_match("/^<?([^< ]+@[^> ]+)>?$/", $text, $regs)) {
-            $result = $mailto . $regs[1] . '">' . banana_htmlentities($regs[1]) . '</a>';
+            $result = $mailto . $regs[1] . $subject . '">' . banana_htmlentities($regs[1]) . '</a>';
         }
         if (preg_match("/^([^ ]+@[^ ]+) \((.*)\)$/", $text, $regs)) {
-            $result = $mailto . $regs[1] . '">' . banana_htmlentities($regs[2]) . '</a>';
+            $result = $mailto . $regs[1] . $subject . '">' . banana_htmlentities($regs[2]) . '</a>';
         }   
         if (preg_match("/^\"?([^<>\"]+)\"? +<(.+@.+)>$/", $text, $regs)) {
             $nom = preg_replace("/^'(.*)'$/", '\1', $regs[1]);
             $nom = stripslashes($nom);
-            $result = $mailto . $regs[2] . '">' . banana_htmlentities($nom) . '</a>';
+            $result = $mailto . $regs[2] . $subject . '">' . banana_htmlentities($nom) . '</a>';
         }
         return preg_replace("/\\\(\(|\))/","\\1",$result);
     }
