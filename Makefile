@@ -16,6 +16,10 @@ all: build
 # build for development (prepare spool
 devel: spool spool/templates_c
 
+q:
+	@echo -e "Code statistics\n"
+	@sloccount $(filter-out spool/ po/ debian/, $(wildcard */)) 2> /dev/null | egrep '^[a-z]*:'
+
 build: pkg-build
 
 dist: clean pkg-dist
