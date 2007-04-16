@@ -1,5 +1,10 @@
-/** Read an mbox
- */
+/********************************************************************************
+* mbox-helper/mbox-helper.c : read and parse an mbox file
+* ------------------------
+*
+* This file is part of the banana distribution
+* Copyright: See COPYING files that comes with this distribution
+********************************************************************************/
 
 #define _GNU_SOURCE
 #include <unistd.h>
@@ -20,7 +25,7 @@
  */
 typedef struct
 {
-    FILE *fp; // File pointer
+    FILE *fp;                   // File pointer
     long int lastLine;          // Offset of the precedent line (-1 if invalid)
     long int currentLine;       // Offset of the current line
     long int messageId;         // Current message Id
@@ -32,6 +37,8 @@ typedef struct
 MBox;
 
 /** Open a mbox
+ * @param filename char* Path to the file to open
+ * @return NULL on error, a well initialized MBox structure pointer on success
  */
 static MBox *openMBox(char *filename)
 {
@@ -69,6 +76,11 @@ static void closeMBox(MBox *mbox)
 }
 
 /** Read a line in a file
+ * @param mbox MBox the source mbox
+ * @return the read line
+ *
+ * This function do not only read the line, it does minimum parsing stuff and
+ * set the corresponding mbox structure flags
  */
 static char *readLine(MBox *mbox)
 {
@@ -102,21 +114,9 @@ static char *readLine(MBox *mbox)
     return mbox->line;
 }
 
-#if 0 /* unused right now */
-/** Return to the last line
+/** Read a From_ line from the mbox
+ * the From_ line MUST be the current or the next one
  */
-static bool lastLine(MBox *mbox)
-{
-    if (mbox->lastLine != -1) {
-        fseek(mbox->fp, mbox->lastLine, SEEK_SET);
-        mbox->lastLine = -1;
-        readLine(mbox);
-        return true;
-    }
-    return false;
-}
-#endif
-
 static bool readFrom_(MBox *mbox)
 {
     if (!mbox->isFrom_) {
@@ -126,6 +126,8 @@ static bool readFrom_(MBox *mbox)
 }
 
 /** Read a message
+ * The message is not stored or returned, just skipped.
+ * If display is true, the message is printed on stdio
  */
 static void readMessage(MBox *mbox, bool display)
 {
@@ -147,6 +149,12 @@ static void readMessage(MBox *mbox, bool display)
 }
 
 /** Read the headers of a message
+ * Read the given headers of the current message of the given mbox
+ * @param mbox     MBox    source
+ * @param headers  char**  list of requested headers
+ * @param hdrsize  int     size of @ref headers
+ *
+ * THe headers are printed on stdio
  */
 static void readHeaders(MBox *mbox, char **headers, int hdrsize)
 {
@@ -216,7 +224,8 @@ static void rewindMBox(MBox *mbox)
     readLine(mbox);
 }
 
-/** Go back to the beginning of the message
+/** Go back to the beginning of the current message
+ * @return true if the beginning of a message has been reached
  */
 static bool rewindMessage(MBox *mbox)
 {
@@ -231,6 +240,10 @@ static bool rewindMessage(MBox *mbox)
 }
 
 /** Move to the given offset
+ * @param mbox   MBox the source mbox
+ * @param offset int  offset where to go
+ * @param idx    int  index of the message corresponding with the offset
+ * @return true if the given offset is the beginning of a message
  */
 static bool goToOffset(MBox *mbox, int offset, int idx)
 {
@@ -247,6 +260,9 @@ static bool goToOffset(MBox *mbox, int offset, int idx)
 }
 
 /** Move to the given message number
+ * @param mbox MBox the source mbox
+ * @param idx  int  the index of the message where to go
+ * @return true if the given message has been reached
  */
 static bool goToMessage(MBox *mbox, int idx)
 {
@@ -273,7 +289,7 @@ static bool goToMessage(MBox *mbox, int idx)
 }
 
 
-/** Display the program help
+/** Display the program usage help
  */
 static void help(void)
 {
@@ -299,6 +315,7 @@ static void help(void)
 
 /** Display an error message
  * This function display the giver error, then show the program help and exit the program
+ * The memory must be cleared before calling this function
  */
 static void error(const char *message)
 {
@@ -321,6 +338,7 @@ int main(int argc, char *argv[])
     char *endptr;
     MBox *mbox;
 
+    // Parse command line
     while ((c = getopt(argc, argv, ":bcdp:hm:f:")) != -1) {
         switch (c) {
           case 'f':
@@ -362,7 +380,8 @@ int main(int argc, char *argv[])
             break;
         }
     }
-    
+
+    // Check command line arguments consistence
     if (!filename) {
         error("no file defined");
     }
@@ -386,6 +405,8 @@ int main(int argc, char *argv[])
             rewindMBox(mbox);
         }   
     }
+
+    // Do requested stuff
     switch (action) {
       case 'b':
         if (fmid == -1) {
