@@ -159,7 +159,7 @@ class BananaSpool
         // Compute the range of indexes
         list($msgnum, $first, $last) = Banana::$protocole->getIndexes();
         if ($last < $first) {
-            $threshold = $firt + $msgnum - $last;
+            $threshold = $first + $msgnum - $last;
             $threshold = (int)(log($threshold)/log(2));
             $threshold = (2 ^ ($threshold + 1)) - 1;
         }
