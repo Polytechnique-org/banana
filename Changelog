@@ -1,3 +1,6 @@
+================================================================================ 
+VERSION 1.6
+
 Sat, 24 Mar 2006					Pascal Corpet <pascal.corpet@m4x.org>
 
 	* Threads are foldable (using jquery)
