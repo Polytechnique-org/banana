@@ -434,14 +434,13 @@ class BananaMimePart
                                                  'part'  => $part,
                                                  'text'  => $this->filename ? $this->filename : $this->content_type,
                                                  'img'   => 'save')) . ']';
-        } else {
-            if ($type == 'multipart' && ($subtype == 'mixed' || $subtype == 'report')) {
-                $text = '';
-                foreach ($this->multipart as &$part) {
-                    $text .= $part->toHtml();
-                }
-                return $text;
+        } elseif ($type == 'multipart' && ($subtype == 'mixed' || $subtype == 'report')) {
+            $text = '';
+            foreach ($this->multipart as &$part) {
+                $text .= $part->toHtml();
             }
+            return $text;
+        } else {
             switch ($subtype) {
               case 'html': return banana_formatHtml($this);
               case 'enriched': case 'richtext': return banana_formatRichText($this);
