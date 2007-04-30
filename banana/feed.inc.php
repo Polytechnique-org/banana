@@ -72,7 +72,7 @@ class BananaFeed
             $array['author'] = $message->getAuthorName();
             $array['date']   = $message->getHeaderValue('Date');
             $array['title']  = $message->getHeaderValue('Subject');
-            $array['body']   = $message->toHtml();
+            $array['body']   = $message->getFormattedBody();
             $array['link']   = Banana::$page->makeUrl(array('group' => $this->group, 'artid' => $key));
             if (Banana::$protocole->canSend()) {
                 $array['reply'] = Banana::$page->makeUrl(array('group' => $this->group, 'artid' => $key, 'action' => 'new'));
