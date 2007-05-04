@@ -362,7 +362,8 @@ class BananaMimePart
         $headers['Content-Type'] = $this->content_type . ";"
             . ($this->filename ? " name=\"{$this->filename}\";" : '')
             . ($this->charset ? " charset=\"{$this->charset}\";" : '')
-            . ($this->boundary ? " boundary=\"{$this->boundary}\";" : "");
+            . ($this->boundary ? " boundary=\"{$this->boundary}\";" : "")
+            . ($this->format ? " format={$this->format}" : "");
         if ($this->encoding) {
             $headers['Content-Transfer-Encoding'] = $this->encoding;
         }
@@ -401,6 +402,8 @@ class BananaMimePart
                 $content .= "\n--{$this->boundary}\n" . $part->get(true);
             }
             $content .= "\n--{$this->boundary}--";
+        } elseif ($this->isType('text', 'plain')) {
+            $content .= banana_flow($this->body);
         } else {
             $content .= banana_wordwrap($this->body);
         }
