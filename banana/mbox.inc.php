@@ -105,6 +105,9 @@ class BananaMBox implements BananaProtocoleInterface
     private function getCount()
     {
         $options = array();
+        if (@filesize($this->getFileName()) == Banana::$spool->storage['size']) { 
+            return max(Banana::$spool->ids); 
+        } 
         $this->getMBoxPosition($options);
         $val =& $this->callHelper('-c', $options);
         if (!$val) {
@@ -153,19 +156,11 @@ class BananaMBox implements BananaProtocoleInterface
                     break;
                 }
                 $hval  = array_shift($lines);
-                if ($hval === '') {
-                    break;
-                }
                 if ($hname == 'date') {
                     $headers[$id][$hname] = @strtotime($hval);
                 } else {
                     $headers[$id][$hname] = $hval;
                 }
-            }
-            if (!isset($headers[$id]['date'])) {
-                print_r($id);
-                print_r($offset);
-                print_r($headers[$id]);
             }
         }
         array_walk_recursive($headers, array('BananaMimePart', 'decodeHeader'));
@@ -181,6 +176,7 @@ class BananaMBox implements BananaProtocoleInterface
                 Banana::$spool->overview[$id]->storage['offset'] = $data['beginning'];
             }
         }
+        Banana::$spool->storage['size'] = @filesize($this->getFileName());
     }
 
     /** Return the indexes of the new messages since the give date
@@ -300,13 +296,13 @@ class BananaMBox implements BananaProtocoleInterface
     
     /** Add the '-p' optioin for callHelper
      */
-    private function getMBoxPosition(array &$option, $id = null)
+    private function getMBoxPosition(array &$options, $id = null)
     {
         if (Banana::$spool->overview) {
-            if (!is_null($id) && Banana::$spool->overview[$id]) {
+            if (!is_null($id) && isset(Banana::$spool->overview[$id])) {
                 $key = $id;
             } else {
-                $key       = max(array_keys(Banana::$spool->overview));
+                $key = max(Banana::$spool->ids);
                 if (!is_null($id) && $key >= $id) {
                     return;
                 }

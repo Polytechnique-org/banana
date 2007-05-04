@@ -9,7 +9,7 @@
 
 require_once dirname(__FILE__) . '/banana.inc.php';
 
-define('BANANA_SPOOL_VERSION', '0.4');
+define('BANANA_SPOOL_VERSION', '0.5');
 
 /** Class spoolhead
  *  class used in thread overviews
@@ -71,6 +71,8 @@ class BananaSpool
     public $ids;
     /** thread starts */
     public $roots;
+    /** protocole specific data */
+    public $storage = array();
 
     private $unreadnb = 0;
 
