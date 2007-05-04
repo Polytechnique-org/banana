@@ -396,7 +396,7 @@ int main(int argc, char *argv[])
 
     mbox = openMBox(filename);
     if (!mbox) {
-        fprintf(stderr, "can't open file '%s'", filename);
+        fprintf(stderr, "can't open file '%s'\n", filename);
         return 1;
     }
     if ((fmid >= pmid || fmid == -1) && pos) {
@@ -410,7 +410,7 @@ int main(int argc, char *argv[])
     switch (action) {
       case 'b':
         if (fmid == -1) {
-            fprintf(stderr, "you have to define a message number");
+            fprintf(stderr, "you have to define a message number\n");
             break;
         }
         goToMessage(mbox, fmid);
@@ -424,7 +424,7 @@ int main(int argc, char *argv[])
         break;
       case 'd':
         if (fmid == -1) {
-             fprintf(stderr, "you have to define a message number");
+             fprintf(stderr, "you have to define a message number\n");
              break;
         }
         for (i = fmid ; i <= lmid ; i++) {
