@@ -50,8 +50,8 @@ class BananaMimePart
         $this->id           = $id;
         if (is_null($content_type) || $content_type == 'application/octet-stream') {
             $this->decodeContent();
-            $this->content_type = BananaMimePart::getMimeType($body, false);
-        }   
+            $this->content_type = BananaMimePart::getMimeType($this->body, false);
+        }
     }
 
     protected function makeFilePart($file, $content_type =null, $disposition = 'attachment')
@@ -423,8 +423,9 @@ class BananaMimePart
                                                                     'artid' => Banana::$artid,
                                                                     'part'  => $part)))
                  . '" alt="' . banana_htmlentities($this->filename) . '" />';
-        } elseif (!in_array($type, Banana::$msgshow_mimeparts)
-                  && !in_array($this->content_type, Banana::$msgshow_mimeparts)) {
+        } elseif ((!in_array($type, Banana::$msgshow_mimeparts)
+                  && !in_array($this->content_type, Banana::$msgshow_mimeparts))
+                  || $this->disposition == 'attachment') {
             $part = $this->id ? $this->id : $this->filename;
             if (!$part) {
                 $part = $this->content_type;
