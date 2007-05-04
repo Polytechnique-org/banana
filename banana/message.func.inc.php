@@ -77,7 +77,6 @@ function banana_wordwrap($text, $quote_level = 0)
     if ($quote_level > 0) {
         $length = Banana::$msgshow_wrap - $quote_level - 1;
         return banana_quote(wordwrap($text, $length), $quote_level);
-    
     }
     return wordwrap($text, Banana::$msgshow_wrap);
 }
@@ -96,6 +95,22 @@ function banana_catchFormats($text)
                              "<$mark>\\1</$mark>", $text);
     }
     return preg_replace('/&&&urls&&&/e', 'array_shift($urls[0])', $text);
+}
+
+/** Build a flowed text from plain text
+ */
+function banana_flow($text)
+{
+    $lines = explode("\n", $text);
+    $text  = '';
+    while (!is_null($line = array_shift($lines))) {
+        if ($line != '-- ') {
+            $text .= rtrim(str_replace("\n", " \n", banana_wordwrap($line))) . "\n";
+        } else {
+            $text .= $line . "\n";
+        }
+    }
+    return $text;
 }
 
 // {{{ URL Catcher tools

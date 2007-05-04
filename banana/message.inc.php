@@ -36,7 +36,7 @@ final class BananaMessage extends BananaMimePart
     {
         $msg = new BananaMessage();
         $msg->msg_headers = $headers;
-        $msg->makeTextPart($body, 'text/plain', '8bits', 'UTF-8', 'fixed');
+        $msg->makeTextPart($body, 'text/plain', '8bits', 'UTF-8', 'flowed');
         if (!is_null($file)) {
             $msg->addAttachment($file);
         }

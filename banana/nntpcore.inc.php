@@ -98,29 +98,17 @@ class BananaNNTPCore
      */
     private function getLine()
     {
-        return rtrim(@fgets($this->ns, 1200));
+        return rtrim(@fgets($this->ns, 1200), "\r\n");
     }
 
     /** fetch data (and on delimitor)
      * @param STRING $delim string indicating and of transmission
      */
-    private function fetchResult($callback = null)
+    private function fetchResult()
     {
         $array = Array();
         while (($result = $this->getLine()) != '.') {
-            if (!is_null($callback)) {
-                list($key, $result) = call_user_func($callback, $result);
-                if (is_null($result)) {
-                    continue;
-                }
-                if (is_null($key)) {
-                    $array[] = $result;
-                } else {
-                    $array[$key] = $result;
-                }
-            } else {
-                $array[] = $result;
-            }
+            $array[] = $result;
         }
         if ($this->debug && $this->bt) {
             $this->bt[count($this->bt) - 1]['response'] = count($array);
