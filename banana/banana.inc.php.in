@@ -383,6 +383,9 @@ class Banana
     {
         Banana::load('feed');
         if (Banana::$group) {
+            if (Banana::$feed_updateOnDemand) { 
+                $this->loadSpool(Banana::$group); 
+            } 
             $feed =& BananaFeed::getFeed();
             $feed->toXML();
         }
