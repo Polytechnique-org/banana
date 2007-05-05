@@ -247,7 +247,7 @@ function banana_quotePlainText(BananaMimePart &$part)
     if ($part->isFlowed()) {
         $text = banana_unflowed($text);
     }
-    return banana_wrap($text, 1);
+    return banana_quote($text, 1);
 }
 
 // }}}
@@ -499,7 +499,7 @@ function banana_quoteHtml(BananaMimePart &$part)
 {
     $text = $part->getText();
     $text = banana_htmlToPlainText($text);
-    return banana_wrap($text, 1);
+    return banana_quote($text, 1);
 }
 
 // }}}
@@ -551,7 +551,7 @@ function banana_quoteRichtText(BananaMimePart &$part)
     $text = $part->getText();
     $text = banana_richtextToHtml($text);
     $text = banana_htmlToPlainText($text);
-    return banana_wrap($text, 1);
+    return banana_quote($text, 1);
 }
 
 // }}}
