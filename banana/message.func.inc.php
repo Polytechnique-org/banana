@@ -105,7 +105,9 @@ function banana_flow($text)
     $text  = '';
     while (!is_null($line = array_shift($lines))) {
         if ($line != '-- ') {
-            $text .= rtrim(str_replace("\n", " \n", banana_wordwrap($line))) . "\n";
+            $level = 0;
+            $line  = banana_removeQuotes($line, $level);
+            $text .= rtrim(str_replace("\n", " \n", banana_wordwrap($line, $level))) . "\n";
         } else {
             $text .= $line . "\n";
         }
