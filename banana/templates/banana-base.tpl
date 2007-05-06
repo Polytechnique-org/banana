@@ -29,11 +29,11 @@
 <div class="banana">
 {/if}
       {foreach from=$errors item=error}
-      <p class="error">{$error}</p>
+      <p class="error">{$error|smarty:nodefaults}</p>
       {/foreach}
       {if !$killed}
       {foreach from=$actions item=act}
-      <p class="center" style="padding: 0; margin: 0 0 1em 0">{$act.text}</p>
+      <p class="center" style="padding: 0; margin: 0 0 1em 0">{$act.text|smarty:nodefaults}</p>
       {/foreach}
       {if $page eq 'forums'}
         {include file="banana-boxlist.inc.tpl" grouplist=$groups withstats=true withfeed=$feed_active}

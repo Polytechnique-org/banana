@@ -26,6 +26,15 @@ if (!function_exists('is_utf8')) {
     }
 }
 
+function banana_entities($source)
+{
+    if (is_string($source) || is_numeric($source)) {
+        return banana_htmlentities($source);
+    } else {
+        return $source;
+    }
+}
+
 function banana_utf8entities($source)
 {
    // array used to figure what number to decrement from character order value 

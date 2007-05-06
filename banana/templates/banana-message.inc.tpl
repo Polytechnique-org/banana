@@ -24,13 +24,13 @@
         {/if}
       </div>
       {/if}
-      {$message->translateHeaderValue('subject')}
+      {$message->translateHeaderValue('subject')|smarty:nodefaults}
     </th>
   </tr>
   {foreach from=$headers name=headers item=hdr}
   <tr class="pair">
     <td class="hdr">{$message->translateHeaderName($hdr)}</td>
-    <td>{$message->translateHeaderValue($hdr)}</td>
+    <td>{$message->translateHeaderValue($hdr)|smarty:nodefaults}</td>
     {if $smarty.foreach.headers.first}
     <td class="xface" rowspan="{$headers|@count}">
       {if $message->hasXFace()}
@@ -70,7 +70,7 @@
   {/if}
   <tr>
     <td colspan="3" class="body">
-      {$body}
+      {$body|banana_utf8entities|smarty:nodefaults}
     </td>
   </tr>
 </table>

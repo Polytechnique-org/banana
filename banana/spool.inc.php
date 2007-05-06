@@ -453,11 +453,11 @@ class BananaSpool
             $res .= '<td class="subj' . ($_index == $_ref ? ' cur' : '') . '"><div class="tree">'
                 . $_pfx_node .($hc ? ($_head ? $spfx_f : ($overview->parent_direct ? $spfx_s : $spfx_snd)) : $spfx_n)
                 . '</div>';
-            $subject = $overview->subject;
+            $popup = $subject = $overview->subject;
             if (function_exists('hook_formatDisplayHeader')) {
                 list($subject, $link) = hook_formatDisplayHeader('subject', $subject, true);
             } else {
-                $subject = banana_catchFormats(banana_htmlentities(stripslashes($subject)));
+                $subject = banana_catchFormats(banana_entities(stripslashes($subject)));
                 $link = null;
             }
             if (empty($subject)) {
@@ -465,7 +465,7 @@ class BananaSpool
             }
             if ($_index != $_ref) {
                 $subject = Banana::$page->makeLink(Array('group' => $this->group, 'artid' => $_id,
-                                                    'text'  => $subject, 'popup' => $subject));
+                                                    'text'  => $subject, 'popup' => $popup));
             }
             $res .= '&nbsp;' . $subject . $link;
             $res .= "</td>\n<td class='from'>" . BananaMessage::formatFrom($overview->from) . "</td>\n</tr>";
