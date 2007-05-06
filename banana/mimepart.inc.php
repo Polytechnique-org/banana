@@ -260,10 +260,10 @@ class BananaMimePart
             if (!is_utf8($val)) {
                 $val = utf8_encode($val);
             }
-        } else {
+        } elseif (strpos($val, '=') !== false) {
             $val = preg_replace('/(=\?.*?\?[bq]\?.*?\?=) (=\?.*?\?[bq]\?.*?\?=)/i', '\1\2', $val);
             $val = preg_replace('/=\?(.*?)\?([bq])\?(.*?)\?=/ie', 'BananaMimePart::_decodeHeader("\1", "\2", "\3")', $val);
-        }    
+        }
     }
 
     static public function &parseHeaders(array &$lines)

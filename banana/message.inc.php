@@ -229,8 +229,15 @@ final class BananaMessage extends BananaMimePart
     static public function formatReferences(array &$refs)
     {
         if (isset($refs['references'])) {
-            $text = str_replace('><', '> <', $refs['references']);
-            return preg_split('/\s/', strtr($text, Banana::$spool->ids));
+            $text = preg_split('/\s/', str_replace('><', '> <', $refs['references']));
+            foreach ($text as $id=>&$value) {
+                if (isset(Banana::$spool->ids[$value])) {
+                    $value = Banana::$spool->ids[$value];
+                } else {
+                    unset($text[$id]);
+                }
+            }
+            return $text;
         } elseif (isset($refs['in-reply-to']) && isset(Banana::$spool->ids[$refs['in-reply-to']])) {
             return array(Banana::$spool->ids[$refs['in-reply-to']]);
         } else {
