@@ -134,20 +134,20 @@ class BananaSpool
 
     private function compare($a, $b)
     {
-        return ($b->date >= $a->date);
+        return ($this->overview[$b]->date >= $this->overview[$a]->date);
     }
 
     private function saveToFile()
     {
         $file = BananaSpool::spoolFilename($this->group);
-        uasort($this->overview, array($this, 'compare'));
 
         $this->roots = Array();
-        foreach($this->overview as $id=>$msg) {
+        foreach($this->overview as $id=>&$msg) {
             if (is_null($msg->parent)) {
                 $this->roots[] = $id;
             }
         }
+        usort($this->roots, array($this, 'compare'));
 
         if ($this->mode == Banana::SPOOL_ALL) {
             file_put_contents($file, serialize($this));

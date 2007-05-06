@@ -106,7 +106,7 @@ class BananaMBox implements BananaProtocoleInterface
     {
         $options = array();
         if (@filesize($this->getFileName()) == Banana::$spool->storage['size']) { 
-            return max(Banana::$spool->ids); 
+            return max(Banana::$spool->ids) + 1; 
         } 
         $this->getMBoxPosition($options);
         $val =& $this->callHelper('-c', $options);
@@ -139,31 +139,33 @@ class BananaMBox implements BananaProtocoleInterface
             return $headers;
         }
         $headers = array();
-        while ($lines) {
-            $id = array_shift($lines);
-            if ($id === '') {
-                continue;
-            }
-            $offset = array_shift($lines);
-            if ($offset === '') {
-                continue;
-            }
-            $id     = intval($id);
-            $headers[$id] = array('beginning' => intval($offset));
-            while (true) {
-                $hname = array_shift($lines);
-                if ($hname === '') {
-                    break;
+        $in_message = false;
+        $get_pos    = true;
+        $hname      = null;
+        foreach ($lines as $key=>&$line) {
+            if (!$in_message) {
+                if (!empty($line)) {
+                    $id = intval($line);
+                    $in_message = true;
+                    $get_pos    = true;
                 }
-                $hval  = array_shift($lines);
-                if ($hname == 'date') {
-                    $headers[$id][$hname] = @strtotime($hval);
-                } else {
-                    $headers[$id][$hname] = $hval;
-                }
+            } elseif ($get_pos) {
+                $headers[$id] = array('beginning' => intval($line));
+                $get_pos = false;
+            } elseif (empty($line) && empty($hname)) {
+                $in_message = false;
+            } elseif (empty($hname)) {
+                $hname = $line;
+            } elseif ($hname == 'date') {
+                $headers[$id][$hname] = @strtotime($line);
+                $hname = null;
+            } else {
+                BananaMimePart::decodeHeader($line, $hname);
+                $headers[$id][$hname] = $line;
+                $hname = null;
             }
+            unset($lines[$key]);
         }
-        array_walk_recursive($headers, array('BananaMimePart', 'decodeHeader'));
         return $headers;
     }
 

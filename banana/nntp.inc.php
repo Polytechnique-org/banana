@@ -153,10 +153,11 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
         $messages = array();
         foreach ($msg_headers as $header) {
             $headers = $this->xhdr($header, $firstid, $lastid);
-            array_walk($headers, array('BananaMimePart', 'decodeHeader'));
             $header  = strtolower($header);
             if ($header == 'date') {
                 $headers = array_map('strtotime', $headers);
+            } else {
+                array_walk($headers, array('BananaMimePart', 'decodeHeader'));
             }
             foreach ($headers as $id=>&$value) {
                 if (!isset($messages[$id])) {
