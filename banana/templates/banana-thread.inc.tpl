@@ -1,8 +1,9 @@
+{capture name=pages}
 {if $withtitle}
 <div class="pages">
-{if $spool->overview|@count > $msgbypage}
+{if $spool->overview|@count gt $msgbypage}
 {section name=pages loop=$spool->overview step=$msgbypage}
-  {if $first >= $smarty.section.pages.index && $first < $smarty.section.pages.index_next}
+  {if $first ge $smarty.section.pages.index && $first lt $smarty.section.pages.index_next}
     <strong>{$smarty.section.pages.iteration}</strong>
   {else}
     {link group=$group first=$smarty.section.pages.index text=$smarty.section.pages.iteration}
@@ -11,6 +12,9 @@
 {/if}
 </div>
 {/if}
+{/capture}
+
+{$smarty.capture.pages|smarty:nodefaults}
 <table class="bicol thread">
   <tr>
     {if $withtitle}
@@ -39,7 +43,7 @@
     {/if}
   </tr>
   {if $spool->overview|@count}
-  {if $artid}{$spool->toHtml($artid, true)}{else}{$spool->toHtml($first)}{/if}
+  {if $artid}{$spool->toHtml($artid, true)|smarty:nodefaults}{else}{$spool->toHtml($first)|smarty:nodefaults}{/if}
   {else}
   <tr>
     <td colspan="3">
@@ -51,18 +55,6 @@
 {if $showboxlist}
 {include file="banana-boxlist.inc.tpl" grouplist=$groups withstats=true}
 {/if}
-{if $withtitle}
-<div class="pages">
-{if $spool->overview|@count > $msgbypage}
-{section name=pages loop=$spool->overview step=$msgbypage}
-  {if $first >= $smarty.section.pages.index && $first < $smarty.section.pages.index_next}
-    <strong>{$smarty.section.pages.iteration}</strong>
-  {else}
-    {link group=$group first=$smarty.section.pages.index text=$smarty.section.pages.iteration}
-  {/if}
-{/section}
-{/if}
-</div>
-{/if}
+{$smarty.capture.pages|smarty:nodefaults}
 
 {* vim:set et sw=2 sts=2 ts=2 enc=utf-8: *}

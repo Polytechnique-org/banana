@@ -184,20 +184,22 @@ class BananaPage extends Smarty
         $this->register_function('imglink', array($this, 'makeImgLink'));
         $this->register_function('img',     array($this, 'makeImg'));
         $this->register_modifier('b',       '_b_');
-        $this->register_modifier('htmlentities', 'banana_htmlentities');
 
         $this->assign('errors',    $this->error);
         $this->assign('page',      $this->page);
         $this->assign('pages',     $this->pages);
         $this->assign('actions',   $this->actions);
+        $this->register_modifier('banana_utf8entities', 'banana_utf8entities');
+        $this->register_modifier('banana_entities', 'banana_entities');
+
+        if ($ent) {
+            $this->default_modifiers = Array('@banana_entities');
+        }
 
         if (!Banana::$debug_smarty) {
             $error_level = error_reporting(0);
         }
         $text = $this->fetch($tpl);
-        if ($ent) {
-            $text = banana_utf8entities($text);
-        }
         if (!Banana::$debug_smarty) {
             error_reporting($error_level);
         }
@@ -272,7 +274,7 @@ class BananaPage extends Smarty
             $popup .= ' (raccourci : ' . $accesskey . ')';
         }
         if (!is_null($popup)) {
-            $popup = ' title="' . banana_htmlentities($popup) . '"';
+            $popup = ' title="' . banana_entities($popup) . '"';
         }
         if (!is_null($class)) {
             $class = ' class="' . $class . '"';
@@ -280,7 +282,7 @@ class BananaPage extends Smarty
         if (!is_null($accesskey)) {
             $accesskey = ' accesskey="' . $accesskey . '"';
         }
-        return '<a href="' . banana_htmlentities($link) . '"'
+        return '<a href="' . banana_entities($link) . '"'
               . $popup . $class . $accesskey
               . '>' . $text . '</a>';
     }

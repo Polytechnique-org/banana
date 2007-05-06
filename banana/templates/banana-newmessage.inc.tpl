@@ -6,11 +6,11 @@
     {foreach from=$headers key=header item=values}
     <tr class="pair">
       <td>
-        {$values.name|htmlentities}
+        {$values.name}
       </td>
       <td>
         {if $values.fixed}
-        {$values.fixed|htmlentities}
+        {$values.fixed}
         {else}
         <input type="text" name="{$header}" value="{$values.user|default:$smarty.request.$header}" size="50" />
         {/if}
