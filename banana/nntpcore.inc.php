@@ -104,7 +104,7 @@ class BananaNNTPCore
     /** fetch data (and on delimitor)
      * @param STRING $delim string indicating and of transmission
      */
-    private function fetchResult()
+    private function &fetchResult()
     {
         $array = Array();
         while (($result = $this->getLine()) != '.') {
@@ -459,9 +459,9 @@ class BananaNNTPCore
         if (!$this->execLine("XGTITLE $pattern ")) {
             return false;
         }
-        $array  = $this->fetchResult();
+        $array  =& $this->fetchResult();
         $groups = array();
-        foreach ($array as $result) {
+        foreach ($array as &$result) {
             list($group, $desc) = split("[ \t]", $result, 2);
             $groups[$group] = $desc;
         }
@@ -483,7 +483,7 @@ class BananaNNTPCore
         if (!$this->execLine("XHDR $hdr $range ")) {
             return false;
         }
-        $array   = $this->fetchResult();
+        $array   =& $this->fetchResult();
         $headers = array();
         foreach ($array as &$result) {
             @list($head, $value) = explode(' ', $result, 2);
@@ -503,7 +503,7 @@ class BananaNNTPCore
         if (!$this->execLine("XPAT $hdr $range $pat")) {
             return false;
         }
-        $array   = $this->fetchResult();
+        $array   =& $this->fetchResult();
         $headers = array();
         foreach ($array as &$result) {
             list($head, $value) = explode(' ', $result, 2);
