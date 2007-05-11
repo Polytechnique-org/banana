@@ -507,8 +507,8 @@ class Banana
             }
             if (empty($hdr_values['Subject'])) {
                 Banana::$page->trig(_b_('Le message doit avoir un sujet'));
-            } elseif (Banana::$msgedit_canattach && isset($_FILES['attachment'])) {
-                $uploaded = $_FILES['attachment'];
+            } elseif (Banana::$msgedit_canattach && isset($_FILES['attachment']) && $_FILES['attachment']['name']) {
+                $uploaded =& $_FILES['attachment'];
                 if (!is_uploaded_file($uploaded['tmp_name'])) {
                     Banana::$page->trig(_b_('Une erreur est survenue lors du téléchargement du fichier'));
                 } else {
@@ -522,9 +522,10 @@ class Banana
                     $this->loadSpool($group);
                     $newid = Banana::$spool->updateUnread(Banana::$profile['lastnews']);
                     Banana::$page->redirect(array('group' => $group, 'artid' => $newid ? $newid : $artid));
-                }
-                Banana::$page->trig(_b_('Une erreur est survenue lors de l\'envoi du message :') . '<br />'
+                } else {
+                    Banana::$page->trig(_b_('Une erreur est survenue lors de l\'envoi du message :') . '<br />'
                                    . Banana::$protocole->lastError());
+                }
             }
         } else {
             if (!is_null($artid)) {
