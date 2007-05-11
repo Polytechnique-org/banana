@@ -28,7 +28,7 @@ if (!function_exists('is_utf8')) {
 
 function banana_entities($source)
 {
-    if (is_string($source) || is_numeric($source)) {
+    if (is_string($source)) {
         return banana_htmlentities($source);
     } else {
         return $source;

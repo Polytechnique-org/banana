@@ -53,6 +53,7 @@ class Banana
     static public $msgshow_externalimages = false;
     static public $msgshow_hasextimages   = false;
     static public $msgshow_withthread = true;
+    static public $msgshow_javascript = true;
 
     /** Match an url
      * Should be included in a regexp delimited using /, !, , or @ (eg: "/$url_regexp/ui")

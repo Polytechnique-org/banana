@@ -333,6 +333,9 @@ class BananaPage extends Smarty
      */
     public function makeJs($src)
     {
+        if (!Banana::$msgshow_javascript) {
+            return '';
+        }
         if (function_exists('hook_makeJs')
                 && $res = hook_makeJs($src)) {
             return $res;
