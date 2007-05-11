@@ -25,9 +25,13 @@ class BananaMimePart
 
     protected function __construct($data = null)
     {
-        if (!is_null($data)) {
+        if ($data instanceof BananaMimePart) {
+            foreach ($this as $key=>$value) {
+                $this->$key = $data->$key;
+            }
+        } elseif (!is_null($data)) {
             $this->fromRaw($data);
-        }   
+        }
     }
 
     protected function makeTextPart($body, $content_type, $encoding, $charset = null, $format = 'fixed')
@@ -54,7 +58,7 @@ class BananaMimePart
         }
     }
 
-    protected function makeFilePart($file, $content_type =null, $disposition = 'attachment')
+    protected function makeFilePart(array $file, $content_type = null, $disposition = 'attachment')
     {
         $body = file_get_contents($file['tmp_name']);
         if ($body === false || strlen($body) != $file['size']) {
@@ -89,7 +93,7 @@ class BananaMimePart
     protected function convertToMultiPart()
     {
         if (!$this->isType('multipart', 'mixed')) {
-            $newpart = $this;
+            $newpart = new BananaMimePart($this);
             $this->content_type = 'multipart/mixed';
             $this->encoding     = '8bit';
             $this->multipart    = array($newpart);
@@ -106,10 +110,10 @@ class BananaMimePart
 
     public function addAttachment(array $file, $content_type = null, $disposition = 'attachment')
     {
-        $newpart = new BananaMimePart;
         if (!is_uploaded_file($file['tmp_name'])) {
             return false;
         }
+        $newpart = new BananaMimePart;
         if ($newpart->makeFilePart($file, $content_type, $disposition)) {
             $this->convertToMultiPart();
             $this->multipart[] = $newpart;
@@ -219,7 +223,7 @@ class BananaMimePart
     public static function getMimeType($data, $is_filename = true)
     {
         if ($is_filename) {
-            $type = mime_content_type($arg);
+            $type = mime_content_type($data);
         } else {
             $arg = escapeshellarg($data);
             $type = preg_replace('/;.*/', '', trim(shell_exec("echo $arg | file -bi -")));
