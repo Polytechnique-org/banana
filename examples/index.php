@@ -29,6 +29,50 @@ class MyBanana extends Banana
     }
 }
 
+if (!isset($_SESSION['banana_email']) || isset($_POST['change_login']) || isset($_POST['valid_change'])) {
+    if (isset($_COOKIE['banana_login']) && !isset($_POST['change_login']) && !isset($_POST['valid_change'])) {
+        $_SESSION['banana_email'] = $_COOKIE['banana_email'];
+    } elseif (isset($_POST['valid_change'])) {
+        $_SESSION['banana_name'] = $_POST['name'];
+        $_SESSION['banana_email'] = $_POST['email'];
+        setcookie('banana_name', $_POST['name'],  time() + 25920000);
+        setcookie('banana_email', $_POST['email'],  time() + 25920000);
+    } else {
+?>
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+  <head> 
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> 
+    <meta name="description" content="WebForum2/Banana" /> 
+    <link href="css/style.css" type="text/css" rel="stylesheet" media="screen" /> 
+    <link href="css/banana.css" type="text/css" rel="stylesheet" media="screen"> 
+    <title>Banana, a NNTP<->Web Gateway</title>
+  </head>
+  <body>
+    <div class="bloc">
+      <h1>Les Forums de Banana</h1>
+      Merci d'entrer vos identifiants pour accéder à Banana :
+      <form action="" method="post">
+        <div class="banana" style="margin: auto; width: 50%">
+          Nom : <input type="text" name="name" size="40" /><br />
+          Email : <input type="text" name="email" size="40" />
+          <div class="center">
+            <input type="submit" name="valid_change" value="Valider" />
+          </div>
+        </div>
+      </form>
+      <div class="foot">
+        <em>Banana</em>, a Web interface for a NNTP Server<br /> 
+        Developed under GPL License for <a href="http://www.polytechnique.org">Polytechnique.org</a><br />
+        Use <em>silk</em> icons from <a href="http://www.famfamfam.com/lab/icons/silk/">www.famfamfam.com</a> 
+      </div>
+    </div>
+  </body>
+</html>
+<?php
+        exit;
+    }
+}
+
 // Restore subscription list
 if (isset($_COOKIE['banana_subs'])) {
     Banana::$profile['subscribe'] = unserialize($_COOKIE['banana_subs']);
@@ -40,6 +84,8 @@ if (!isset($_SESSION['banana_lastnews']) && isset($_COOKIE['banana_lastnews'])) 
 } else if (!isset($_SESSION['banana_lastnews'])) {
     $_SESSION['banana_lastnews'] = 0;
 }
+Banana::$profile['signature'] = $_SESSION['banana_name'];
+Banana::$profile['headers']['From'] = '"' . $_SESSION['banana_name'] . '" <' . $_SESSION['banana_email'] . '>';
 Banana::$profile['lastnews'] = $_SESSION['banana_lastnews'];
 setcookie('banana_lastnews', time(),  time() + 25920000);
 
@@ -77,10 +123,19 @@ session_write_close();
     <div class="bloc">
       <h1>Les Forums de Banana</h1>
       <?php echo $res; ?>
+      <div>
+      <div style="padding-top: 1ex; float: right; text-align: right; font-size: small"> 
+        <form action="" method="post">
+        Vous êtes :<br /> 
+        <?php echo $_SESSION['banana_name'] . ' &lt;' . $_SESSION['banana_email'] . '&gt;'; ?><br /> 
+        <input type="submit" name="change_login" value="Changer" />
+        </form>
+      </div> 
       <div class="foot">
         <em>Banana</em>, a Web interface for a NNTP Server<br />
-        Developed under GPL License for <a href="http://www.polytechnique.org">Polytechnique.org</a>
+        Developed under GPL License for <a href="http://www.polytechnique.org">Polytechnique.org</a><br />
         Use <em>silk</em> icons from <a href="http://www.famfamfam.com/lab/icons/silk/">www.famfamfam.com</a>
+      </div>
       </div>
 <?php
     // Generate the protocole Backtrace at the bottom of the page
