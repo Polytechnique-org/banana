@@ -7,7 +7,9 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-require_once 'smarty/libs/Smarty.class.php';
+if (!include_once('Smarty.class.php')) {
+    require_once 'smarty/libs/Smarty.class.php';
+}
 
 class BananaPage extends Smarty
 {
