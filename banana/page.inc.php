@@ -230,7 +230,7 @@ class BananaPage extends Smarty
             return $res;
         }   
         $proto = empty($_SERVER['HTTPS']) ? 'http://' : 'https://';
-        $host  = $_SERVER['HTTP_HOST'];
+        $host  = Banana::$baseurl ? Banana::$baseurl : $_SERVER['SERVER_NAME'];
         $file  = $_SERVER['PHP_SELF'];
     
         if (count($params) != 0) {

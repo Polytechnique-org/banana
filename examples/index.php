@@ -17,6 +17,7 @@ Banana::$spool_root  = dirname(__FILE__) . '/spool'; // where to store cache fil
 Banana::$debug_nntp   = false; // if true, show the NNTP backtrace
 Banana::$debug_smarty = false; // if true, shos php-error in page generation
 Banana::$feed_active  = true;  // Activate RSS feed
+Banana::$feed_updateOnDemand = true; // Update the feed cache when it is acceeded
 
 // Implement a Banana which stores subscription list in a cookie
 class MyBanana extends Banana
@@ -29,7 +30,9 @@ class MyBanana extends Banana
     }
 }
 
-if (!isset($_SESSION['banana_email']) || isset($_POST['change_login']) || isset($_POST['valid_change'])) {
+// Minimalist login
+if ((@$_GET['action'] == 'rss2') && 
+    (!isset($_SESSION['banana_email']) || isset($_POST['change_login']) || isset($_POST['valid_change']))) {
     if (isset($_COOKIE['banana_login']) && !isset($_POST['change_login']) && !isset($_POST['valid_change'])) {
         $_SESSION['banana_email'] = $_COOKIE['banana_email'];
     } elseif (isset($_POST['valid_change'])) {
