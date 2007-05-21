@@ -33,8 +33,9 @@ class MyBanana extends Banana
 // Minimalist login
 if ((@$_GET['action'] == 'rss2') && 
     (!isset($_SESSION['banana_email']) || isset($_POST['change_login']) || isset($_POST['valid_change']))) {
-    if (isset($_COOKIE['banana_login']) && !isset($_POST['change_login']) && !isset($_POST['valid_change'])) {
+    if (isset($_COOKIE['banana_email']) && !isset($_POST['change_login']) && !isset($_POST['valid_change'])) {
         $_SESSION['banana_email'] = $_COOKIE['banana_email'];
+        $_SESSION['banana_name'] = $_COOKIE['banana_name'];
     } elseif (isset($_POST['valid_change'])) {
         $_SESSION['banana_name'] = $_POST['name'];
         $_SESSION['banana_email'] = $_POST['email'];

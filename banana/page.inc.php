@@ -322,7 +322,7 @@ class BananaPage extends Smarty
         }
 
         $proto = empty($_SERVER['HTTPS']) ? 'http://' : 'https://';
-        $host  = $_SERVER['HTTP_HOST'];
+        $host  = Banana::$baseurl ? Banana::$baseurl : $_SERVER['SERVER_NAME'];
         $file  = dirname($_SERVER['PHP_SELF']) . '/img/' . $img;
         $url   = $proto . $host . $file;
 
@@ -344,7 +344,7 @@ class BananaPage extends Smarty
         }
 
         $proto = empty($_SERVER['HTTPS']) ? 'http://' : 'https://';
-        $host  = $_SERVER['HTTP_HOST'];
+        $host  = Banana::$baseurl ? Banana::$baseurl : $_SERVER['SERVER_NAME'];
         $file  = dirname($_SERVER['PHP_SELF']) . '/javascript/' . $src . '.js';
         $url   = $proto . $host . $file;
 
