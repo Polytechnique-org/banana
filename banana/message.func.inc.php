@@ -204,7 +204,7 @@ function banana_plainTextToHtml($text, $strict = true)
     $text = banana_catchURLs($text);
     $text = banana_catchQuotes($text, $strict);
     $text = banana_catchSignature($text);
-    return banana_cleanHtml('<pre>' . $text . '</pre>');
+    return '<pre>' . $text . '</pre>';
 }
 
 function banana_wrap($text, $base_level = 0, $strict = true)
@@ -373,6 +373,7 @@ function banana_cleanHtml($source, $to_xhtml = false)
             }
             tidy_set_encoding('utf8');
             $source = tidy_repair_string($source);
+
         } else { // Tidy 2.0
             $source = tidy_repair_string($source, $tidy_config, 'utf8');
         }
