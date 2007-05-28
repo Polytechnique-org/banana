@@ -30,7 +30,9 @@ class BananaPage extends Smarty
         $this->template_dir  = dirname(__FILE__) . '/templates/';
         $this->compile_dir   = Banana::$spool_root . '/templates_c/';
         $this->register_prefilter('banana_trimwhitespace');
-    
+        if (!is_dir($this->compile_dir)) {
+            mkdir($this->compile_dir);
+        }
     }
 
     /** Add an error message
