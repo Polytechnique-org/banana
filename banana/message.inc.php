@@ -134,6 +134,8 @@ final class BananaMessage extends BananaMimePart
         }
         if ($hdr == 'date') {
             return strtotime($this->headers['date']);
+        } else if ($hdr == 'references' || $hdr == 'reply-to') {
+            return str_replace('><', '> <', $this->headers[$hdr]);
         } else {
             return $this->headers[$hdr];
         }
@@ -230,14 +232,13 @@ final class BananaMessage extends BananaMimePart
     {
         if (isset($refs['references'])) {
             $text = preg_split('/\s/', str_replace('><', '> <', $refs['references']));
+            $references = array();
             foreach ($text as $id=>&$value) {
                 if (isset(Banana::$spool->ids[$value])) {
-                    $value = Banana::$spool->ids[$value];
-                } else {
-                    unset($text[$id]);
+                    $references[] = Banana::$spool->ids[$value];
                 }
             }
-            return $text;
+            return $references;
         } elseif (isset($refs['in-reply-to']) && isset(Banana::$spool->ids[$refs['in-reply-to']])) {
             return array(Banana::$spool->ids[$refs['in-reply-to']]);
         } else {
