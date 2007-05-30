@@ -501,7 +501,7 @@ class Banana
             }
             if (!is_null($artid)) {
                 $old =& $this->loadMessage($group, $artid);
-                $hdr_values['References'] = $old->getHeaderValue('references') . $old->getHeaderValue('message-id');
+                $hdr_values['References'] = $old->getHeaderValue('references') . ' ' . $old->getHeaderValue('message-id');
             }
             $msg = null;
             if (isset($_POST['body']) && !is_utf8($_POST['body'])) {
