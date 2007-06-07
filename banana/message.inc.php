@@ -303,7 +303,7 @@ final class BananaMessage extends BananaMimePart
         if (function_exists('hook_checkcancel')) {
             return hook_checkcancel($this->headers);
         }
-        return Banana::$profile['name'] == $this->headers['from'];
+        return Banana::$profile['headers']['From'] == $this->headers['from'];
     }
 
     public function canSend()
