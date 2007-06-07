@@ -193,6 +193,11 @@ class Banana
      */
     protected function loadParams()
     {
+        foreach ($this->params as &$value) {
+            if ($value === "") {
+                $value = null;
+            }
+        }
         Banana::$group = isset($this->params['group']) ? $this->params['group'] : null;
         Banana::$artid = isset($this->params['artid']) ? $this->params['artid'] : null;
         Banana::$first = isset($this->params['first']) ? $this->params['first'] : null;
