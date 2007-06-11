@@ -19,6 +19,7 @@ class BananaMimePart
     private $boundary     = null;
     private $filename     = null;
     private $format       = null;
+    private $sign_protocole = null;
 
     private $body         = null;
     private $multipart    = null;
@@ -81,12 +82,13 @@ class BananaMimePart
         return true;
     }
 
-    protected function makeMultiPart($body, $content_type, $encoding, $boundary)
+    protected function makeMultiPart($body, $content_type, $encoding, $boundary, $sign_protocole)
     {
         $this->body         = $body;
         $this->content_type = $content_type;
         $this->encoding     = $encoding;
         $this->boundary     = $boundary;
+        $this->sign_protocole = $sign_protocole;
         $this->parse();
     }
 
@@ -173,6 +175,7 @@ class BananaMimePart
             $filename     = $this->getHeader('content-disposition', '/filename="?([^ "]+?)"?\s*(;|$)/i');
             $format       = strtolower($this->getHeader('content-type', '/format="?([^ "]+?)"?\s*(;|$)/i'));
             $id           = $this->getHeader('content-id', '/<(.*?)>/');
+            $sign_protocole = strtolower($this->getHeader('content-type', '/protocol="?([^ "]+?)"?\s*(;|$)/i'));
             if (empty($filename)) {
                 $filename = $this->getHeader('content-type', '/name="?([^"]+)"?/');
             }
@@ -183,7 +186,7 @@ class BananaMimePart
             $this->makeTextPart($content, $content_type, $encoding, $charset, $format);
             break;
           case 'multipart':
-            $this->makeMultiPart($content, $content_type, $encoding, $boundary);
+            $this->makeMultiPart($content, $content_type, $encoding, $boundary, $sign_protocole);
             break;
           default:
             $this->makeDataPart($content, $content_type, $encoding, $filename, $disposition, $id);
@@ -210,12 +213,23 @@ class BananaMimePart
             $this->multipart = array();
         }
         $boundary =& $this->boundary;
-        $parts = preg_split("/\n--" . preg_quote($boundary, '/') . "(--|\n)/", $this->body, -1, PREG_SPLIT_NO_EMPTY);
+        $parts = preg_split("/(^|\n)--" . preg_quote($boundary, '/') . "(--|\n)/", $this->body, -1, PREG_SPLIT_NO_EMPTY);
+        $signed = $this->isType('multipart', 'signed');
+        $signature = null;
+        $signed_message = null;
         foreach ($parts as &$part) {
             $newpart = new BananaMimePart($part);
             if (!is_null($newpart->content_type)) {
+                if ($signed && $newpart->content_type == $this->sign_protocole) { 
+                    $signature = $newpart->body; 
+                } elseif ($signed) { 
+                    $signed_message = $part; 
+                } 
                 $this->multipart[] = $newpart;
             }
+        }
+        if ($signed) {
+            $this->checkSignature($signature, $signed_message);
         }
         $this->body = null;
     }
@@ -599,6 +613,13 @@ class BananaMimePart
             }
         }
         return null;
+    }
+
+    private function checkSignature($signature, $message)
+    {
+        file_put_contents('machin.asc', $signature);
+        file_put_contents('message', str_replace(array("\r\n", "\n"), array("\n", "\r\n"), $message));
+        passthru('gpg --verify machin.asc message');
     }
 }
 
