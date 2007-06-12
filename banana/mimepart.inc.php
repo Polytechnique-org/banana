@@ -19,7 +19,7 @@ class BananaMimePart
     private $boundary     = null;
     private $filename     = null;
     private $format       = null;
-    private $sign_protocole = null;
+    private $signature    = array();
 
     private $body         = null;
     private $multipart    = null;
@@ -88,7 +88,7 @@ class BananaMimePart
         $this->content_type = $content_type;
         $this->encoding     = $encoding;
         $this->boundary     = $boundary;
-        $this->sign_protocole = $sign_protocole;
+        $this->signature['protocole'] = $sign_protocole;
         $this->parse();
     }
 
@@ -220,7 +220,7 @@ class BananaMimePart
         foreach ($parts as &$part) {
             $newpart = new BananaMimePart($part);
             if (!is_null($newpart->content_type)) {
-                if ($signed && $newpart->content_type == $this->sign_protocole) { 
+                if ($signed && $newpart->content_type == $this->signature['protocole']) { 
                     $signature = $newpart->body; 
                 } elseif ($signed) { 
                     $signed_message = $part; 
@@ -229,7 +229,7 @@ class BananaMimePart
             }
         }
         if ($signed) {
-            $this->checkSignature($signature, $signed_message);
+            $this->checkPGPSignature($signature, $signed_message);
         }
         $this->body = null;
     }
@@ -430,12 +430,20 @@ class BananaMimePart
 
     public function getText()
     {
+        $signed =& $this->getSignedPart(); 
+        if ($signed !== $this) { 
+            return $signed->getText(); 
+        } 
         $this->decodeContent();
         return $this->body;
     }
 
     public function toHtml()
     {
+        $signed =& $this->getSignedPart(); 
+        if ($signed !== $this) { 
+            return $signed->toHtml(); 
+        }
         @list($type, $subtype) = $this->getType();
         if ($type == 'image') {
             $part = $this->id ? $this->id : $this->filename;
@@ -478,6 +486,10 @@ class BananaMimePart
 
     public function quote()
     {
+        $signed =& $this->getSignedPart();
+        if ($signed !== $this) {
+            return $signed->quote();
+        }
         list($type, $subtype) = $this->getType();
         if (in_array($type, Banana::$msgedit_mimeparts) || in_array($this->content_type, Banana::$msgedit_mimeparts)) {
             if ($type == 'multipart' && ($subtype == 'mixed' || $subtype == 'report')) {
@@ -571,7 +583,9 @@ class BananaMimePart
         if (in_array('source', $types)) {
             $source = @$names['source'] ? $names['source'] : 'source';
         }
-        if (!$this->isType('multipart', 'alternative') && !$this->isType('multipart', 'related')) {
+        if ($this->isType('multipart', 'signed')) {
+            $parts = array($this->getSignedPart());
+        } else if (!$this->isType('multipart', 'alternative') && !$this->isType('multipart', 'related')) {
             if ($source) {
                 $parts = array($this);
             } else {
@@ -615,11 +629,59 @@ class BananaMimePart
         return null;
     }
 
-    private function checkSignature($signature, $message)
+    protected function &getSignedPart()
     {
-        file_put_contents('machin.asc', $signature);
-        file_put_contents('message', str_replace(array("\r\n", "\n"), array("\n", "\r\n"), $message));
-        passthru('gpg --verify machin.asc message');
+        if ($this->isType('multipart', 'signed')) {
+            foreach ($this->multipart as &$part) {
+                if ($part->content_type != $this->signature['protocole']) {
+                    return $part;
+                }
+            }
+        }
+        return $this;
+    }
+
+    private function checkPGPSignature($signature, $message = null)
+    {
+        $signname = tempnam(Banana::$spool_root, 'banana_pgp_');
+        file_put_contents($signname. '.asc', $signature);
+        $gpg_check = array();
+        if (!is_null($message)) {
+            file_put_contents($signname, str_replace(array("\r\n", "\n"), array("\n", "\r\n"), $message));
+            exec('LC_ALL="en_US" gpg --verify ' . $signname . '.asc ' . $signname . ' 2>&1', $gpg_check, $result);
+            unlink($signname);
+        } else {
+            exec('LC_ALL="en_US" gpg --verify ' . $signname . '.asc 2&>1', $gpg_check, $result);
+        }
+        unlink("$signname.asc");
+        if (preg_match('/Signature made (.+) using (.+) key ID (.+)/', array_shift($gpg_check), $matches)) {
+            $this->signature['date'] = strtotime($matches[1]);
+            $this->signature['key'] = array('format' => $matches[2],
+                                            'id'     => $matches[3]);
+        } else {
+            return false;
+        }
+        $signature = array_shift($gpg_check);
+        if (preg_match('/Good signature from "(.+)"/', $signature, $matches)) {
+            $this->signature['verify'] = true;
+            $this->signature['identity'] = array($matches[1]);
+        } elseif (preg_match('/BAD signature from "(.+)"/', $signature, $matches)) {
+            $this->signature['verify'] = false;
+            $this->signature['identity'] = array($matches[1]);
+        } else {
+            return false;
+        }
+        foreach ($gpg_check as $aka) {
+            if (preg_match('/aka "(.+)"/', $aka, $matches)) {
+                $this->signature['identity'][] = $matches[1];
+            }
+        }
+        return true;
+    }
+
+    public function getSignature()
+    {
+        return $this->signature;
     }
 }
 
