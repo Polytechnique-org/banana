@@ -43,11 +43,36 @@
   {assign var=files value=$message->getAttachments()}
   {if $files|@count}
   <tr class="pair">
-    <td class="hdr">Fichiers joints</td>
+    <td class="hdr">{"Fichiers joints"|b}</td>
     <td colspan="2">
       {foreach from=$files item=file name=attachs}
       {imglink img=save alt="Enregistrer"|b group=$group artid=$artid part=$file->getFilename() text=$file->getFilename()}{if !$smarty.foreach.attachs.last}, {/if}
       {/foreach}
+    </td>
+  </tr>
+  {/if}
+  {assign var=signature value=$message->getSignature()}
+  {if $signature|@count}
+  <tr class="pair">
+    <td class="hdr">{"Signature"|b}</td>
+    <td colspan="2">
+      {if $signature.verify && $signature.certified}
+      {img img=accept alt="Signature valide par une clé de confiance"|b}
+      {elseif $signature.verify}
+      {img img=error alt="Signature valide par une clé non vérifiée"|b}
+      {else}
+      {img img=exclamation alt="Signature non valide"|b}
+      {/if}
+      <strong>
+        {if $signature.verify}<span class="ok">{"Valide"|b}...</span>
+        {else}<span class="erreur">{"Non valide"|b}...</span>{/if}
+      </strong>&nbsp;
+      {"Message signé par la clé"|b} {$signature.key.format}:{$signature.key.id}
+      {if $signature.certified}
+        (<span class="ok">{"identité vérifiée"|b}</span>)
+      {else}
+        (<span class="erreur">{"non vérifiée"|b}</span>&nbsp;: {$signature.certification_error})
+      {/if}
     </td>
   </tr>
   {/if}

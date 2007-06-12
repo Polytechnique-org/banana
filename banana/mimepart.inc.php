@@ -179,7 +179,7 @@ class BananaMimePart
             if (empty($filename)) {
                 $filename = $this->getHeader('content-type', '/name="?([^"]+)"?/');
             }
-        } 
+        }
         list($type, $subtype) = explode('/', $content_type);
         switch ($type) {
           case 'text': case 'message':
@@ -221,7 +221,7 @@ class BananaMimePart
             $newpart = new BananaMimePart($part);
             if (!is_null($newpart->content_type)) {
                 if ($signed && $newpart->content_type == $this->signature['protocole']) { 
-                    $signature = $newpart->body; 
+                    $signature = $newpart->body;
                 } elseif ($signed) { 
                     $signed_message = $part; 
                 } 
@@ -643,15 +643,20 @@ class BananaMimePart
 
     private function checkPGPSignature($signature, $message = null)
     {
+        if (!Banana::$msgshow_pgpcheck) {
+            return true;
+        }
         $signname = tempnam(Banana::$spool_root, 'banana_pgp_');
+        $gpg = 'LC_ALL="en_US" ' . Banana::$msgshow_pgppath . ' ' . Banana::$msgshow_pgpoptions . ' --verify '
+                .  $signname . '.asc ';
         file_put_contents($signname. '.asc', $signature);
         $gpg_check = array();
         if (!is_null($message)) {
             file_put_contents($signname, str_replace(array("\r\n", "\n"), array("\n", "\r\n"), $message));
-            exec('LC_ALL="en_US" gpg --verify ' . $signname . '.asc ' . $signname . ' 2>&1', $gpg_check, $result);
+            exec($gpg . $signname . ' 2>&1', $gpg_check, $result);
             unlink($signname);
         } else {
-            exec('LC_ALL="en_US" gpg --verify ' . $signname . '.asc 2&>1', $gpg_check, $result);
+            exec($gpg . '2&>1', $gpg_check, $result);
         }
         unlink("$signname.asc");
         if (preg_match('/Signature made (.+) using (.+) key ID (.+)/', array_shift($gpg_check), $matches)) {
@@ -665,15 +670,21 @@ class BananaMimePart
         if (preg_match('/Good signature from "(.+)"/', $signature, $matches)) {
             $this->signature['verify'] = true;
             $this->signature['identity'] = array($matches[1]);
+            $this->signature['certified'] = true;
         } elseif (preg_match('/BAD signature from "(.+)"/', $signature, $matches)) {
             $this->signature['verify'] = false;
             $this->signature['identity'] = array($matches[1]);
+            $this->signature['certified'] = false;
         } else {
             return false;
         }
         foreach ($gpg_check as $aka) {
             if (preg_match('/aka "(.+)"/', $aka, $matches)) {
                 $this->signature['identity'][] = $matches[1];
+            }
+            if (preg_match('/This key is not certified with a trusted signature!/', $aka)) {
+                $this->signature['certified'] = false;
+                $this->signature['certification_error'] = _b_("identité non confirmée");
             }
         }
         return true;

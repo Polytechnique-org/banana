@@ -56,6 +56,10 @@ class Banana
     static public $msgshow_withthread = true;
     static public $msgshow_javascript = true;
 
+    static public $msgshow_pgpcheck   = true;
+    static public $msgshow_pgppath    = 'gpg';
+    static public $msgshow_pgpoptions = '';
+
     /** Match an url
      * Should be included in a regexp delimited using /, !, , or @ (eg: "/$url_regexp/ui")
      * If it matches, return 3 main parts :

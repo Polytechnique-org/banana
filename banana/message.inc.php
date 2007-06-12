@@ -310,6 +310,27 @@ final class BananaMessage extends BananaMimePart
     {
         return Banana::$protocole->canSend();
     }
+
+    public function getSignature()
+    {
+        $email = $this->getHeaderValue('from');
+        if (preg_match('/<?([^ <]+@[^ >]+)>?/', $email, $matches)) {
+            $email = $matches[1];
+        }
+        $signature = BananaMimePart::getSignature();
+        if (empty($signature)) {
+            return $signature;
+        } else {
+            foreach ($signature['identity'] as $ident) {
+                if (strpos($ident, "<$email>") !== false) {
+                    return $signature;
+                }
+            }
+            $signature['certified'] = false;
+            $signature['certification_error'] = 'mauvaise identité';
+        }
+        return $signature;
+    }
 }
 
 // vim:set et sw=4 sts=4 ts=4 enc=utf-8:
