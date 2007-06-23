@@ -405,8 +405,10 @@ class BananaSpool
             $format = _b_('hier')." %H:%M";
         } elseif ($today < 7 + $dday) {
             $format = '%a %H:%M';
-        } else {
+        } elseif ($today < 90 + $dday) {
             $format = '%a %e %b';
+        } else {
+            $format = '%a %e %b %Y';
         }
         return strftime($format, $stamp);
     }
