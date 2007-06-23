@@ -504,10 +504,9 @@ class Banana
                 if (!is_utf8($hdr_values[$header])) {
                     $hdr_values[$header] = utf8_encode($hdr_values[$header]);
                 }
-                if ($headers != 'Subject') {
-                    $hdr_values[$header] = str_replace(', ', ',', $hdr_values[$header]);
-                }
             }
+            $values = split('[,; ]', $hdr_values[$hdrs['dest']]);
+            $hdr_values[$hdrs['dest']] = preg_replace('/,+/', ',', implode(',', $values));
             if (!is_null($artid)) {
                 $old =& $this->loadMessage($group, $artid);
                 $hdr_values['References'] = $old->getHeaderValue('references') . ' ' . $old->getHeaderValue('message-id');
@@ -536,6 +535,7 @@ class Banana
                 } else {
                     Banana::$page->trig(_b_('Une erreur est survenue lors de l\'envoi du message :') . '<br />'
                                    . Banana::$protocole->lastError());
+                    $body = $_POST['body'];
                 }
             }
         } else {
@@ -556,8 +556,8 @@ class Banana
             if (Banana::$profile['signature']) {
                 $body .=  "\n\n-- \n" . Banana::$profile['signature'];
             }
-            Banana::$page->assign('body', $body);
         }
+        Banana::$page->assign('body', $body);
 
         Banana::$page->assign('maxfilesize', Banana::$msgedit_maxfilesize);
         Banana::$page->assign('can_attach', Banana::$msgedit_canattach);
