@@ -79,7 +79,11 @@ class BananaNNTPCore
 
     public function lastError()
     {
-        return $this->lasterrortext;
+        if (!is_utf8($this->lasterrortext)) {
+            return utf8_encode($this->lasterrortext);
+        } else {
+            return $this->lasterrortext;
+        }
     }
 
     public function backtrace()

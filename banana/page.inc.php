@@ -386,6 +386,7 @@ class BananaPage extends Smarty
     public function redirect(array $params = array())
     {
         header('Location: ' . $this->makeUrl($params));
+        exit;
     }
 }
 
