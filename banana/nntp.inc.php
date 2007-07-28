@@ -61,7 +61,11 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
             } else {
                 $list = $this->listGroups();
                 if ($mode == Banana::BOXES_SUB) {
-                    $sub = array_flip(Banana::$profile['subscribe']);
+                    if (is_array(Banana::$profile['subscribe'])) {
+                        $sub = array_flip(Banana::$profile['subscribe']);
+                    } else {
+                        $sub = array();
+                    }
                     $list = array_intersect_key($list, $sub);
                 }
             }
