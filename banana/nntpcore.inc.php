@@ -50,7 +50,7 @@ class BananaNNTPCore
         }
 
         $this->checkState();
-        $this->posting = ($this->lastresultcode == '200'); 
+        $this->posting = ($this->lastresultcode == '200');
         if ($reader && $this->posting) {
             $this->execLine('MODE READER');
             $this->posting = ($this->lastresultcode == '200');

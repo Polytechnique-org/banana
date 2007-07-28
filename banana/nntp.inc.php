@@ -30,10 +30,8 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
         if (!isset($url['port'])) {
             $url['port'] = 119;
         }
-        if (!isset($url['user'])) {
-            parent::__construct($url['host'], $url['port']);
-        } else {
-            parent::__construct($url['host'], $url['port'], 120, false);
+        parent::__construct($url['host'], $url['port']);
+        if (isset($url['user'])) {
             $this->authinfo($url['user'], $url['pass']);
         }      
     }
