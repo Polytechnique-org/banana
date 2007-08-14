@@ -94,7 +94,7 @@ class BananaSpool
             $spool =& Banana::$spool;
         } else {
             $spool =& BananaSpool::readFromFile($group);
-        }        
+        }
         if (is_null($spool)) {
             $spool = new BananaSpool($group);
         }
@@ -151,7 +151,7 @@ class BananaSpool
 
         if ($this->mode == Banana::SPOOL_ALL) {
             file_put_contents($file, serialize($this));
-        }    
+        }
     }
 
     private function build()
@@ -173,12 +173,12 @@ class BananaSpool
         }
         $clean  = $this->clean($first, $last, $msgnum);
         $update = $this->update($first, $last, $msgnum);
-        
+
         if ($clean || $update) {
             $this->saveToFile();
         }
     }
-    
+
     private function clean(&$first, &$last, $msgnum)
     {
         $do_save = false;
@@ -200,7 +200,7 @@ class BananaSpool
 
     private function update(&$first, &$last, $msgnum)
     {
-        if ($first > $last || !$msgnum) {       
+        if ($first > $last || !$msgnum) {
             return false;
         }
 
@@ -239,7 +239,7 @@ class BananaSpool
                         $p = $this->overview[$p]->parent;
                     } else {
                         $p = null;
-                    }    
+                    }
                 }
             }
         }
@@ -281,6 +281,10 @@ class BananaSpool
         $this->mode = $mode;
         switch ($mode) {
           case Banana::SPOOL_UNREAD:
+            $num = max(array_keys($this->overview));
+            if ($this->overview[$num]->isread) {
+                break;
+            }
             foreach ($this->roots as $k=>$i) {
                 if ($this->overview[$i]->descunread == 0) {
                     $this->killdesc($i);
@@ -387,7 +391,7 @@ class BananaSpool
             if ($msgid !== false) {
                 unset($this->roots[$msgid]);
             }
-            
+
             if ($write) {
                 $this->saveToFile();
             }
@@ -418,7 +422,7 @@ class BananaSpool
      * @param $_index INTEGER linear number of post in the tree
      * @param $_first INTEGER linear number of first post displayed
      * @param $_last INTEGER linear number of last post displayed
-     * @param $_ref STRING MSGNUM of current post 
+     * @param $_ref STRING MSGNUM of current post
      * @param $_pfx_node STRING prefix used for current node
      * @param $_pfx_end STRING prefix used for children of current node
      * @param $_head BOOLEAN true if first post in thread
@@ -429,7 +433,7 @@ class BananaSpool
     {
         static $spfx_f, $spfx_n, $spfx_Tnd, $spfx_Lnd, $spfx_snd, $spfx_T, $spfx_L, $spfx_s, $spfx_e, $spfx_I;
         if (!isset($spfx_f)) {
-            $spfx_f   = Banana::$page->makeImg(Array('img' => 'k1',       'alt' => 'o', 'height' => 21,  'width' => 9)); 
+            $spfx_f   = Banana::$page->makeImg(Array('img' => 'k1',       'alt' => 'o', 'height' => 21,  'width' => 9));
             $spfx_n   = Banana::$page->makeImg(Array('img' => 'k2',       'alt' => '*', 'height' => 21,  'width' => 9));
             $spfx_Tnd = Banana::$page->makeImg(Array('img' => 'T-direct', 'alt' => '+', 'height' => 21, 'width' => 12));
             $spfx_Lnd = Banana::$page->makeImg(Array('img' => 'L-direct', 'alt' => '`', 'height' => 21, 'width' => 12));
@@ -475,7 +479,7 @@ class BananaSpool
             if ($hc) {
                 return $res;
             }
-        } 
+        }
 
         $_index ++;
         $children = $overview->children;
@@ -546,7 +550,7 @@ class BananaSpool
             $id_parent = $this->overview[$id_cur]->parent;
             if (is_null($id_parent)) break;
             $pos       = array_search($id_cur, $this->overview[$id_parent]->children);
-        
+
             for ($i = 0; $i < $pos ; $i++) {
                 $ndx += $this->overview[$this->overview[$id_parent]->children[$i]]->desc;
             }
@@ -665,7 +669,7 @@ class BananaSpool
         if (count($this->overview[$id]->children) != 0) {
             return $this->overview[$id]->children[0];
         }
-        
+
         $cur    = $id;
         while (true) {
             $parent = $this->overview[$cur]->parent;
@@ -698,7 +702,7 @@ class BananaSpool
             $unread = $this->_nextUnread($child);
             if (!is_null($unread)) {
                 return $unread;
-            }    
+            }
         }
         return null;
     }
@@ -746,7 +750,7 @@ class BananaSpool
             $cur = $parent;
         } while(!is_null($cur));
         return null;
-    }    
+    }
 }
 
 // vim:set et sw=4 sts=4 ts=4 enc=utf-8:

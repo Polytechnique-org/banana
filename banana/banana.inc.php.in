@@ -47,7 +47,7 @@ class Banana
 ### Message display ###
     static public $msgshow_headers   = array('from', 'newsgroups', 'followup-to', 'to', 'cc', 'reply-to',
                                        'organization', 'date', 'references', 'in-reply-to');
-    static public $msgshow_mimeparts = array('multipart/report', 'multipart/mixed', 
+    static public $msgshow_mimeparts = array('multipart/report', 'multipart/mixed',
                                              'text/html', 'text/plain', 'text/enriched', 'text', 'message');
     static public $msgshow_xface     = true;
     static public $msgshow_wrap      = 80;
@@ -109,7 +109,7 @@ class Banana
 
 #######
 # Constants
-#######    
+#######
 
     // Actions
     const ACTION_BOX_NEEDED = 1; // mask
@@ -173,7 +173,7 @@ class Banana
         $classname = 'Banana' . $protocole;
         if (!class_exists($classname)) {
             Banana::load($protocole);
-        }    
+        }
         Banana::$protocole = new $classname(Banana::$group);
 
         // build the page
@@ -216,7 +216,7 @@ class Banana
             Banana::$action = Banana::ACTION_BOX_FEED;
             return;
         }
-    
+
         // Look for the action to execute
         if (is_null(Banana::$group)) {
             if ($action  == 'subscribe') {
@@ -226,7 +226,7 @@ class Banana
             }
             return;
         }
-        
+
         if (is_null(Banana::$artid)) {
             if ($action == 'new') {
                 Banana::$action = Banana::ACTION_MSG_NEW;
@@ -257,7 +257,7 @@ class Banana
     {
         // Configure locales
         setlocale(LC_ALL,  Banana::$profile['locale']);
-        
+
         // Check if the state is valid
         if (Banana::$protocole->lastErrNo()) {
             return Banana::$page->kill(_b_('Une erreur a été rencontrée lors de la connexion au serveur') . '<br />'
@@ -268,7 +268,7 @@ class Banana
         }
         if (Banana::$action & Banana::ACTION_BOX_NEEDED) {
             if(Banana::$boxpattern && !preg_match('/' . Banana::$boxpattern . '/i', Banana::$group)) {
-                Banana::$page->setPage('group');        
+                Banana::$page->setPage('group');
                 return Banana::$page->kill(_b_("Ce newsgroup n'existe pas ou vous n'avez pas l'autorisation d'y accéder"));
             }
         }
@@ -319,7 +319,7 @@ class Banana
         $headers[$hdrs['dest']]  = $dest;
         if ($reply) {
             $headers[$hdrs['reply']] = $reply;
-        } 
+        }
         $headers['Subject']      = $subject;
         $msg = BananaMessage::newMessage($headers, $body);
         if (Banana::$protocole->send($msg)) {
@@ -394,9 +394,9 @@ class Banana
     {
         Banana::load('feed');
         if (Banana::$group) {
-            if (Banana::$feed_updateOnDemand) { 
-                $this->loadSpool(Banana::$group); 
-            } 
+            if (Banana::$feed_updateOnDemand) {
+                $this->loadSpool(Banana::$group);
+            }
             $feed =& BananaFeed::getFeed();
             $feed->toXML();
         }
@@ -475,7 +475,7 @@ class Banana
         if (Banana::$spool_boxlist) {
             $groups    = Banana::$protocole->getBoxList(Banana::BOXES_SUB, Banana::$profile['lastnews'], true);
             Banana::$page->assign('groups', $groups);
-        }    
+        }
         Banana::$page->assign_by_ref('message', $msg);
         Banana::$page->assign('extimages', Banana::$msgshow_hasextimages);
         Banana::$page->assign('headers', Banana::$msgshow_headers);
@@ -668,7 +668,7 @@ class Banana
             print "\n";
         }
     }
- 
+
     /**************************************************************************/
     /* Private functions                                                      */
     /**************************************************************************/
