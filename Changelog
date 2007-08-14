@@ -1,3 +1,7 @@
+Wed, 15 Aug 2007					Florent Bruneau <florent.bruneau@m4x.org>
+
+	* Bugfix: don't show an empty forum when it contains no unread post
+
 Sat, 23 Jun 2007					Florent Bruneau <florent.bruneau@m4x.org>
 
 	* Add the year of the post in the spool for post older than 90 days
