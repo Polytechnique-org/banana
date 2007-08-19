@@ -7,7 +7,7 @@
 * Copyright: See COPYING files that comes with this distribution
 ********************************************************************************/
 
-if (!include_once('Smarty.class.php')) {
+if (@!include_once('Smarty.class.php')) {
     require_once 'smarty/libs/Smarty.class.php';
 }
 

@@ -52,7 +52,7 @@
   </tr>
   {/if}
   {assign var=signature value=$message->getSignature()}
-  {if $signature|@count}
+  {if $signature && $signature.key.id}
   <tr class="pair">
     <td class="hdr">{"Signature"|b}</td>
     <td colspan="2">
