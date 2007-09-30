@@ -1,3 +1,7 @@
+Sun, 30 Sep 2007				    Florent Bruneau <florent.bruneau@m4x.org>
+
+	* Can overlaod the xface generation
+
 Wed, 15 Aug 2007					Florent Bruneau <florent.bruneau@m4x.org>
 
 	* Bugfix: don't show an empty forum when it contains no unread post

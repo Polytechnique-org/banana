@@ -34,7 +34,7 @@
     {if $smarty.foreach.headers.first}
     <td class="xface" rowspan="{$headers|@count}">
       {if $message->hasXFace()}
-      <img src="{url group=$group artid=$artid part="xface"}" alt="[ X-Face ]" />
+      <img src="{url group=$group artid=$artid part="xface"}" style="width: 48px" alt="[ X-Face ]" />
       {/if}
     </td>
     {/if}
