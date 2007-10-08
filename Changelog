@@ -1,3 +1,6 @@
+================================================================================
+VERSION 1.7
+
 Sun, 30 Sep 2007				    Florent Bruneau <florent.bruneau@m4x.org>
 
 	* Can overlaod the xface generation
@@ -43,7 +46,7 @@ Sat, 4 May 2007                     Florent Bruneau <florent.bruneau@m4x.org>
 	* Bugfix: do not inline attachments in message text anymore
 	* Highly reduce the cost of the mbox-helper during spool updates
 
-================================================================================ 
+================================================================================
 VERSION 1.6
 
 Sat, 24 Mar 2007                        Pascal Corpet <pascal.corpet@m4x.org>
