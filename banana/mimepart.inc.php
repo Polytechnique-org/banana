@@ -433,7 +433,7 @@ class BananaMimePart
         $signed =& $this->getSignedPart(); 
         if ($signed !== $this) { 
             return $signed->getText(); 
-        } 
+        }
         $this->decodeContent();
         return $this->body;
     }
@@ -452,6 +452,15 @@ class BananaMimePart
                                                                     'artid' => Banana::$artid,
                                                                     'part'  => $part)))
                  . '" alt="' . banana_htmlentities($this->filename) . '" />';
+        } else if ($type == 'multipart' && $subtype == 'alternative') {
+            $types =& Banana::$msgshow_mimeparts;
+            foreach ($types as $type) {
+                @list($type, $subtype) = explode('/', $type);
+                $part = $this->getParts($type, $subtype);
+                if (count($part) > 0) {
+                    return $part[0]->toHtml();
+                }
+            }
         } elseif ((!in_array($type, Banana::$msgshow_mimeparts)
                   && !in_array($this->content_type, Banana::$msgshow_mimeparts))
                   || $this->disposition == 'attachment') {
