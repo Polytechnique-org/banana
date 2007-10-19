@@ -298,15 +298,15 @@ function banana_cleanStyles($tag, $attributes)
     } else {
         $style = '';
     }
-    $attributes = str_replace("\n", ' ', stripslashes($attributes));
-    $attributes = str_replace('= "', '="', $attributes);
+    $attributes = str_replace(array("\n", "\r"), ' ', stripslashes($attributes));
+    $attributes = str_replace(array('= "', '= \''), array('="', '=\''), $attributes);
     foreach ($conv as $att=>$stl) {
         $pattern = '/\b' . preg_quote($att, '/') . '=([\'"])?(.+?)(?(1)\1|(?:$| ))/i';
         if (preg_match($pattern, $attributes, $matches)) {
             $attributes = preg_replace($pattern, '', $attributes);
             $val = $matches[2];
             if ($att == 'cellspacing' && strpos($style, 'border-collapse') === false) {
-                $style .= "border-collapse: separate; border-spacing: $val $val; ";
+                $style = "border-collapse: separate; border-spacing: $val $val; " . $style;
             } elseif ($att == 'cellpadding' && $tag == 'table') {
                 $td_style[0] = "$stl: {$val}px; ";
             } elseif ($att == 'style') {
@@ -314,11 +314,11 @@ function banana_cleanStyles($tag, $attributes)
                 $style .= "$val; ";
             } elseif ($att == 'size') {
                 $val = $size_conv[$val];
-                $style .= "$stl: $val; ";
+                $style = "$stl: $val; " . $style;
             } elseif (is_numeric($val)) {
-                $style .= "$stl: {$val}px; ";
+                $style = "$stl: {$val}px; " . $style;
             } else {
-                $style .= "$stl: $val; ";
+                $style = "$stl: $val; " . $style;
             }
         }
     }
@@ -406,7 +406,7 @@ function banana_cleanHtml($source, $to_xhtml = false)
 
     // Use inlined style instead of old html attributes
     if ($to_xhtml) {
-        $source = preg_replace('/<(\/?\w+)(.*?)(\/?>)/uise', "'<\\1' . banana_cleanStyles('\\1', '\\2') . '\\3'", $source);
+        $source = preg_replace('/<(\/?\w+)(.*?)(\/?>)/muise', "'<\\1' . banana_cleanStyles('\\1', '\\2') . '\\3'", $source);
     }    
     return preg_replace('/<(.*?)>/ie', "'<'.banana_removeEvilAttributes('\\1').'>'", $source);
 }
