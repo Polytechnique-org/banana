@@ -18,8 +18,8 @@
 
 /** Macros
  */
-#define LTRIM(pos)              while (isspace(*pos)) { pos++; }
-#define STRTOLOWER(str, ptr)    for (ptr = str ; *ptr ; ptr++) { *ptr = tolower(*ptr); }
+#define LTRIM(pos)              while (isspace(*pos)) { ++pos; }
+#define STRTOLOWER(str, ptr)    for (ptr = str ; *ptr ; ++ptr) { *ptr = tolower(*ptr); }
 
 /** MBox pointer
  */
@@ -45,7 +45,7 @@ static MBox *openMBox(char *filename)
     FILE *fp;
     MBox *mbox;
 
-    fp = fopen(filename, "r"); 
+    fp = fopen(filename, "r");
     if (!fp) {
         return NULL;
     }
@@ -88,7 +88,7 @@ static char *readLine(MBox *mbox)
     mbox->lastLine    = mbox->currentLine;
     mbox->currentLine = ftell(mbox->fp);
     mbox->isFrom_ = false;
-    
+
     if (!mbox->line) {
         mbox->line = (char*)malloc(1001);
     }
@@ -161,7 +161,7 @@ static void readHeaders(MBox *mbox, char **headers, int hdrsize)
     char *current = NULL;
     char *pos, *ptr;
     int size, i;
-    
+
     if (!readFrom_(mbox)) {
         return;
     }
@@ -185,11 +185,11 @@ static void readHeaders(MBox *mbox, char **headers, int hdrsize)
                 continue;
             }
             size = pos - mbox->line;
-            for (i = 0 ; i < hdrsize ; i++) {
+            for (i = 0 ; i < hdrsize ; ++i) {
                 if ((int)strlen(headers[i]) == size && strcasestr(mbox->line, headers[i]) == mbox->line) {
                     current = (char*)malloc(size + 1);
                     strcpy(current, headers[i]);
-                    current[size] = '\0'; 
+                    current[size] = '\0';
                 }
             }
             if (!current && !hdrsize) {
@@ -267,7 +267,7 @@ static bool goToOffset(MBox *mbox, int offset, int idx)
 static bool goToMessage(MBox *mbox, int idx)
 {
     if (mbox->messageId > idx) {
-        rewindMBox(mbox); 
+        rewindMBox(mbox);
     } else if(mbox->messageId == idx) {
         rewindMessage(mbox);
         return true;
@@ -387,7 +387,7 @@ int main(int argc, char *argv[])
     }
 
     setlocale(LC_ALL, "C");
-  
+
     headerNb = argc - optind;
     headers  = (argv + optind);
     for (i = 0 ; i < headerNb ; i++) {
@@ -403,7 +403,7 @@ int main(int argc, char *argv[])
         if (!goToOffset(mbox, pos, pmid)) {
             fprintf(stderr, "Offset %d do not match with a message beginning\n", pos);
             rewindMBox(mbox);
-        }   
+        }
     }
 
     // Do requested stuff
