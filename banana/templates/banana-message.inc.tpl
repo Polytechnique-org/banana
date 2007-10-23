@@ -1,3 +1,7 @@
+<pre>
+{$spool->buildTree($artid)|smarty:nodefaults}
+</pre>
+
 <table class="bicol message">
   <tr>
     <th colspan="3" class="subject">

@@ -9,7 +9,7 @@
 
 require_once dirname(__FILE__) . '/banana.inc.php';
 
-define('BANANA_SPOOL_VERSION', '0.5');
+define('BANANA_SPOOL_VERSION', '0.6');
 
 /** Class spoolhead
  *  class used in thread overviews
@@ -22,6 +22,7 @@ class BananaSpoolHead
     public $subject;
     /** author */
     public $from;
+    public $color;
     /** reference of parent */
     public $parent = null;
     /** paren is direct */
@@ -51,6 +52,7 @@ class BananaSpoolHead
         $this->date       = $message['date'];
         $this->subject    = $message['subject'];
         $this->from       = $message['from'];
+        $this->color      = sprintf('#%06x', abs(crc32($this->from) % 0xffffff));
         $this->desc       = 1;
         $this->isread     = true;
         $this->descunread = 0;
@@ -536,6 +538,54 @@ class BananaSpool
             }
         }
         return $res;
+    }
+
+
+    public function _buildTree($id, BananaSpoolHead &$head, $current) {
+        $style = 'color:' . $head->color . '; text-decoration: none';
+        $prof  = 1;
+        if ($id == $current) {
+            $text = "<strong style=\"$style\">0</strong>";
+        } else {
+            $text = Banana::$page->makeLink(Array('group' => $this->group, 'artid' => $id,
+                                                  'text'  => 'o', 'popup' => $head->from,
+                                                  'style' => $style));
+        }
+        $array = array($text);
+        foreach ($head->children as $key=>&$child) {
+            list($tpr, $tree) = $this->_buildTree($child, $this->overview[$child], $current);
+            $last = $key == count($head->children) - 1;
+            foreach ($tree as $kt=>&$line) {
+                if ($kt == 0 && $key == 0) {
+                    $array[0] .= '--' . $line;
+                } else if ($kt == 0 && $last) {
+                    $array[] = ' !-' . $line;
+                } else if ($kt == 0) {
+                    $array[] = ' |-' . $line;
+                } else if ($last) {
+                    $array[] = '   ' . $line;
+                } else {
+                    $array[] = ' | ' . $line;
+                }
+            }
+            if ($tpr > $prof) {
+                $prof = $tpr + 1;
+            }
+        }
+        return array($prof, $array);
+    }
+
+    /** build the spool tree associated with the given message
+     */
+    public function buildTree($id) {
+        $pos      =  $id;
+        $overview =& $this->overview[$id];
+        while (!is_null($overview->parent)) {
+            $pos = $overview->parent;
+            $overview =& $this->overview[$pos];
+        }
+        list($prof, $tree) = $this->_buildTree($pos, $overview, $id);
+        return implode("\n", $tree);
     }
 
     /** computes linear post index

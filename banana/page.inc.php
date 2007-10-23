@@ -265,7 +265,7 @@ class BananaPage extends Smarty
      */
     public function makeLink(array $params, &$smarty = null)
     {
-        $catch = array('text', 'popup', 'class', 'accesskey');
+        $catch = array('text', 'popup', 'class', 'accesskey', 'style');
         foreach ($catch as $key) {
             ${$key} = isset($params[$key]) ? $params[$key] : null;
             unset($params[$key]);
@@ -283,11 +283,14 @@ class BananaPage extends Smarty
         if (!is_null($class)) {
             $class = ' class="' . $class . '"';
         }
+        if (!is_null($style)) {
+            $style = ' style="' . $style . '"';
+        }
         if (!is_null($accesskey)) {
             $accesskey = ' accesskey="' . $accesskey . '"';
         }
         return '<a href="' . banana_entities($link) . '"'
-              . $popup . $class . $accesskey
+              . $popup . $class . $style . $accesskey
               . '>' . $text . '</a>';
     }
 
