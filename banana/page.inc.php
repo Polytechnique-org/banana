@@ -182,6 +182,7 @@ class BananaPage extends Smarty
         $this->assign('withtabs'   , Banana::$withtabs);
         $this->assign('feed_format', Banana::$feed_format);
         $this->assign('feed_active', Banana::$feed_active);
+        $this->assign('with_javascript', Banana::$msgshow_javascript);
 
         $this->register_function('url',     array($this, 'makeUrl'));
         $this->register_function('link',    array($this, 'makeLink'));
