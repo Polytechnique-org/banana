@@ -9,7 +9,7 @@
 
 require_once dirname(__FILE__) . '/banana.inc.php';
 
-define('BANANA_SPOOL_VERSION', '0.5.7');
+define('BANANA_SPOOL_VERSION', '0.5.9');
 
 /** Class spoolhead
  *  class used in thread overviews
@@ -268,7 +268,7 @@ class BananaSpool
             }
         }
         foreach ($updateTrees as $root=>$t) {
-            $this->trees[$root] = $this->buildTree($root, true);
+            $this->trees[$root] =& $this->buildTree($root);
         }
         Banana::$protocole->updateSpool($messages);
         return true;
@@ -486,129 +486,8 @@ class BananaSpool
         return Banana::$first ? Banana::$spool_tmax : Banana::$spool_tcontext;
     }
 
-    /** displays children tree of a post
-     * @param $_id INTEGER MSGNUM of post
-     * @param $_index INTEGER linear number of post in the tree
-     * @param $_first INTEGER linear number of first post displayed
-     * @param $_last INTEGER linear number of last post displayed
-     * @param $_ref STRING MSGNUM of current post
-     * @param $_pfx_node STRING prefix used for current node
-     * @param $_pfx_end STRING prefix used for children of current node
-     * @param $_head BOOLEAN true if first post in thread
-     *
-     * If you want to analyse subject, you can define the function hook_formatDisplayHeader
-     */
-    private function _to_html($_id, $_index, $_first=0, $_last=0, $_ref="", $_pfx_node="", $_pfx_end="", $_head=true, $_pfx_id="")
-    {
-        static $spfx_f, $spfx_n, $spfx_Tnd, $spfx_Lnd, $spfx_snd, $spfx_T, $spfx_L, $spfx_s, $spfx_e, $spfx_I;
-        if (!isset($spfx_f)) {
-            $spfx_f   = Banana::$page->makeImg(Array('img' => 'k1',       'alt' => 'o', 'height' => 21,  'width' => 9));
-            $spfx_n   = Banana::$page->makeImg(Array('img' => 'k2',       'alt' => '*', 'height' => 21,  'width' => 9));
-            $spfx_Tnd = Banana::$page->makeImg(Array('img' => 'T-direct', 'alt' => '+', 'height' => 21, 'width' => 12));
-            $spfx_Lnd = Banana::$page->makeImg(Array('img' => 'L-direct', 'alt' => '`', 'height' => 21, 'width' => 12));
-            $spfx_snd = Banana::$page->makeImg(Array('img' => 's-direct', 'alt' => '-', 'height' => 21, 'width' => 5));
-            $spfx_T   = Banana::$page->makeImg(Array('img' => 'T',        'alt' => '+', 'height' => 21, 'width' => 12));
-            $spfx_L   = Banana::$page->makeImg(Array('img' => 'L',        'alt' => '`', 'height' => 21, 'width' => 12));
-            $spfx_s   = Banana::$page->makeImg(Array('img' => 's',        'alt' => '-', 'height' => 21, 'width' => 5));
-            $spfx_e   = Banana::$page->makeImg(Array('img' => 'e',   'alt' => '&nbsp;', 'height' => 21, 'width' => 12));
-            $spfx_I   = Banana::$page->makeImg(Array('img' => 'I',        'alt' => '|', 'height' => 21, 'width' => 12));
-        }
 
-        $overview =& $this->overview[$_id];
-        if ($_index + $overview->desc < $_first || $_index > $_last) {
-            return '';
-        }
-
-        $res = '';
-        if ($_index >= $_first) {
-            $hc = empty($overview->children);
-
-            $res .= '<tr id="'.$_pfx_id.$_id.'" class="' . ($_index%2 ? 'pair' : 'impair') . ($overview->isread ? '' : ' new') . "\">\n";
-            $res .= '<td class="date">' . $this->formatDate($overview->date) . " </td>\n";
-            $res .= '<td class="subj' . ($_index == $_ref ? ' cur' : '') . '"><div class="tree">'
-                . $_pfx_node .($hc ? ($_head ? $spfx_f : ($overview->parent_direct ? $spfx_s : $spfx_snd)) : $spfx_n)
-                . '</div>';
-            $popup = $subject = $overview->subject;
-            if (function_exists('hook_formatDisplayHeader')) {
-                list($subject, $link) = hook_formatDisplayHeader('subject', $subject, true);
-            } else {
-                $subject = banana_catchFormats(banana_entities(stripslashes($subject)));
-                $link = null;
-            }
-            if (empty($subject)) {
-                $subject = _b_('(pas de sujet)');
-            }
-            if ($_index != $_ref) {
-                $subject = Banana::$page->makeLink(Array('group' => $this->group, 'artid' => $_id,
-                                                    'text'  => $subject, 'popup' => $popup));
-            }
-            $res .= '&nbsp;' . $subject . $link;
-            $res .= "</td>\n<td class='from'>" . BananaMessage::formatFrom($overview->from) . "</td>\n</tr>";
-
-            if ($hc) {
-                return $res;
-            }
-        }
-
-        $_index ++;
-        $children = $overview->children;
-        while ($child = array_shift($children)) {
-            $overview =& $this->overview[$child];
-            if ($_index > $_last) {
-                return $res;
-            }
-            if ($_index + $overview->desc >= $_first) {
-                if (sizeof($children)) {
-                    $res .= $this->_to_html($child, $_index, $_first, $_last, $_ref,
-                            $_pfx_end . ($overview->parent_direct ? $spfx_T : $spfx_Tnd),
-                            $_pfx_end . $spfx_I, false,$_id.'_');
-                } else {
-                    $res .= $this->_to_html($child, $_index, $_first, $_last, $_ref,
-                            $_pfx_end . ($overview->parent_direct ? $spfx_L : $spfx_Lnd),
-                            $_pfx_end . $spfx_e, false,$_id.'_');
-                }
-            }
-            $_index += $overview->desc;
-        }
-
-        return $res;
-    }
-
-    /** Displays overview
-     * @param $_first INTEGER MSGNUM of first post
-     * @param $_last INTEGER MSGNUM of last post
-     * @param $_ref STRING MSGNUM of current/selectionned post
-     */
-    public function toHtml($first = 0, $overview = false)
-    {
-        $res = Banana::$page->makeJs('jquery');
-        $res .= Banana::$page->makeJs('spool_toggle');
-
-        if (!$overview) {
-            $_first = $first;
-            $_last  = $first + Banana::$spool_tmax - 1;
-            $_ref   = null;
-        } else {
-            $_ref   = $this->getNdx($first);
-            $_last  = $_ref + Banana::$spool_tafter;
-            $_first = $_ref - Banana::$spool_tbefore;
-            if ($_first < 0) {
-                $_last -= $_first;
-            }
-        }
-        $index = 1;
-        foreach ($this->roots as $id) {
-            $res   .= $this->_to_html($id, $index, $_first, $_last, $_ref);
-            $index += $this->overview[$id]->desc ;
-            if ($index > $_last) {
-                break;
-            }
-        }
-        return $res;
-    }
-
-
-    public function _buildTree($id, BananaSpoolHead &$head, $current) {
+    private function &_buildTree($id, BananaSpoolHead &$head) {
         static $t_e, $u_h, $u_ht, $u_vt, $u_l, $u_f, $r_h, $r_ht, $r_vt, $r_l, $r_f;
         if (!isset($spfx_f)) {
             $t_e   = Banana::$page->makeImg(Array('img' => 'e',  'alt' => '&nbsp;', 'height' => 18,  'width' => 14));
@@ -624,27 +503,25 @@ class BananaSpool
             $r_f   = Banana::$page->makeImg(Array('img' => 'f2r', 'alt' => 't', 'height' => 18, 'width' => 14));
         }
         $style = 'background-color:' . $head->color . '; text-decoration: none';
-        $prof  = 1;
-        $text = '<span style="' . $style . '" title="' . banana_entities($head->name . ', ' . $this->formatDate($head->date)) . '">' .
-                '<input type="radio" name="banana_tree" '. ($id == $current ? 'checked="checked" ' : ' ' ) .
-                (Banana::$msgshow_javascript ? 'onchange="window.location=\'' .
+        $text = '<span style="' . $style . '" title="' . banana_entities($head->name . ', ' . $this->formatDate($head->date))
+              . '"><input type="radio" name="banana_tree" '
+              . (Banana::$msgshow_javascript ? 'onchange="window.location=\'' .
                     banana_entities(Banana::$page->makeURL(array('group' => $this->group, 'artid' => $id))) . '\'"'
                     : ' disabled="disabled"')
-                .' />' .
-                '</span>';
+              . ' /></span>';
         $array = array($text);
         foreach ($head->children as $key=>&$child) {
             $msg =& $this->overview[$child];
-            list($tpr, $tree) = $this->_buildTree($child, $msg, $current);
+            $tree =& $this->_buildTree($child, $msg);
             $last = $key == count($head->children) - 1;
             foreach ($tree as $kt=>&$line) {
-                if ($kt == 0 && $key == 0 && !$last) {
+                if ($kt === 0 && $key === 0 && !$last) {
                     $array[0] .= ($msg->isread ? $r_ht : $u_ht) . $line;
-                } else if($kt == 0 && $key == 0) {
+                } else if($kt === 0 && $key === 0) {
                     $array[0] .= ($msg->isread ? $r_h : $u_h)  . $line;
-                } else if ($kt == 0 && $last) {
+                } else if ($kt === 0 && $last) {
                     $array[] = $t_e . ($msg->isread ? $r_vt : $u_vt) . $line;
-                } else if ($kt == 0) {
+                } else if ($kt === 0) {
                     $array[] = $t_e . ($msg->isread ? $r_f : $u_f) . $line;
                 } else if ($last) {
                     $array[] = $t_e . $t_e . $line;
@@ -653,27 +530,22 @@ class BananaSpool
                 }
             }
             unset($tree);
-            if ($tpr > $prof) {
-                $prof = $tpr + 1;
-            }
         }
-        return array($prof, $array);
+        return $array;
     }
 
     /** build the spool tree associated with the given message
      */
-    public function buildTree($id, $force = false) {
-        $pos      =  $id;
-        $overview =& $this->overview[$id];
-        while (!is_null($overview->parent)) {
-            $pos = $overview->parent;
-            $overview =& $this->overview[$pos];
-        }
-        if (!$force && isset($this->trees[$pos])) {
-            return $this->trees[$pos];
+    public function &buildTree($id, $force = false) {
+        $id = $this->root($id);
+        if (!$force && isset($this->trees[$id])) {
+            return $this->trees[$id];
         } else {
-            list(, $tree) = $this->_buildTree($pos, $overview, $force ? -1 : $id);
-            return '<div style="height:18px">' . implode("</div>\n<div style=\"height:18px\">", $tree) . '</div>';
+            $tree =& $this->_buildTree($id, $this->overview[$id]);
+            $tree = '<div class="tree"><div style="height:18px">'
+                  . implode("</div>\n<div style=\"height:18px\">", $tree)
+                  . '</div></div>';
+            return $tree;
         }
     }
 
@@ -688,7 +560,7 @@ class BananaSpool
         while (true) {
             $id_parent = $this->overview[$id_cur]->parent;
             if (is_null($id_parent)) break;
-            $pos       = array_search($id_cur, $this->overview[$id_parent]->children);
+            $pos = array_search($id_cur, $this->overview[$id_parent]->children);
 
             for ($i = 0; $i < $pos ; $i++) {
                 $ndx += $this->overview[$this->overview[$id_parent]->children[$i]]->desc;
@@ -712,13 +584,12 @@ class BananaSpool
      */
     public function root($id)
     {
-        $id_cur = $id;
         while (true) {
-            $id_parent = $this->overview[$id_cur]->parent;
+            $id_parent = $this->overview[$id]->parent;
             if (is_null($id_parent)) break;
-            $id_cur = $id_parent;
+            $id = $id_parent;
         }
-        return $id_cur;
+        return $id;
     }
 
     /** Return the last post id with the given subject

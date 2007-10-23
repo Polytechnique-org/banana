@@ -29,7 +29,6 @@
 
 .banana table.thread .date { width: 15%; text-align: center; }
 .banana table.thread .subj { text-align: left; overflow: hidden; }
-.banana table.thread .tree { float: left; height: 20px; margin: 0; padding: 0; }
 .banana table.thread .from { text-align: left; }
 
 .banana table.thread .cur { font-style: italic; }
@@ -88,6 +87,10 @@
     padding: 0;
     width: 14px;
     height: 18px;
+}
+
+.banana .thread_tree .tree {
+    margin-left: 2em;
 }
 
 
