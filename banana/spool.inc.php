@@ -9,7 +9,7 @@
 
 require_once dirname(__FILE__) . '/banana.inc.php';
 
-define('BANANA_SPOOL_VERSION', '0.5.1');
+define('BANANA_SPOOL_VERSION', '0.5.7');
 
 /** Class spoolhead
  *  class used in thread overviews
@@ -22,6 +22,7 @@ class BananaSpoolHead
     public $subject;
     /** author */
     public $from;
+    public $name;
     public $color;
     /** reference of parent */
     public $parent = null;
@@ -56,6 +57,20 @@ class BananaSpoolHead
         $this->desc       = 1;
         $this->isread     = true;
         $this->descunread = 0;
+        if (preg_match("/^([^ ]+@[^ ]+) \((.*)\)$/", $this->from, $regs)) {
+            $this->name = $regs[2];
+        }
+        if (preg_match("/^\"?([^<>\"]+)\"? +<(.+@.+)>$/", $this->from, $regs)) {
+            $this->name = preg_replace("/^'(.*)'$/", '\1', $regs[1]);
+            $this->name = stripslashes($this->name);
+        }
+        if ($this->name) {
+            $this->name =  preg_replace("/\\\(\(|\))/","\\1", $this->name);
+        } else if (preg_match("/([^< ]+)@([^> ]+)/", $this->from, $regs)) {
+            $this->name = $regs[1];
+        } else {
+            $this->name = 'Anonymous';
+        }
     }
 }
 
@@ -73,6 +88,9 @@ class BananaSpool
     public $ids;
     /** thread starts */
     public $roots;
+    /** thread trees (one tree per root node) */
+    public $trees = array();
+
     /** protocole specific data */
     public $storage = array();
 
@@ -219,6 +237,7 @@ class BananaSpool
         if (!is_array($this->overview)) {
             $this->overview = array();
         }
+        $updateTrees = array();
         foreach ($messages as $id=>&$message) {
             if (!isset($this->overview[$id])) {
                 $this->overview[$id] = new BananaSpoolHead($message);
@@ -234,16 +253,22 @@ class BananaSpool
                     $this->overview[$p] = new BananaSpoolHead($messages[$p]);
                 }
                 $this->overview[$p]->children[] = $id;
-
                 while (!is_null($p)) {
                     $this->overview[$p]->desc += $msg->desc;
+                    $prev = $p;
                     if ($p != $this->overview[$p]->parent) {
                         $p = $this->overview[$p]->parent;
                     } else {
                         $p = null;
                     }
+                    if (is_null($p)) {
+                        $updateTrees[$prev] = true;
+                    }
                 }
             }
+        }
+        foreach ($updateTrees as $root=>$t) {
+            $this->trees[$root] = $this->buildTree($root, true);
         }
         Banana::$protocole->updateSpool($messages);
         return true;
@@ -385,6 +410,7 @@ class BananaSpool
             }
             unset($overview);
             unset($this->overview[$_id]);
+            unset($this->trees[$_id]);
             $msgid = array_search($_id, $this->ids);
             if ($msgid !== false) {
                 unset($this->ids[$msgid]);
@@ -400,7 +426,7 @@ class BananaSpool
         }
     }
 
-    private function formatDate($stamp)
+    public function formatDate($stamp)
     {
         $today  = intval(time() / (24*3600));
         $dday   = intval($stamp / (24*3600));
@@ -417,6 +443,47 @@ class BananaSpool
             $format = '%a %e %b %Y';
         }
         return strftime($format, $stamp);
+    }
+
+    public function formatSubject($id, $subject)
+    {
+        $subject = banana_html_entity_decode($subject);
+        $popup = $subject;
+        if (function_exists('hook_formatDisplayHeader')) {
+            list($subject, $link) = hook_formatDisplayHeader('subject', $subject, true);
+        } else {
+            $subject = banana_catchFormats(banana_entities(stripslashes($subject)));
+            $link = null;
+        }
+        if (empty($subject)) {
+            $subject = _b_('(pas de sujet)');
+        }
+        if ($id != Banana::$artid) {
+            $subject = Banana::$page->makeLink(Array('group' => $this->group, 'artid' => $id,
+                                                     'text'  => $subject, 'popup' => $popup));
+        }
+        return $subject . $link;
+    }
+
+    public function formatFrom($from)
+    {
+        $from = banana_html_entity_decode($from);
+        return BananaMessage::formatFrom($from);
+    }
+
+    public function start()
+    {
+        if (Banana::$first) {
+            return Banana::$first;
+        } else {
+            $first = array_search(Banana::$artid, $this->roots);
+            return max(0, $first - Banana::$spool_tbefore);
+        }
+    }
+
+    public function context()
+    {
+        return Banana::$first ? Banana::$spool_tmax : Banana::$spool_tcontext;
     }
 
     /** displays children tree of a post
@@ -558,10 +625,11 @@ class BananaSpool
         }
         $style = 'background-color:' . $head->color . '; text-decoration: none';
         $prof  = 1;
-        $text = '<span style="' . $style . '" title="' . banana_entities($head->from) . '">' .
+        $text = '<span style="' . $style . '" title="' . banana_entities($head->name . ', ' . $this->formatDate($head->date)) . '">' .
                 '<input type="radio" name="banana_tree" '. ($id == $current ? 'checked="checked" ' : ' ' ) .
                 (Banana::$msgshow_javascript ? 'onchange="window.location=\'' .
-                    Banana::$page->makeURL(array('group' => $this->group, 'artid' => $id)) . '\'"' : ' disabled="disabled"')
+                    banana_entities(Banana::$page->makeURL(array('group' => $this->group, 'artid' => $id))) . '\'"'
+                    : ' disabled="disabled"')
                 .' />' .
                 '</span>';
         $array = array($text);
@@ -584,6 +652,7 @@ class BananaSpool
                     $array[] = $t_e . ($msg->isread ? $r_l : $u_l) . $line;
                 }
             }
+            unset($tree);
             if ($tpr > $prof) {
                 $prof = $tpr + 1;
             }
@@ -593,15 +662,19 @@ class BananaSpool
 
     /** build the spool tree associated with the given message
      */
-    public function buildTree($id) {
+    public function buildTree($id, $force = false) {
         $pos      =  $id;
         $overview =& $this->overview[$id];
         while (!is_null($overview->parent)) {
             $pos = $overview->parent;
             $overview =& $this->overview[$pos];
         }
-        list($prof, $tree) = $this->_buildTree($pos, $overview, $id);
-        return implode("\n", $tree);
+        if (!$force && isset($this->trees[$pos])) {
+            return $this->trees[$pos];
+        } else {
+            list(, $tree) = $this->_buildTree($pos, $overview, $force ? -1 : $id);
+            return '<div style="height:18px">' . implode("</div>\n<div style=\"height:18px\">", $tree) . '</div>';
+        }
     }
 
     /** computes linear post index

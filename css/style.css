@@ -72,8 +72,8 @@
     background-color: #fff;
 }
 
-.banana pre.thread_tree {
-  overflow: scroll;
+.banana td.thread_tree, .banana div.thread_tree {
+  overflow: auto;
 }
 
 .banana .thread_tree input {

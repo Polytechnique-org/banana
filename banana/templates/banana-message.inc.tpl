@@ -1,22 +1,18 @@
-<pre class="thread_tree">
-{$spool->buildTree($artid)|smarty:nodefaults}
-</pre>
-
 <table class="bicol message">
   <tr>
     <th colspan="3" class="subject">
       {if !$noactions}
       <div class="menu">
-        {if $spool->nextUnread($artid)}
-        {imglink group=$group artid=$spool->nextUnread($artid) img=next_unread alt="Message non-lu suivant"|b accesskey=u}{/if}
-        {if $spool->prevPost($artid)}
-        {imglink group=$group artid=$spool->prevPost($artid) img=prev alt="Message précédent"|b accesskey=a}{/if}
-        {if $spool->nextPost($artid)}
-        {imglink group=$group artid=$spool->nextPost($artid) img=next alt="Message suivant"|b accesskey=z}{/if}
-        {if $spool->prevThread($artid)}
-        {imglink group=$group artid=$spool->prevThread($artid) img=prev_thread alt="Discussion précédente"|b accesskey=q}{/if}
-        {if $spool->nextThread($artid)}
-        {imglink group=$group artid=$spool->nextThread($artid) img=next_thread alt="Discussion suivante"|b accesskey=s}{/if}
+        {assign var=nextUnread value=$spool->nextUnread($artid)}
+        {assign var=prevPost value=$spool->prevPost($artid)}
+        {assign var=nextPost value=$spool->nextPost($artid)}
+        {assign var=prevThread value=$spool->prevThread($artid)}
+        {assign var=nextThread value=$spool->nextThread($artid)}
+        {if $nextUnread}{imglink group=$group artid=$nextUnread img=next_unread alt="Message non-lu suivant"|b accesskey=u}{/if}
+        {if $prevPost}{imglink group=$group artid=$prevPost img=prev alt="Message précédent"|b accesskey=a}{/if}
+        {if $nextPost}{imglink group=$group artid=$nextPost img=next alt="Message suivant"|b accesskey=z}{/if}
+        {if $prevThread}{imglink group=$group artid=$prevThread img=prev_thread alt="Discussion précédente"|b accesskey=q}{/if}
+        {if $nextThread}{imglink group=$group artid=$nextThread img=next_thread alt="Discussion suivante"|b accesskey=s}{/if}
       </div>
       <div class="action">
         {if $message->canSend()}
@@ -102,6 +98,16 @@
       {$body|banana_utf8entities|smarty:nodefaults}
     </td>
   </tr>
+  {if $spool && ($nextPost || $prevPost)}
+  <tr class="pair">
+    <th colspan="3">
+      <strong>{"Naviguer dans la discussion..."|b}</strong>
+    </th>
+  </tr>
+  <tr class="pair">
+    <td colspan="3" class="thread_tree">{$spool->buildTree($artid)|smarty:nodefaults}</td>
+  </tr>
+  {/if}
 </table>
 
 {* vim:set et sw=2 sts=2 ts=2 enc=utf-8: *}

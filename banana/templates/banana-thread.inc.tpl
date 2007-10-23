@@ -1,8 +1,8 @@
 {capture name=pages}
 {if $withtitle}
 <div class="pages">
-{if $spool->overview|@count gt $msgbypage}
-{section name=pages loop=$spool->overview step=$msgbypage}
+{if $spool->roots|@count gt $msgbypage}
+{section name=pages loop=$spool->roots step=$msgbypage}
   {if $first ge $smarty.section.pages.index && $first lt $smarty.section.pages.index_next}
     <strong>{$smarty.section.pages.iteration}</strong>
   {else}
@@ -19,9 +19,10 @@
   <tr>
     {if $withtitle}
     <th>
-      {if $spool->nextUnread()}
+      {assign var=nextUnread value=$spool->nextUnread()}
+      {if $nextUnread}
       <div class="menu">
-        {imglink group=$group artid=$spool->nextUnread() img=next_unread alt="Message non-lu suivant"|b accesskey=u}
+        {imglink group=$group artid=$nextUnread img=next_unread alt="Message non-lu suivant"|b accesskey=u}
       </div>
       {/if}
       {"Date"|b}
@@ -37,13 +38,25 @@
       {"Auteur"|b}
     </th>
     {else}
-    <th colspan="3">
-      {"Aperçu de "|b}{link group=$group text=$group}
-    </th>
+    <th colspan="3">{"En discussion sur "|b}{link group=$group text=$group}...</th>
     {/if}
   </tr>
-  {if $spool->overview|@count}
-  {if $artid}{$spool->toHtml($artid, true)|smarty:nodefaults}{else}{$spool->toHtml($first)|smarty:nodefaults}{/if}
+  {if $spool->roots|@count}
+  {section name=threads loop=$spool->roots step=1 start=$spool->start() max=$spool->context()}
+  {assign var=id value=$spool->roots[$smarty.section.threads.index]}
+  {assign var=overview value=$spool->overview[$id]}
+  {cycle assign=class values="impair,pair"}
+  <tr class="{$class} {if $overview->descunread}new{/if}">
+    <td class="date">{$spool->formatDate($overview->date)}</td>
+    <td class="subj">{$spool->formatSubject($id, $overview->subject)|smarty:nodefaults}</td>
+    <td class="from">{$spool->formatFrom($overview->from)|smarty:nodefaults}</td>
+  </tr>
+  {if !$artid && $spool->nextPost($id)}
+  <tr class="{$class}">
+    <td colspan="3" class="thread_tree">{$spool->buildTree($id)|smarty:nodefaults}</td>
+  </tr>
+  {/if}
+  {/section}
   {else}
   <tr>
     <td colspan="3">

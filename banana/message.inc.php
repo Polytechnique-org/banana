@@ -119,7 +119,7 @@ final class BananaMessage extends BananaMimePart
     public function getSender()
     {
         $from = $this->headers['from'];
-        $name = trim(preg_replace('/<[^ ]*>/', '', $from));
+        $name = trim(strip_tags($from));
         if (empty($name)) {
             return $from;
         }
@@ -165,7 +165,7 @@ final class BananaMessage extends BananaMimePart
         }
         if (preg_match("/^([^ ]+@[^ ]+) \((.*)\)$/", $text, $regs)) {
             $result = $mailto . $regs[1] . $subject . '">' . banana_htmlentities($regs[2]) . '</a>';
-        }   
+        }
         if (preg_match("/^\"?([^<>\"]+)\"? +<(.+@.+)>$/", $text, $regs)) {
             $nom = preg_replace("/^'(.*)'$/", '\1', $regs[1]);
             $nom = stripslashes($nom);
@@ -180,7 +180,7 @@ final class BananaMessage extends BananaMimePart
         $name = null;
         if (preg_match("/^([^ ]+@[^ ]+) \((.*)\)$/", $text, $regs)) {
             $name = $regs[2];
-        }   
+        }
         if (preg_match("/^\"?([^<>\"]+)\"? +<(.+@.+)>$/", $text, $regs)) {
             $name = preg_replace("/^'(.*)'$/", '\1', $regs[1]);
             $name = stripslashes($name);

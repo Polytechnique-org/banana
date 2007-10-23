@@ -33,8 +33,8 @@ class Banana
     static public $spool_root    = '/var/spool/banana';
     static public $spool_max     = 3000;
     static public $spool_tbefore = 5;
-    static public $spool_tafter  = 5;
-    static public $spool_tmax    = 50;
+    static public $spool_tcontext= 10;
+    static public $spool_tmax    = 10;
     static public $spool_boxlist = true;
 
 ### Message processing ###
