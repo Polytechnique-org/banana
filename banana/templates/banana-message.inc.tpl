@@ -1,4 +1,4 @@
-<pre>
+<pre class="thread_tree">
 {$spool->buildTree($artid)|smarty:nodefaults}
 </pre>
 

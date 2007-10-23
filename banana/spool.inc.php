@@ -9,7 +9,7 @@
 
 require_once dirname(__FILE__) . '/banana.inc.php';
 
-define('BANANA_SPOOL_VERSION', '0.6');
+define('BANANA_SPOOL_VERSION', '0.5.1');
 
 /** Class spoolhead
  *  class used in thread overviews
@@ -542,30 +542,46 @@ class BananaSpool
 
 
     public function _buildTree($id, BananaSpoolHead &$head, $current) {
-        $style = 'color:' . $head->color . '; text-decoration: none';
-        $prof  = 1;
-        if ($id == $current) {
-            $text = "<strong style=\"$style\">0</strong>";
-        } else {
-            $text = Banana::$page->makeLink(Array('group' => $this->group, 'artid' => $id,
-                                                  'text'  => 'o', 'popup' => $head->from,
-                                                  'style' => $style));
+        static $t_e, $u_h, $u_ht, $u_vt, $u_l, $u_f, $r_h, $r_ht, $r_vt, $r_l, $r_f;
+        if (!isset($spfx_f)) {
+            $t_e   = Banana::$page->makeImg(Array('img' => 'e',  'alt' => '&nbsp;', 'height' => 18,  'width' => 14));
+            $u_h   = Banana::$page->makeImg(Array('img' => 'h2', 'alt' => '-', 'height' => 18,  'width' => 14));
+            $u_ht  = Banana::$page->makeImg(Array('img' => 'T2', 'alt' => '+', 'height' => 18, 'width' => 14));
+            $u_vt  = Banana::$page->makeImg(Array('img' => 't2', 'alt' => '`', 'height' => 18, 'width' => 14));
+            $u_l   = Banana::$page->makeImg(Array('img' => 'l2', 'alt' => '|', 'height' => 18, 'width' => 14));
+            $u_f   = Banana::$page->makeImg(Array('img' => 'f2', 'alt' => 't', 'height' => 18, 'width' => 14));
+            $r_h   = Banana::$page->makeImg(Array('img' => 'h2r', 'alt' => '-', 'height' => 18,  'width' => 14));
+            $r_ht  = Banana::$page->makeImg(Array('img' => 'T2r', 'alt' => '+', 'height' => 18, 'width' => 14));
+            $r_vt  = Banana::$page->makeImg(Array('img' => 't2r', 'alt' => '`', 'height' => 18, 'width' => 14));
+            $r_l   = Banana::$page->makeImg(Array('img' => 'l2r', 'alt' => '|', 'height' => 18, 'width' => 14));
+            $r_f   = Banana::$page->makeImg(Array('img' => 'f2r', 'alt' => 't', 'height' => 18, 'width' => 14));
         }
+        $style = 'background-color:' . $head->color . '; text-decoration: none';
+        $prof  = 1;
+        $text = '<span style="' . $style . '" title="' . banana_entities($head->from) . '">' .
+                '<input type="radio" name="banana_tree" '. ($id == $current ? 'checked="checked" ' : ' ' ) .
+                (Banana::$msgshow_javascript ? 'onchange="window.location=\'' .
+                    Banana::$page->makeURL(array('group' => $this->group, 'artid' => $id)) . '\'"' : ' disabled="disabled"')
+                .' />' .
+                '</span>';
         $array = array($text);
         foreach ($head->children as $key=>&$child) {
-            list($tpr, $tree) = $this->_buildTree($child, $this->overview[$child], $current);
+            $msg =& $this->overview[$child];
+            list($tpr, $tree) = $this->_buildTree($child, $msg, $current);
             $last = $key == count($head->children) - 1;
             foreach ($tree as $kt=>&$line) {
-                if ($kt == 0 && $key == 0) {
-                    $array[0] .= '--' . $line;
+                if ($kt == 0 && $key == 0 && !$last) {
+                    $array[0] .= ($msg->isread ? $r_ht : $u_ht) . $line;
+                } else if($kt == 0 && $key == 0) {
+                    $array[0] .= ($msg->isread ? $r_h : $u_h)  . $line;
                 } else if ($kt == 0 && $last) {
-                    $array[] = ' !-' . $line;
+                    $array[] = $t_e . ($msg->isread ? $r_vt : $u_vt) . $line;
                 } else if ($kt == 0) {
-                    $array[] = ' |-' . $line;
+                    $array[] = $t_e . ($msg->isread ? $r_f : $u_f) . $line;
                 } else if ($last) {
-                    $array[] = '   ' . $line;
+                    $array[] = $t_e . $t_e . $line;
                 } else {
-                    $array[] = ' | ' . $line;
+                    $array[] = $t_e . ($msg->isread ? $r_l : $u_l) . $line;
                 }
             }
             if ($tpr > $prof) {

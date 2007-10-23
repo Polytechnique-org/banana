@@ -72,6 +72,25 @@
     background-color: #fff;
 }
 
+.banana pre.thread_tree {
+  overflow: scroll;
+}
+
+.banana .thread_tree input {
+    width: 14px;
+    height: 14px;
+    padding: 2px 0;
+    margin: 0;
+}
+
+.banana .thread_tree img {
+    margin: 0;
+    padding: 0;
+    width: 14px;
+    height: 18px;
+}
+
+
 /** MISC **/
 
 .banana .center { text-align: center; padding: 1em; }
