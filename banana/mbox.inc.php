@@ -18,25 +18,25 @@ class BananaMBox implements BananaProtocoleInterface
 
     private $_lasterrno = 0;
     private $_lasterror = null;
-    
+
     public function __construct()
     {
         $this->debug = Banana::$debug_mbox;
     }
-    
+
     public function isValid()
     {
         return true;
         //!Banana::$group || $this->file;
     }
-    
+
     /** Indicate last error n°
      */
     public function lastErrNo()
     {
         return $this->_lasterrno;;
     }
-    
+
     /** Indicate last error text
      */
     public function lastError()
@@ -66,10 +66,10 @@ class BananaMBox implements BananaProtocoleInterface
     {
         $message = null;
         if (!is_numeric($id)) {
-            if (!Banana::$spool) { 
+            if (!Banana::$spool) {
                 return $message;
             }
-            $id = Banana::$spool->ids[$id];
+            $id = Banana::$spool->ids[$id]->id;
         }
         $options = array ('-m ' . $id);
         $this->getMBoxPosition($options, $id);
@@ -85,29 +85,31 @@ class BananaMBox implements BananaProtocoleInterface
         $messages =& $this->getRawMessage($id);
         if ($messages) {
             $messages = new BananaMessage($messages);
+        } else {
+            $messages = null;
         }
-        return $messages;    
+        return $messages;
     }
 
     /** Return the sources of the given message
      */
     public function getMessageSource($id)
-    { 
+    {
         $message =& $this->getRawMessage($id);
         if ($message) {
-            $message = implode("\n", $message); 
+            $message = implode("\n", $message);
         }
         return $message;
-    }   
+    }
 
     /** Compute the number of messages of the box
      */
     private function getCount()
     {
         $options = array();
-        if (@filesize($this->getFileName()) == Banana::$spool->storage['size']) { 
-            return max(Banana::$spool->ids) + 1; 
-        } 
+        if (@filesize($this->getFileName()) == @Banana::$spool->storage['size']) {
+            return max(array_keys(Banana::$spool->overview)) + 1;
+        }
         $this->getMBoxPosition($options);
         $val =& $this->callHelper('-c', $options);
         if (!$val) {
@@ -191,7 +193,7 @@ class BananaMBox implements BananaProtocoleInterface
             return array();
         }
         if (is_null($this->new_messages)) {
-            $this->getCount(); 
+            $this->getCount();
         }
         return range($this->count - $this->new_messages, $this->count - 1);
     }
@@ -235,7 +237,7 @@ class BananaMBox implements BananaProtocoleInterface
         foreach ($headers as $key=>$value) {
             if (!empty($value)) {
                 $hdrs .= "$key: $value\r\n";
-            }    
+            }
         }
         $body = $message->get(false);
         return mail($to, $subject, $body, $hdrs);
@@ -295,7 +297,7 @@ class BananaMBox implements BananaProtocoleInterface
 #######
 # MBox parser
 #######
-    
+
     /** Add the '-p' optioin for callHelper
      */
     private function getMBoxPosition(array &$options, $id = null)
@@ -304,12 +306,12 @@ class BananaMBox implements BananaProtocoleInterface
             if (!is_null($id) && isset(Banana::$spool->overview[$id])) {
                 $key = $id;
             } else {
-                $key = max(Banana::$spool->ids);
+                $key = max(array_keys(Banana::$spool->overview));
                 if (!is_null($id) && $key >= $id) {
                     return;
                 }
             }
-            if (isset(Banana::$spool->overview[$key]->storage['offset'])) { 
+            if (isset(Banana::$spool->overview[$key]->storage['offset'])) {
                 $options[] = '-p ' . $key . ':' . Banana::$spool->overview[$key]->storage['offset'];
             }
         }

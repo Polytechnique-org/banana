@@ -52,9 +52,9 @@ class BananaSpoolHead
     public function __construct($id, array &$message)
     {
         $this->id         = $id;
-        $this->msgid      = $message['message-id'];
+        $this->msgid      = @$message['message-id'];
         $this->date       = $message['date'];
-        $this->subject    = $message['subject'];
+        $this->subject    = @$message['subject'];
         $this->from       = $message['from'];
         $this->color      = sprintf('#%06x', abs(crc32($this->from) % 0xffffff));
         $this->desc       = 1;
@@ -247,7 +247,7 @@ class BananaSpool
             $msg         =& $this->overview[$id];
             $parents     =& $this->getReferences($message);
             while (!empty($parents) && ($msg->parent === $msg || is_null($msg->parent))) {
-                $msg->parent =& array_pop($parents);
+                @$msg->parent =& array_pop($parents);
             }
 
             if (!is_null($msg->parent)) {

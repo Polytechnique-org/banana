@@ -53,13 +53,13 @@ class BananaFeed
         if (!Banana::$spool || Banana::$spool->group != $this->group) {
             return false;
         }
-        if (!Banana::$spool->ids) {
+        if (empty(Banana::$spool->overview)) {
             $spool_indexes = array();
         } else {
-            $spool_indexes = Banana::$spool->ids;
+            $spool_indexes = array_keys(Banana::$spool->overview);
             sort($spool_indexes, SORT_NUMERIC);
             $spool_indexes = array_slice($spool_indexes, -Banana::$feed_size, Banana::$feed_size);
-        }    
+        }
         $feed_indexes  = array_keys($this->messages);
         $old = array_diff($feed_indexes, $spool_indexes);
         foreach ($old as $key) {
@@ -68,6 +68,9 @@ class BananaFeed
         $new = array_diff($spool_indexes, $feed_indexes);
         foreach ($new as $key) {
             $message =& Banana::$protocole->getMessage($key);
+            if (is_null($message)) {
+                return;
+            }
             $array = array();
             $array['author'] = $message->getAuthorName();
             $array['date']   = $message->getHeaderValue('Date');
