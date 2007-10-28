@@ -127,7 +127,7 @@ class BananaSpool
             $spool->markAllAsRead();
         }
         $spool->updateUnread($since);
-        //var_dump($spool);
+        //var_dump($spool->trees);
         return $spool;
     }
 
@@ -255,7 +255,7 @@ class BananaSpool
                 $parent->children[] =& $msg;
                 while (!is_null($parent)) {
                     $parent->desc += $msg->desc;
-                    $prev =& $p;
+                    $prev =& $parent;
                     if ($parent !== $parent->parent) {
                         $parent =& $parent->parent;
                     } else {
@@ -532,7 +532,7 @@ class BananaSpool
         $text = '<span style="' . $style . '" title="' . banana_entities($head->name . ', ' . $this->formatDate($head))
               . '"><input type="radio" name="banana_tree" '
               . (Banana::$msgshow_javascript ? 'onchange="window.location=\'' .
-                    banana_entities(Banana::$page->makeURL(array('group' => $this->group, 'artid' => $id))) . '\'"'
+                    banana_entities(Banana::$page->makeURL(array('group' => $this->group, 'artid' => $head->id))) . '\'"'
                     : ' disabled="disabled"')
               . ' /></span>';
         $array = array($text);
@@ -562,11 +562,12 @@ class BananaSpool
     /** build the spool tree associated with the given message
      */
     public function &buildTree($id, $force = false) {
-        $id = $this->root($id);
+        $root =& $this->root($id);
+        $id   = $root->id;
         if (!$force && isset($this->trees[$id])) {
             return $this->trees[$id];
         } else {
-            $tree =& $this->_buildTree($this->overview[$id]);
+            $tree =& $this->_buildTree($root);
             $tree = '<div class="tree"><div style="height:18px">'
                   . implode("</div>\n<div style=\"height:18px\">", $tree)
                   . '</div></div>';
@@ -607,14 +608,13 @@ class BananaSpool
     /** Return root message of the given thread
      * @param id INTEGER id of a message
      */
-    public function root($id)
+    public function &root($id)
     {
-        while (true) {
-            $id_parent = $this->overview[$id]->parent;
-            if (is_null($id_parent)) break;
-            $id = $id_parent;
+        $parent =& $this->overview[$id];
+        while (!is_null($parent->parent)) {
+            $parent =& $parent->parent;
         }
-        return $id;
+        return $parent;
     }
 
     /** Return the last post id with the given subject
@@ -648,13 +648,13 @@ class BananaSpool
      */
     public function prevThread($id)
     {
-        $root = $this->root($id);
+        $root =& $this->root($id);
         $last = null;
-        foreach ($this->roots as $i) {
-            if ($i == $root) {
+        foreach ($this->roots as &$i) {
+            if ($i === $root) {
                 return $last;
             }
-            $last = $i;
+            $last = $i->id;
         }
         return $last;
     }
@@ -664,13 +664,13 @@ class BananaSpool
      */
     public function nextThread($id)
     {
-        $root = $this->root($id);
+        $root =& $this->root($id);
         $ok   = false;
-        foreach ($this->roots as $i) {
+        foreach ($this->roots as &$i) {
             if ($ok) {
-                return $i;
+                return $i->id;
             }
-            if ($i == $root) {
+            if ($i === $root) {
                 $ok = true;
             }
         }
@@ -682,16 +682,16 @@ class BananaSpool
      */
     public function prevPost($id)
     {
-        $parent = $this->overview[$id]->parent;
+        $parent =& $this->overview[$id]->parent;
         if (is_null($parent)) {
             return null;
         }
-        $last = $parent;
-        foreach ($this->overview[$parent]->children as $child) {
-            if ($child == $id) {
+        $last = $parent->id;
+        foreach ($parent->children as &$child) {
+            if ($child->id == $id) {
                 return $last;
             }
-            $last = $child;
+            $last = $child->id;
         }
         return null;
     }
@@ -701,26 +701,27 @@ class BananaSpool
      */
     public function nextPost($id)
     {
-        if (count($this->overview[$id]->children) != 0) {
-            return $this->overview[$id]->children[0];
+        $cur =& $this->overview[$id];
+        if (count($cur->children) != 0) {
+            return $cur->children[0]->id;
         }
 
-        $cur    = $id;
+        $parent =& $cur;
         while (true) {
-            $parent = $this->overview[$cur]->parent;
+            $parent =& $cur->parent;
             if (is_null($parent)) {
                 return null;
             }
             $ok = false;
-            foreach ($this->overview[$parent]->children as $child) {
+            foreach ($parent->children as &$child) {
                 if ($ok) {
-                    return $child;
+                    return $child->id;
                 }
-                if ($child == $cur) {
+                if ($child === $cur) {
                     $ok = true;
                 }
             }
-            $cur = $parent;
+            $cur =& $parent;
         }
         return null;
     }
@@ -728,12 +729,12 @@ class BananaSpool
     /** Look for an unread message in the thread rooted by the message
      * @param id INTEGER message number
      */
-    private function _nextUnread($id)
+    private function _nextUnread(BananaSpoolHead &$cur)
     {
-        if (!$this->overview[$id]->isread) {
-            return $id;
+        if (!$cur->isread) {
+            return $cur->id;
         }
-        foreach ($this->overview[$id]->children as $child) {
+        foreach ($cur->children as &$child) {
             $unread = $this->_nextUnread($child);
             if (!is_null($unread)) {
                 return $unread;
@@ -753,7 +754,7 @@ class BananaSpool
 
         if (!is_null($id)) {
             // Look in message children
-            foreach ($this->overview[$id]->children as $child) {
+            foreach ($this->overview[$id]->children as &$child) {
                 $next = $this->_nextUnread($child);
                 if (!is_null($next)) {
                     return $next;
@@ -762,27 +763,36 @@ class BananaSpool
         }
 
         // Look in current thread
-        $cur = $id;
+        if (is_null($id)) {
+            $cur = null;
+        } else {
+            $cur =& $this->overview[$id];
+        }
         do {
-            $parent = is_null($cur) ? null : $this->overview[$cur]->parent;
-            $ok     = is_null($cur) ? true : false;
-            if (!is_null($parent)) {
-                $array = &$this->overview[$parent]->children;
+            if (is_null($cur)) {
+                $parent =& $cur;
+                $ok     = true;
             } else {
-                $array = &$this->roots;
+                $parent =& $cur->parent;
+                $ok     =  false;
             }
-            foreach ($array as $child) {
+            if (!is_null($parent)) {
+                $array =& $parent->children;
+            } else {
+                $array =& $this->roots;
+            }
+            foreach ($array as &$child) {
                 if ($ok) {
                     $next = $this->_nextUnread($child);
                     if (!is_null($next)) {
                         return $next;
                     }
                 }
-                if ($child == $cur) {
+                if ($child === $cur) {
                     $ok = true;
                 }
             }
-            $cur = $parent;
+            $cur =& $parent;
         } while(!is_null($cur));
         return null;
     }
