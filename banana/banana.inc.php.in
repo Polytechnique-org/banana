@@ -46,7 +46,7 @@ class Banana
 
 ### Message display ###
     static public $msgshow_headers   = array('from', 'newsgroups', 'followup-to', 'to', 'cc', 'reply-to',
-                                       'organization', 'date', 'references', 'in-reply-to');
+                                             'organization', 'date');
     static public $msgshow_mimeparts = array('multipart/report', 'multipart/mixed',
                                              'text/html', 'text/plain', 'text/enriched', 'text', 'message');
     static public $msgshow_xface     = true;
