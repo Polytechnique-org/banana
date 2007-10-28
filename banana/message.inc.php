@@ -91,18 +91,12 @@ final class BananaMessage extends BananaMimePart
 
           case "references": case "in-reply-to":
             $rsl     = "";
-            $parents = preg_grep('/^\d+$/', $this->getTranslatedReferences());
-            $p       = array_pop($parents);
-
-            $parents = array();
-            while (!is_null($p)) {
-                array_unshift($parents, $p);
-                $p         = Banana::$spool->overview[$p]->parent;  
-            }
+            $parents = Banana::$spool->getReferences($this->headers);
             $ndx = 1;
-            foreach ($parents as $p) {
+            while (!empty($parents)) {
+                $p = array_shift($parents);
                 $rsl .= Banana::$page->makeLink(Array('group' => Banana::$spool->group,
-                                                      'artid' => $p, 'text' => $ndx++)) . ' ';
+                                                      'artid' => $p->id, 'text' => $ndx++)) . ' ';
             }
             return $rsl;
 
@@ -221,21 +215,6 @@ final class BananaMessage extends BananaMimePart
         $text = $this->headers['references'];
         $text = str_replace("><","> <", $text);
         return preg_split('/\s/', $text);
-    }
-
-    public function getTranslatedReferences()
-    {
-        return BananaMessage::formatReferences($this->headers);
-    }
-
-    static public function &formatReferences(array &$refs)
-    {
-        $references = array();
-        $msgs = Banana::$spool->getReferences($refs);
-        foreach ($msgs as &$msg) {
-            $references[] = $msg->id;
-        }
-        return $references;
     }
 
     public function hasXFace()
