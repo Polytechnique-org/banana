@@ -127,7 +127,6 @@ class BananaSpool
             $spool->markAllAsRead();
         }
         $spool->updateUnread($since);
-        //var_dump($spool->trees);
         return $spool;
     }
 
