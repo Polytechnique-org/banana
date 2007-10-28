@@ -337,7 +337,7 @@ class BananaMimePart
         }
 
         if (!is_null($this->charset)) {
-            $body = iconv($this->charset, 'UTF-8//IGNORE', $this->body);
+            $body = @iconv($this->charset, 'UTF-8//IGNORE', $this->body);
             if (empty($body)) {
                 return;
             }

@@ -140,7 +140,7 @@ function banana__catchMailLink($email)
     $mid = '<' . $email . '>';
     if (isset(Banana::$spool->ids[$mid])) {
         return Banana::$page->makeLink(Array('group' => Banana::$group,
-                                             'artid' => Banana::$spool->ids[$mid],
+                                             'artid' => Banana::$spool->ids[$mid]->id,
                                              'text'  => $email));
     } elseif (strpos($email, '$') !== false) {
         return $email;
