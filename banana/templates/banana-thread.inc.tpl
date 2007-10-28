@@ -43,13 +43,13 @@
   </tr>
   {if $spool->roots|@count}
   {section name=threads loop=$spool->roots step=1 start=$spool->start() max=$spool->context()}
-  {assign var=id value=$spool->roots[$smarty.section.threads.index]}
-  {assign var=overview value=$spool->overview[$id]}
+  {assign var=overview value=$spool->roots[$smarty.section.threads.index]}
+  {assign var=id value=$overview->id}
   {cycle assign=class values="impair,pair"}
   <tr class="{$class} {if $overview->descunread}new{/if}">
-    <td class="date">{$spool->formatDate($overview->date)}</td>
-    <td class="subj">{$spool->formatSubject($id, $overview->subject)|smarty:nodefaults}</td>
-    <td class="from">{$spool->formatFrom($overview->from)|smarty:nodefaults}</td>
+    <td class="date">{$spool->formatDate($overview)}</td>
+    <td class="subj">{$spool->formatSubject($overview)|smarty:nodefaults}</td>
+    <td class="from">{$spool->formatFrom($overview)|smarty:nodefaults}</td>
   </tr>
   {if !$artid && $spool->nextPost($id)}
   <tr class="{$class}">

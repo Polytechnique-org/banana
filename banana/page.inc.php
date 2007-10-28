@@ -24,7 +24,7 @@ class BananaPage extends Smarty
 
     public function __construct()
     {
-        $this->Smarty();
+        parent::Smarty();
 
         $this->compile_check = Banana::$debug_smarty;
         $this->template_dir  = dirname(__FILE__) . '/templates/';
@@ -67,7 +67,7 @@ class BananaPage extends Smarty
      * @param action_code HTML code of the action
      * @param pages ARRAY pages where to show the action (null == every pages)
      * @return true if success
-     */ 
+     */
     public function registerAction($action_code, array $pages = null)
     {
         $this->actions[] = array('text' => $action_code, 'pages' => $pages);
@@ -133,7 +133,7 @@ class BananaPage extends Smarty
 
         return 'banana-base.tpl';
     }
-    
+
     /** Generate XHTML code
      */
     public function run()
@@ -215,7 +215,7 @@ class BananaPage extends Smarty
      * @param params ARRAY location datas
      * @param smarty OBJECT Smarty instance associated (null if none)
      * @return URL of the page associated with the given parameters
-     * 
+     *
      * Usual parameters are :
      * - group : the box name
      * - artid : the current message id (index of message-id)
@@ -231,11 +231,11 @@ class BananaPage extends Smarty
         if (function_exists('hook_makeLink')
                 && $res = hook_makeLink($params)) {
             return $res;
-        }   
+        }
         $proto = empty($_SERVER['HTTPS']) ? 'http://' : 'https://';
         $host  = Banana::$baseurl ? Banana::$baseurl : $_SERVER['SERVER_NAME'];
         $file  = $_SERVER['PHP_SELF'];
-    
+
         if (count($params) != 0) {
             $get = '?';
             foreach ($params as $key=>$value) {
@@ -246,7 +246,7 @@ class BananaPage extends Smarty
             }
         } else {
             $get = '';
-        }     
+        }
         return $proto . $host . $file . $get;
     }
 
@@ -334,7 +334,7 @@ class BananaPage extends Smarty
 
         return '<img src="' . $url . '"' . $height . $width . ' alt="' . _b_($alt) . '" />';
     }
-    
+
     /** Build a link to one of the banana built-in javascript
      * @param src STRING javascript name
      * @return Javascript tag
@@ -356,7 +356,7 @@ class BananaPage extends Smarty
 
         return '<script type="text/javascript" src="' . $url . '"/></script>';
     }
-    
+
     /** Build a link with an image as text
      * @param params ARRAY image and location data
      * @param smarty OBJECT Smarty instance associated (null if none)
@@ -371,7 +371,7 @@ class BananaPage extends Smarty
     {
         if (!isset($params['popup'])) {
             $params['popup'] = @$params['alt'];
-        }    
+        }
         $img = $this->makeImg($params, $smarty);
         if (isset($params['text'])) {
             $img .= ' ' . $params['text'];

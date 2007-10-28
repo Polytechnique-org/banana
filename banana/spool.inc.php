@@ -9,13 +9,16 @@
 
 require_once dirname(__FILE__) . '/banana.inc.php';
 
-define('BANANA_SPOOL_VERSION', '0.5.9');
+define('BANANA_SPOOL_VERSION', '0.5.12');
 
 /** Class spoolhead
  *  class used in thread overviews
  */
 class BananaSpoolHead
 {
+    public $id;
+    public $msgid;
+
     /** date (timestamp) */
     public $date;
     /** subject */
@@ -26,8 +29,6 @@ class BananaSpoolHead
     public $color;
     /** reference of parent */
     public $parent = null;
-    /** paren is direct */
-    public $parent_direct;
     /** array of children */
     public $children = Array();
     /** true if post is read */
@@ -48,8 +49,10 @@ class BananaSpoolHead
      * @param $_read BOOLEAN true if read
      * @param $_descunread INTEGER descunread value (0 for a new post)
      */
-    public function __construct(array &$message)
+    public function __construct($id, array &$message)
     {
+        $this->id         = $id;
+        $this->msgid      = $message['message-id'];
         $this->date       = $message['date'];
         $this->subject    = $message['subject'];
         $this->from       = $message['from'];
@@ -83,13 +86,13 @@ class BananaSpool
     /**  group name */
     public $group;
     /**  spool */
-    public $overview;
+    public $overview = array();
     /**  array msgid => msgnum */
-    public $ids;
+    public $ids      = array();
     /** thread starts */
-    public $roots;
+    public $roots    = array();
     /** thread trees (one tree per root node) */
-    public $trees = array();
+    public $trees    = array();
 
     /** protocole specific data */
     public $storage = array();
@@ -124,6 +127,7 @@ class BananaSpool
             $spool->markAllAsRead();
         }
         $spool->updateUnread($since);
+        //var_dump($spool);
         return $spool;
     }
 
@@ -152,9 +156,9 @@ class BananaSpool
         return $spool;
     }
 
-    private function compare($a, $b)
+    private function compare(&$a, &$b)
     {
-        return ($this->overview[$b]->date >= $this->overview[$a]->date);
+        return ($b->date - $a->date);
     }
 
     private function saveToFile()
@@ -162,9 +166,9 @@ class BananaSpool
         $file = BananaSpool::spoolFilename($this->group);
 
         $this->roots = Array();
-        foreach($this->overview as $id=>&$msg) {
+        foreach($this->overview as &$msg) {
             if (is_null($msg->parent)) {
-                $this->roots[] = $id;
+                $this->roots[] =& $msg;
             }
         }
         usort($this->roots, array($this, 'compare'));
@@ -202,7 +206,7 @@ class BananaSpool
     private function clean(&$first, &$last, $msgnum)
     {
         $do_save = false;
-        if (is_array($this->overview)) {
+        if (!empty($this->overview)) {
             $mids = array_keys($this->overview);
             foreach ($mids as $id) {
                 if (($first <= $last && ($id < $first || $id > $last))
@@ -227,44 +231,38 @@ class BananaSpool
         $messages =& Banana::$protocole->getMessageHeaders($first, $last,
             array('Date', 'Subject', 'From', 'Message-ID', 'References', 'In-Reply-To'));
 
-        if (!is_array($this->ids)) {
-            $this->ids = array();
-        }
-        foreach ($messages as $id=>&$message) {
-            $this->ids[$message['message-id']] = $id;
-        }
-
-        if (!is_array($this->overview)) {
-            $this->overview = array();
-        }
-        $updateTrees = array();
+        // Build all the new Spool Heads
         foreach ($messages as $id=>&$message) {
             if (!isset($this->overview[$id])) {
-                $this->overview[$id] = new BananaSpoolHead($message);
+                $this->overview[$id] = new BananaSpoolHead($id, $message);
+                $head =& $this->overview[$id];
+                $this->ids[$head->msgid] =& $head;
             }
-            $msg    =& $this->overview[$id];
-            $msgrefs = BananaMessage::formatReferences($message);
-            $parents = preg_grep('/^\d+$/', $msgrefs);
-            $msg->parent = array_pop($parents);
-            $msg->parent_direct = preg_match('/^\d+$/', array_pop($msgrefs));
+        }
 
-            if (!is_null($p = $msg->parent)) {
-                if (empty($this->overview[$p])) {
-                    $this->overview[$p] = new BananaSpoolHead($messages[$p]);
-                }
-                $this->overview[$p]->children[] = $id;
-                while (!is_null($p)) {
-                    $this->overview[$p]->desc += $msg->desc;
-                    $prev = $p;
-                    if ($p != $this->overview[$p]->parent) {
-                        $p = $this->overview[$p]->parent;
+        // Build tree
+        $updateTrees = array();
+        $null = null;
+        foreach ($messages as $id=>&$message) {
+            $msg         =& $this->overview[$id];
+            $parents     =& $this->getReferences($message);
+            while (!empty($parents) && ($msg->parent === $msg || is_null($msg->parent))) {
+                $msg->parent =& array_pop($parents);
+            }
+
+            if (!is_null($msg->parent)) {
+                $parent =& $msg->parent;
+                $parent->children[] =& $msg;
+                while (!is_null($parent)) {
+                    $parent->desc += $msg->desc;
+                    $prev =& $p;
+                    if ($parent !== $parent->parent) {
+                        $parent =& $parent->parent;
                     } else {
-                        $p = null;
-                    }
-                    if (is_null($p)) {
-                        $updateTrees[$prev] = true;
+                        $parent =& $null;
                     }
                 }
+                $updateTrees[$prev->id] = true;
             }
         }
         foreach ($updateTrees as $root=>$t) {
@@ -286,21 +284,18 @@ class BananaSpool
             return;
         }
 
-        if (!is_array($this->ids)) {
-            $this->ids = array();
-        }
         $newpostsids = array_intersect($newpostsids, array_keys($this->ids));
         foreach ($newpostsids as $mid) {
-            $id = $this->ids[$mid];
-            if ($this->overview[$id]->isread) {
-                $this->overview[$id]->isread = false;
-                $this->unreadnb++;
-                while (isset($id)) {
-                    $this->overview[$id]->descunread++;
-                    $id = $this->overview[$id]->parent;
+            $overview =& $this->ids[$mid];
+            if ($overview->isread) {
+                $overview->isread = false;
+                while (!is_null($overview)) {
+                    $overview->descunread++;
+                    $overview =& $overview->parent;
                 }
             }
         }
+        $this->unreadnb += count($newpostsids);
     }
 
     public function setMode($mode)
@@ -312,14 +307,31 @@ class BananaSpool
             if ($this->overview[$num]->isread) {
                 break;
             }
-            foreach ($this->roots as $k=>$i) {
-                if ($this->overview[$i]->descunread == 0) {
-                    $this->killdesc($i);
-                    unset($this->roots[$k]);
+            foreach ($this->roots as &$root) {
+                if ($root->descunread == 0) {
+                    $this->killdesc($root->id);
                 }
             }
             break;
         }
+    }
+
+    /** Fetch list of references
+     */
+    public function &getReferences(array &$refs)
+    {
+        $references = array();
+        if (isset($refs['references'])) {
+            $text = preg_split('/\s/', str_replace('><', '> <', $refs['references']));
+            foreach ($text as $id=>&$value) {
+                if (isset($this->ids[$value])) {
+                    $references[] =& $this->ids[$value];
+                }
+            }
+        } elseif (isset($refs['in-reply-to']) && isset($this->ids[$refs['in-reply-to']])) {
+            $references[] =& $this->ids[$refs['in-reply-to']];
+        }
+        return $references;
     }
 
     /** Mark the given id as read
@@ -344,20 +356,20 @@ class BananaSpool
         if (!$this->unreadnb) {
             return;
         }
-        if (is_null($array) && is_array($this->roots)) {
+        if (is_null($array) && !empty($this->roots)) {
             $array =& $this->roots;
         } elseif (is_null($array)) {
             return;
         }
-        foreach ($array as $id) {
-            if (!$this->overview[$id]->isread) {
-                $this->markAsRead($id);
+        foreach ($array as &$msg) {
+            if (!$msg->isread) {
+                $this->markAsRead($msg->id);
                 if (!$this->unreadnb) {
                     return;
                 }
             }
-            if ($this->overview[$id]->descunread) {
-                $this->markAllAsRead($this->overview[$id]->children);
+            if ($msg->descunread) {
+                $this->markAllAsRead($msg->children);
             }
         }
     }
@@ -367,15 +379,23 @@ class BananaSpool
      */
     private function killdesc($_id)
     {
-        if (sizeof($this->overview[$_id]->children)) {
-            foreach ($this->overview[$_id]->children as $c) {
-                $this->killdesc($c);
+        $overview =& $this->overview[$_id];
+        $children =& $overview->children;
+        if (sizeof($children)) {
+            foreach ($children as &$c) {
+                $this->killdesc($c->id);
             }
         }
         unset($this->overview[$_id]);
-        if (($msgid = array_search($_id, $this->ids)) !== false) {
-            unset($this->ids[$msgid]);
+        foreach ($this->roots as $k=>&$root) {
+            if ($root === $overview) {
+                unset($this->roots[$k]);
+                break;
+            }
         }
+        unset($this->ids[$overview->msgid]);
+        unset($this->trees[$_id]);
+        $overview = null;
     }
 
     /** delete a post from overview
@@ -383,51 +403,58 @@ class BananaSpool
      */
     public function delid($_id, $write = true)
     {
-        if (isset($this->overview[$_id])) {
-            $overview =& $this->overview[$_id];
-            if (!$overview->isread) {
-                $this->markAsRead($_id);
-            }
-            if ($overview->parent) {
-                $p      =  $overview->parent;
-                $parent =& $this->overview[$p];
-                $parent->children = array_diff($parent->children, array($_id));
-                if (sizeof($overview->children)) {
-                    $parent->children = array_merge($parent->children, $overview->children);
-                    foreach ($overview->children as $c) {
-                        $this->overview[$c]->parent        = $p;
-                        $this->overview[$c]->parent_direct = false;
-                    }
-                }
-                while (isset($p)) {
-                    $this->overview[$p]->desc--;
-                    $p = $this->overview[$p]->parent;
-                }
-            } elseif ($overview->children) {
-                foreach ($overview->children as $c) {
-                    $this->overview[$c]->parent = null;
-                }
-            }
-            unset($overview);
-            unset($this->overview[$_id]);
-            unset($this->trees[$_id]);
-            $msgid = array_search($_id, $this->ids);
-            if ($msgid !== false) {
-                unset($this->ids[$msgid]);
-            }
-            $msgid = array_search($_id, $this->roots);
-            if ($msgid !== false) {
-                unset($this->roots[$msgid]);
-            }
+        if (!isset($this->overview[$_id])) {
+            return;
+        }
 
-            if ($write) {
-                $this->saveToFile();
+        $overview =& $this->overview[$_id];
+        // Be sure it is not counted as unread
+        if (!$overview->isread) {
+            $this->markAsRead($_id);
+        }
+
+        $parent =& $overview->parent;
+
+        // Remove from the message tree
+        if (!is_null($parent)) {
+            foreach ($parent->children as $key=>&$child) {
+                if ($child === $overview) {
+                    unset($parent->children[$key]);
+                    break;
+                }
             }
+            if (sizeof($overview->children)) {
+                $parent->children = array_merge($parent->children, $overview->children);
+                foreach ($overview->children as &$child) {
+                    $child->parent =& $parent;
+                }
+            }
+            while (!is_null($parent)) {
+                $parent->desc--;
+                $parent =& $parent->parent;
+            }
+        }
+
+        // Remove all refenrences and assign null to the object
+        unset($this->ids[$overview->msgid]);
+        unset($this->overview[$_id]);
+        unset($this->trees[$_id]);
+        foreach ($this->roots as $k=>&$root) {
+            if ($root === $overview) {
+                unset($this->roots[$k]);
+                break;
+            }
+        }
+        $overview = null;
+
+        if ($write) {
+            $this->saveToFile();
         }
     }
 
-    public function formatDate($stamp)
+    public function formatDate(BananaSpoolHead &$head)
     {
+        $stamp  = $head->date;
         $today  = intval(time() / (24*3600));
         $dday   = intval($stamp / (24*3600));
 
@@ -445,9 +472,9 @@ class BananaSpool
         return strftime($format, $stamp);
     }
 
-    public function formatSubject($id, $subject)
+    public function formatSubject(BananaSpoolHead &$head)
     {
-        $subject = banana_html_entity_decode($subject);
+        $subject = $popup = $head->subject;
         $popup = $subject;
         if (function_exists('hook_formatDisplayHeader')) {
             list($subject, $link) = hook_formatDisplayHeader('subject', $subject, true);
@@ -458,17 +485,16 @@ class BananaSpool
         if (empty($subject)) {
             $subject = _b_('(pas de sujet)');
         }
-        if ($id != Banana::$artid) {
-            $subject = Banana::$page->makeLink(Array('group' => $this->group, 'artid' => $id,
+        if ($head->id != Banana::$artid) {
+            $subject = Banana::$page->makeLink(Array('group' => $this->group, 'artid' => $head->id,
                                                      'text'  => $subject, 'popup' => $popup));
         }
         return $subject . $link;
     }
 
-    public function formatFrom($from)
+    public function formatFrom(BananaSpoolHead &$head)
     {
-        $from = banana_html_entity_decode($from);
-        return BananaMessage::formatFrom($from);
+        return BananaMessage::formatFrom($head->from);
     }
 
     public function start()
@@ -487,7 +513,7 @@ class BananaSpool
     }
 
 
-    private function &_buildTree($id, BananaSpoolHead &$head) {
+    private function &_buildTree(BananaSpoolHead &$head) {
         static $t_e, $u_h, $u_ht, $u_vt, $u_l, $u_f, $r_h, $r_ht, $r_vt, $r_l, $r_f;
         if (!isset($spfx_f)) {
             $t_e   = Banana::$page->makeImg(Array('img' => 'e',  'alt' => '&nbsp;', 'height' => 18,  'width' => 14));
@@ -503,16 +529,15 @@ class BananaSpool
             $r_f   = Banana::$page->makeImg(Array('img' => 'f2r', 'alt' => 't', 'height' => 18, 'width' => 14));
         }
         $style = 'background-color:' . $head->color . '; text-decoration: none';
-        $text = '<span style="' . $style . '" title="' . banana_entities($head->name . ', ' . $this->formatDate($head->date))
+        $text = '<span style="' . $style . '" title="' . banana_entities($head->name . ', ' . $this->formatDate($head))
               . '"><input type="radio" name="banana_tree" '
               . (Banana::$msgshow_javascript ? 'onchange="window.location=\'' .
                     banana_entities(Banana::$page->makeURL(array('group' => $this->group, 'artid' => $id))) . '\'"'
                     : ' disabled="disabled"')
               . ' /></span>';
         $array = array($text);
-        foreach ($head->children as $key=>&$child) {
-            $msg =& $this->overview[$child];
-            $tree =& $this->_buildTree($child, $msg);
+        foreach ($head->children as $key=>&$msg) {
+            $tree =& $this->_buildTree($msg);
             $last = $key == count($head->children) - 1;
             foreach ($tree as $kt=>&$line) {
                 if ($kt === 0 && $key === 0 && !$last) {
@@ -541,7 +566,7 @@ class BananaSpool
         if (!$force && isset($this->trees[$id])) {
             return $this->trees[$id];
         } else {
-            $tree =& $this->_buildTree($id, $this->overview[$id]);
+            $tree =& $this->_buildTree($this->overview[$id]);
             $tree = '<div class="tree"><div style="height:18px">'
                   . implode("</div>\n<div style=\"height:18px\">", $tree)
                   . '</div></div>';

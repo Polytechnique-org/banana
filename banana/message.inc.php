@@ -228,22 +228,14 @@ final class BananaMessage extends BananaMimePart
         return BananaMessage::formatReferences($this->headers);
     }
 
-    static public function formatReferences(array &$refs)
+    static public function &formatReferences(array &$refs)
     {
-        if (isset($refs['references'])) {
-            $text = preg_split('/\s/', str_replace('><', '> <', $refs['references']));
-            $references = array();
-            foreach ($text as $id=>&$value) {
-                if (isset(Banana::$spool->ids[$value])) {
-                    $references[] = Banana::$spool->ids[$value];
-                }
-            }
-            return $references;
-        } elseif (isset($refs['in-reply-to']) && isset(Banana::$spool->ids[$refs['in-reply-to']])) {
-            return array(Banana::$spool->ids[$refs['in-reply-to']]);
-        } else {
-            return array();
+        $references = array();
+        $msgs = Banana::$spool->getReferences($refs);
+        foreach ($msgs as &$msg) {
+            $references[] = $msg->id;
         }
+        return $references;
     }
 
     public function hasXFace()
