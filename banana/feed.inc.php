@@ -9,7 +9,7 @@
 
 require_once dirname(__FILE__) . '/banana.inc.php';
 
-define('BANANA_FEED_VERSION', '0.1');
+define('BANANA_FEED_VERSION', '0.1.1');
 
 class BananaFeed
 {
@@ -35,6 +35,10 @@ class BananaFeed
     /** Last update time
      */
     public $lastupdate = 0;
+
+    /** Path where the feed is stored
+     */
+    public $path = null;
 
     /** Create an empty feed
      */
@@ -105,11 +109,7 @@ class BananaFeed
      */
     static private function filename()
     {
-        $file = Banana::$spool_root . '/' . Banana::$protocole->name() . '/';
-        if (!is_dir($file)) {
-            mkdir($file);
-        }
-        return $file . Banana::$protocole->filename() . '_feed';
+        return BananaSpool::getPath('feed');
     }
 
     /** Read a feed from a cache file

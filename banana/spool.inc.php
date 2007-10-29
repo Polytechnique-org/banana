@@ -9,7 +9,7 @@
 
 require_once dirname(__FILE__) . '/banana.inc.php';
 
-define('BANANA_SPOOL_VERSION', '0.5.12');
+define('BANANA_SPOOL_VERSION', '0.5.13');
 
 /** Class spoolhead
  *  class used in thread overviews
@@ -130,19 +130,27 @@ class BananaSpool
         return $spool;
     }
 
-    private static function spoolFilename($group)
+    public static function getPath($file = null)
     {
-        $file = Banana::$spool_root . '/' . Banana::$protocole->name() . '/';
-        if (!is_dir($file)) {
-            mkdir($file);
+        $path = Banana::$spool_root . '/' . Banana::$protocole->name() . '/' . Banana::$protocole->filename();
+        if (!is_dir($path)) {
+            if (file_exists($path)) {
+                @unlink($path);
+            }
+            mkdir($path, 0777, true);
         }
-        return $file . Banana::$protocole->filename();
+        return $path . '/' . $file;
+    }
+
+    private static function spoolFilename()
+    {
+        return BananaSpool::getPath('spool');
     }
 
     private static function &readFromFile($group)
     {
         $spool = null;
-        $file = BananaSpool::spoolFilename($group);
+        $file = BananaSpool::spoolFilename();
         if (!file_exists($file)) {
             return $spool;
         }
@@ -162,7 +170,7 @@ class BananaSpool
 
     private function saveToFile()
     {
-        $file = BananaSpool::spoolFilename($this->group);
+        $file = BananaSpool::spoolFilename();
 
         $this->roots = Array();
         foreach($this->overview as &$msg) {
