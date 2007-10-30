@@ -53,7 +53,7 @@
   </tr>
   {if !$artid && $spool->nextPost($id)}
   <tr class="{$class}">
-    <td colspan="3" class="thread_tree">{$spool->buildTree($id)|smarty:nodefaults}</td>
+    <td colspan="3" class="thread_tree">{$spool->getTree($id)|smarty:nodefaults}</td>
   </tr>
   {/if}
   {/section}

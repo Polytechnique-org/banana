@@ -105,7 +105,7 @@
     </th>
   </tr>
   <tr class="pair">
-    <td colspan="3" class="thread_tree">{$spool->buildTree($artid)|smarty:nodefaults}</td>
+    <td colspan="3" class="thread_tree">{$spool->getTree($artid)|smarty:nodefaults}</td>
   </tr>
   {/if}
 </table>

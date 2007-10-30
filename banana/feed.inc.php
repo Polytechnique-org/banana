@@ -88,7 +88,7 @@ class BananaFeed
         }
         uasort($this->messages, Array('BananaFeed', 'compare'));
         $this->lastupdate = time();
-        $this->writeToFile();
+        $this->saveToFile();
     }
 
     /** Get the spool corresponding with the current settings of Banana
@@ -130,7 +130,7 @@ class BananaFeed
 
     /** Write a feed to a cache file
      */
-    private function writeToFile()
+    private function saveToFile()
     {
         $file = BananaFeed::filename();
         file_put_contents($file, serialize($this));
