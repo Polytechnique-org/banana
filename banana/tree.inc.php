@@ -102,6 +102,13 @@ class BananaTree
         file_put_contents(BananaTree::filename($id), serialize($this));
     }
 
+    /** Return html to display the tree
+     */
+    public function &show()
+    {
+        return $this->data;
+    }
+
     /** Get filename
      */
     static private function filename($id)

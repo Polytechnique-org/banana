@@ -344,7 +344,7 @@ class BananaSpool
      */
     public function &getTree($id)
     {
-        return BananaTree::build($id)->data;
+        return BananaTree::build($id)->show();
     }
 
     /** Mark the given id as read
@@ -352,12 +352,13 @@ class BananaSpool
      */
     public function markAsRead($id)
     {
-        if (!$this->overview[$id]->isread) {
-            $this->overview[$id]->isread = true;
+        $overview =& $this->overview[$id];
+        if (!$overview->isread) {
+            $overview->isread = true;
             $this->unreadnb--;
-            while (isset($id)) {
-                $this->overview[$id]->descunread--;
-                $id = $this->overview[$id]->parent;
+            while (!is_null($overview)) {
+                $overview->descunread--;
+                $overview =& $overview->parent;
             }
         }
     }
