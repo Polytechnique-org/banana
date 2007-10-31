@@ -92,7 +92,7 @@ class BananaTree
      */
     public function &show()
     {
-        if (!is_null($this->displaid)) {
+        if (!is_null($this->displaid) || is_null($this->data)) {
             return $this->displaid;
         }
         static $t_e, $u_h, $u_ht, $u_vt, $u_l, $u_f, $r_h, $r_ht, $r_vt, $r_l, $r_f;
