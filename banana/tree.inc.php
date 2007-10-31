@@ -63,17 +63,17 @@ class BananaTree
             $last = $key == count($head->children) - 1;
             foreach ($tree as $kt=>&$line) {
                 if ($kt === 0 && $key === 0 && !$last) {
-                    $array[0] = array_merge($array[0], array('+'), $line);
+                    $array[0] = array_merge($array[0], array(array('+', $msg->id)), $line);
                 } else if($kt === 0 && $key === 0) {
-                    $array[0] = array_merge($array[0], array('-'), $line);
+                    $array[0] = array_merge($array[0], array(array('-', $msg->id)), $line);
                 } else if ($kt === 0 && $last) {
-                    $array[] = array_merge(array(' ', '`'), $line);
+                    $array[] = array_merge(array(' ', array('`', $msg->id)), $line);
                 } else if ($kt === 0) {
-                    $array[] = array_merge(array(' ', 't'), $line);
+                    $array[] = array_merge(array(' ', array('t', $msg->id)), $line);
                 } else if ($last) {
                     $array[] = array_merge(array(' ', ' '), $line);
                 } else {
-                    $array[] = array_merge(array(' ', '|'), $line);
+                    $array[] = array_merge(array(' ', array('|', $head->children[$key+1]->id)), $line);
                 }
             }
             unset($tree);
@@ -113,14 +113,18 @@ class BananaTree
         foreach ($this->data as &$line) {
             $text .= '<div style="height: 18px">';
             foreach ($line as &$item) {
-                switch ($item) {
-                  case ' ': $text .= $t_e; break;
-                  case '+': $text .= $u_ht; break;
-                  case '-': $text .= $u_h; break;
-                  case '|': $text .= $u_l; break;
-                  case '`': $text .= $u_vt; break;
-                  case 't': $text .= $u_f; break;
-                  default:
+                if ($item == ' ') {
+                    $text .= $t_e;
+                } else if (is_array($item)) {
+                    $head =& Banana::$spool->overview[$item[1]];
+                    switch ($item[0]) {
+                      case '+': $text .= $head->isread ? $r_ht : $u_ht; break;
+                      case '-': $text .= $head->isread ? $r_h : $u_h; break;
+                      case '|': $text .= $head->isread ? $r_l : $u_l; break;
+                      case '`': $text .= $head->isread ? $r_vt : $u_vt; break;
+                      case 't': $text .= $head->isread ? $r_f : $u_f; break;
+                    }
+                } else {
                     $head =& Banana::$spool->overview[$item];
                     $text .= '<span style="background-color:' . $head->color . '; text-decoration: none"'
                           .       ' title="' .  $this->title[$item] . '">'
