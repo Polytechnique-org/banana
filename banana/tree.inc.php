@@ -8,7 +8,7 @@
 ********************************************************************************/
 
 
-define('BANANA_TREE_VERSION', '0.1');
+define('BANANA_TREE_VERSION', '0.1.2');
 
 /**
  * Class representing a thread tree
@@ -29,7 +29,14 @@ class BananaTree
 
     /** Data
      */
-    public $data;
+    public $data = array();
+
+    /** Data caching
+     */
+    private $urls = array();
+    private $title = array();
+
+    private $displaid = null;
 
     /** Construct a new tree from a given root
      */
@@ -38,10 +45,7 @@ class BananaTree
         if (empty($root->children)) {
             $this->data = null;
         } else {
-            $tree =& $this->builder($root);
-            $this->data = '<div class="tree"><div style="height:18px">'
-                        . implode("</div>\n<div style=\"height:18px\">", $tree)
-                        . '</div></div>';
+            $this->data =& $this->builder($root);
         }
         $this->time = time();
         $this->version = BANANA_TREE_VERSION;
@@ -50,44 +54,26 @@ class BananaTree
 
     private function &builder(BananaSpoolHead &$head)
     {
-        static $t_e, $u_h, $u_ht, $u_vt, $u_l, $u_f, $r_h, $r_ht, $r_vt, $r_l, $r_f;
-        if (!isset($spfx_f)) {
-            $t_e   = Banana::$page->makeImg(Array('img' => 'e',  'alt' => '&nbsp;', 'height' => 18,  'width' => 14));
-            $u_h   = Banana::$page->makeImg(Array('img' => 'h2', 'alt' => '-', 'height' => 18,  'width' => 14));
-            $u_ht  = Banana::$page->makeImg(Array('img' => 'T2', 'alt' => '+', 'height' => 18, 'width' => 14));
-            $u_vt  = Banana::$page->makeImg(Array('img' => 't2', 'alt' => '`', 'height' => 18, 'width' => 14));
-            $u_l   = Banana::$page->makeImg(Array('img' => 'l2', 'alt' => '|', 'height' => 18, 'width' => 14));
-            $u_f   = Banana::$page->makeImg(Array('img' => 'f2', 'alt' => 't', 'height' => 18, 'width' => 14));
-            $r_h   = Banana::$page->makeImg(Array('img' => 'h2r', 'alt' => '-', 'height' => 18,  'width' => 14));
-            $r_ht  = Banana::$page->makeImg(Array('img' => 'T2r', 'alt' => '+', 'height' => 18, 'width' => 14));
-            $r_vt  = Banana::$page->makeImg(Array('img' => 't2r', 'alt' => '`', 'height' => 18, 'width' => 14));
-            $r_l   = Banana::$page->makeImg(Array('img' => 'l2r', 'alt' => '|', 'height' => 18, 'width' => 14));
-            $r_f   = Banana::$page->makeImg(Array('img' => 'f2r', 'alt' => 't', 'height' => 18, 'width' => 14));
-        }
-        $style = 'background-color:' . $head->color . '; text-decoration: none';
-        $text = '<span style="' . $style . '" title="' . banana_entities($head->name . ', ' . Banana::$spool->formatDate($head))
-              . '"><input type="radio" name="banana_tree" '
-              . (Banana::$msgshow_javascript ? 'onchange="window.location=\'' .
-                    banana_entities(Banana::$page->makeURL(array('group' => Banana::$spool->group, 'artid' => $head->id))) . '\'"'
-                    : ' disabled="disabled"')
-              . ' /></span>';
-        $array = array($text);
+        $array = array(array($head->id));
+        $this->urls[$head->id]  = banana_entities(Banana::$page->makeURL(array('group' => Banana::$group,
+                                                                               'artid' => $head->id)));
+        $this->title[$head->id] = banana_entities($head->name . ', ' . Banana::$spool->formatDate($head));
         foreach ($head->children as $key=>&$msg) {
             $tree =& $this->builder($msg);
             $last = $key == count($head->children) - 1;
             foreach ($tree as $kt=>&$line) {
                 if ($kt === 0 && $key === 0 && !$last) {
-                    $array[0] .= ($msg->isread ? $r_ht : $u_ht) . $line;
+                    $array[0] = array_merge($array[0], array('+'), $line);
                 } else if($kt === 0 && $key === 0) {
-                    $array[0] .= ($msg->isread ? $r_h : $u_h)  . $line;
+                    $array[0] = array_merge($array[0], array('-'), $line);
                 } else if ($kt === 0 && $last) {
-                    $array[] = $t_e . ($msg->isread ? $r_vt : $u_vt) . $line;
+                    $array[] = array_merge(array(' ', '`'), $line);
                 } else if ($kt === 0) {
-                    $array[] = $t_e . ($msg->isread ? $r_f : $u_f) . $line;
+                    $array[] = array_merge(array(' ', 't'), $line);
                 } else if ($last) {
-                    $array[] = $t_e . $t_e . $line;
+                    $array[] = array_merge(array(' ', ' '), $line);
                 } else {
-                    $array[] = $t_e . ($msg->isread ? $r_l : $u_l) . $line;
+                    $array[] = array_merge(array(' ', '|'), $line);
                 }
             }
             unset($tree);
@@ -106,7 +92,55 @@ class BananaTree
      */
     public function &show()
     {
-        return $this->data;
+        if (!is_null($this->displaid)) {
+            return $this->displaid;
+        }
+        static $t_e, $u_h, $u_ht, $u_vt, $u_l, $u_f, $r_h, $r_ht, $r_vt, $r_l, $r_f;
+        if (!isset($t_e)) {
+            $t_e   = Banana::$page->makeImg(Array('img' => 'e',  'alt' => ' ', 'height' => 18, 'width' => 14));
+            $u_h   = Banana::$page->makeImg(Array('img' => 'h2', 'alt' => '-', 'height' => 18,  'width' => 14));
+            $u_ht  = Banana::$page->makeImg(Array('img' => 'T2', 'alt' => '+', 'height' => 18, 'width' => 14));
+            $u_vt  = Banana::$page->makeImg(Array('img' => 't2', 'alt' => '`', 'height' => 18, 'width' => 14));
+            $u_l   = Banana::$page->makeImg(Array('img' => 'l2', 'alt' => '|', 'height' => 18, 'width' => 14));
+            $u_f   = Banana::$page->makeImg(Array('img' => 'f2', 'alt' => 't', 'height' => 18, 'width' => 14));
+            $r_h   = Banana::$page->makeImg(Array('img' => 'h2r', 'alt' => '-', 'height' => 18, 'width' => 14));
+            $r_ht  = Banana::$page->makeImg(Array('img' => 'T2r', 'alt' => '+', 'height' => 18, 'width' => 14));
+            $r_vt  = Banana::$page->makeImg(Array('img' => 't2r', 'alt' => '`', 'height' => 18, 'width' => 14));
+            $r_l   = Banana::$page->makeImg(Array('img' => 'l2r', 'alt' => '|', 'height' => 18, 'width' => 14));
+            $r_f   = Banana::$page->makeImg(Array('img' => 'f2r', 'alt' => 't', 'height' => 18, 'width' => 14));
+        }
+        $text = '<div class="tree">';
+        foreach ($this->data as &$line) {
+            $text .= '<div style="height: 18px">';
+            foreach ($line as &$item) {
+                switch ($item) {
+                  case ' ': $text .= $t_e; break;
+                  case '+': $text .= $u_ht; break;
+                  case '-': $text .= $u_h; break;
+                  case '|': $text .= $u_l; break;
+                  case '`': $text .= $u_vt; break;
+                  case 't': $text .= $u_f; break;
+                  default:
+                    $head =& Banana::$spool->overview[$item];
+                    $text .= '<span style="background-color:' . $head->color . '; text-decoration: none"'
+                          .       ' title="' .  $this->title[$item] . '">'
+                          .  '<input type="radio" name="banana_tree" value="' . $head->id . '"';
+                    if (Banana::$msgshow_javascript) {
+                        $text .= ' onchange="window.location=\'' . $this->urls[$item] . '\'"';
+                    } else {
+                        $text .= ' disabled="disabled"';
+                    }
+                    if (Banana::$artid == $item) {
+                        $text .= ' checked="checked"';
+                    }
+                    $text .= '/></span>';
+                }
+            }
+            $text .= "</div>\n";
+        }
+        $text .= '</div>';
+        $this->displaid =& $text;
+        return $text;
     }
 
     /** Get filename
