@@ -574,16 +574,12 @@ class Banana
         }
         if (isset($_POST['cancel'])) {
             $this->loadSpool($group);
-            $ndx = Banana::$spool->getNdX($id) - 1;
             if (!Banana::$protocole->cancel($msg)) {
                 return _b_('Une erreur s\'est produite lors de l\'annulation du message :') . '<br />'
                        . Banana::$protocole->lastError();
             }
-            if ($ndx < 50) {
-                 $ndx = 0;
-            }
             $this->removeMessage($group, $artid);
-            Banana::$page->redirect(Array('group' => $group, 'first' => $ndx));
+            Banana::$page->redirect(Array('group' => $group));
         }
 
         Banana::$page->assign_by_ref('message', $msg);

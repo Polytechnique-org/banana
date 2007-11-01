@@ -527,37 +527,6 @@ class BananaSpool
         return Banana::$first ? Banana::$spool_tmax : Banana::$spool_tcontext;
     }
 
-
-    /** computes linear post index
-     * @param $_id INTEGER MSGNUM of post
-     * @return INTEGER linear index of post
-     */
-    public function getNdX($_id)
-    {
-        $ndx    = 1;
-        $id_cur = $_id;
-        while (true) {
-            $id_parent = $this->overview[$id_cur]->parent;
-            if (is_null($id_parent)) break;
-            $pos = array_search($id_cur, $this->overview[$id_parent]->children);
-
-            for ($i = 0; $i < $pos ; $i++) {
-                $ndx += $this->overview[$this->overview[$id_parent]->children[$i]]->desc;
-            }
-            $ndx++; //noeud père
-
-            $id_cur = $id_parent;
-        }
-
-        foreach ($this->roots as $i) {
-            if ($i==$id_cur) {
-                break;
-            }
-            $ndx += $this->overview[$i]->desc;
-        }
-        return $ndx;
-    }
-
     /** Return root message of the given thread
      * @param id INTEGER id of a message
      */
