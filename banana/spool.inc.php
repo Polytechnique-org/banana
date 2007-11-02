@@ -500,7 +500,7 @@ class BananaSpool
         if (empty($subject)) {
             $subject = _b_('(pas de sujet)');
         }
-        if ($head->id != Banana::$artid) {
+        if ($head->id !== Banana::$artid) {
             $subject = Banana::$page->makeLink(Array('group' => $this->group, 'artid' => $head->id,
                                                      'text'  => $subject, 'popup' => $popup));
         }
