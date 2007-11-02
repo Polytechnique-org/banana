@@ -112,7 +112,17 @@ class BananaPage extends Smarty
         if (!is_null(Banana::$group)) {
             $this->registerPage('thread', Banana::$group, null);
             if (!is_null(Banana::$artid)) {
-                $this->registerPage('message', _b_('Message'), null);
+                if (Banana::$spool) {
+                    $subject = Banana::$spool->overview[Banana::$artid]->subject;
+                } else if (Banana::$message) {
+                    $subject = Banana::$message->getHeaderValue('subject');
+                } else {
+                    $subject = _b_('Message');
+                }
+                if (strlen($subject) > 30) {
+                    $subject = substr($subject, 0, 30) . '…';
+                }
+                $this->registerPage('message', $subject, null);
                 if ($this->page == 'cancel') {
                     $this->registerPage('cancel', _b_('Annulation'), null);
                 } elseif ($this->page == 'new') {
