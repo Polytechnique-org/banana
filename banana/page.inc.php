@@ -13,12 +13,12 @@ if (@!include_once('Smarty.class.php')) {
 
 class BananaPage extends Smarty
 {
-    private $error = array();
-    private $page  = null;
+    protected $error = array();
+    protected $page  = null;
 
-    private $pages   = array();
-    private $killed  = array();
-    private $actions = array();
+    protected $pages   = array();
+    protected $killed  = array();
+    protected $actions = array();
 
     public $css = '';
 
