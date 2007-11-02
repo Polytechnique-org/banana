@@ -48,6 +48,7 @@
       {elseif $page eq 'message'}
         {include file="banana-message.inc.tpl"}
         {if $showthread}
+        <br />
         {include file="banana-thread.inc.tpl" withtitle=false}
         {/if}
       {elseif $page eq 'new'}
