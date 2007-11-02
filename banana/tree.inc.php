@@ -151,7 +151,11 @@ class BananaTree
      */
     static private function filename($id)
     {
-        return BananaSpool::getPath('tree_' . $id);
+        static $host;
+        if (!isset($host)) {
+            $host = parse_url(Banana::$page->makeURL(array()), PHP_URL_HOST);
+        }
+        return BananaSpool::getPath('tree_' . $id . '_' . $host);
     }
 
     /** Read a tree from a file
