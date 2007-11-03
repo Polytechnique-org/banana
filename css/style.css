@@ -71,8 +71,8 @@
     background-color: #fff;
 }
 
-.banana td.thread_tree, .banana div.thread_tree {
-  overflow: auto;
+.banana .thread_tree {
+  white-space: nowrap;
 }
 
 .banana .thread_tree input {
@@ -90,7 +90,11 @@
 }
 
 .banana .thread_tree .tree {
-    margin-left: 2em;
+    overflow-y: hidden;
+    overflow-x: auto;
+    margin: 0;
+    padding-left: 2em;
+    padding-bottom: 1em;
 }
 
 
