@@ -95,19 +95,21 @@ class BananaTree
         if (!is_null($this->displaid) || is_null($this->data)) {
             return $this->displaid;
         }
-        static $t_e, $u_h, $u_ht, $u_vt, $u_l, $u_f, $r_h, $r_ht, $r_vt, $r_l, $r_f;
+        static $t_e, $tree;
+        //$u_h, $u_ht, $u_vt, $u_l, $u_f, $r_h, $r_ht, $r_vt, $r_l, $r_f;
         if (!isset($t_e)) {
+            $tree  = array();
             $t_e   = Banana::$page->makeImg(Array('img' => 'e',  'alt' => ' ', 'height' => 18, 'width' => 14));
-            $u_h   = Banana::$page->makeImg(Array('img' => 'h2', 'alt' => '-', 'height' => 18,  'width' => 14));
-            $u_ht  = Banana::$page->makeImg(Array('img' => 'T2', 'alt' => '+', 'height' => 18, 'width' => 14));
-            $u_vt  = Banana::$page->makeImg(Array('img' => 't2', 'alt' => '`', 'height' => 18, 'width' => 14));
-            $u_l   = Banana::$page->makeImg(Array('img' => 'l2', 'alt' => '|', 'height' => 18, 'width' => 14));
-            $u_f   = Banana::$page->makeImg(Array('img' => 'f2', 'alt' => 't', 'height' => 18, 'width' => 14));
-            $r_h   = Banana::$page->makeImg(Array('img' => 'h2r', 'alt' => '-', 'height' => 18, 'width' => 14));
-            $r_ht  = Banana::$page->makeImg(Array('img' => 'T2r', 'alt' => '+', 'height' => 18, 'width' => 14));
-            $r_vt  = Banana::$page->makeImg(Array('img' => 't2r', 'alt' => '`', 'height' => 18, 'width' => 14));
-            $r_l   = Banana::$page->makeImg(Array('img' => 'l2r', 'alt' => '|', 'height' => 18, 'width' => 14));
-            $r_f   = Banana::$page->makeImg(Array('img' => 'f2r', 'alt' => 't', 'height' => 18, 'width' => 14));
+            $tree['+'] = array(Banana::$page->makeImg(Array('img' => 'T2', 'alt' => '-', 'height' => 18,  'width' => 14)),
+                               Banana::$page->makeImg(Array('img' => 'T2r', 'alt' => '+', 'height' => 18, 'width' => 14)));
+            $tree['-'] = array(Banana::$page->makeImg(Array('img' => 'h2', 'alt' => '-', 'height' => 18,  'width' => 14)),
+                               Banana::$page->makeImg(Array('img' => 'h2r', 'alt' => '-', 'height' => 18, 'width' => 14)));
+            $tree['|'] = array(Banana::$page->makeImg(Array('img' => 'l2', 'alt' => '|', 'height' => 18, 'width' => 14)),
+                               Banana::$page->makeImg(Array('img' => 'l2r', 'alt' => '|', 'height' => 18, 'width' => 14)));
+            $tree['`'] = array(Banana::$page->makeImg(Array('img' => 't2', 'alt' => '`', 'height' => 18, 'width' => 14)),
+                               Banana::$page->makeImg(Array('img' => 't2r', 'alt' => '`', 'height' => 18, 'width' => 14)));
+            $tree['t'] = array(Banana::$page->makeImg(Array('img' => 'f2', 'alt' => 't', 'height' => 18, 'width' => 14)),
+                               Banana::$page->makeImg(Array('img' => 'f2r', 'alt' => 't', 'height' => 18, 'width' => 14)));
         }
         $text = '<div class="tree">';
         foreach ($this->data as &$line) {
@@ -117,18 +119,11 @@ class BananaTree
                     $text .= $t_e;
                 } else if (is_array($item)) {
                     $head =& Banana::$spool->overview[$item[1]];
-                    switch ($item[0]) {
-                      case '+': $text .= $head->isread ? $r_ht : $u_ht; break;
-                      case '-': $text .= $head->isread ? $r_h : $u_h; break;
-                      case '|': $text .= $head->isread ? $r_l : $u_l; break;
-                      case '`': $text .= $head->isread ? $r_vt : $u_vt; break;
-                      case 't': $text .= $head->isread ? $r_f : $u_f; break;
-                    }
+                    $text .= $tree[$item[0]][$head->isread ? 1 : 0];
                 } else {
                     $head =& Banana::$spool->overview[$item];
-                    $text .= '<span style="background-color:' . $head->color . '; text-decoration: none"'
-                          .       ' title="' .  $this->title[$item] . '">'
-                          .  '<input type="radio" name="banana_tree" value="' . $head->id . '"';
+                    $text .= '<span style="background-color: ' . $head->color . '; text-decoration: none" title="'
+                          .  $this->title[$item] . '"><input type="radio" name="banana_tree" value="' . $head->id . '"';
                     if (Banana::$msgshow_javascript) {
                         $text .= ' onchange="window.location=\'' . $this->urls[$item] . '\'"';
                     } else {

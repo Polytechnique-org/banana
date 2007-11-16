@@ -76,10 +76,10 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
                     if (!is_utf8($desc)) {
                         $desc = utf8_encode($desc);
                     }
-                    $this->boxes[$group] = array('desc' => $desc);           
+                    $this->boxes[$group] = array('desc' => $desc);
                 } else {
                     $this->boxes[$group] = array('desc' => null);
-                }    
+                }
             }
             ksort($this->boxes);
         }

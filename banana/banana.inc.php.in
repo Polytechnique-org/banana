@@ -673,26 +673,7 @@ class Banana
     {
         Banana::load('spool');
         if (!Banana::$spool || Banana::$spool->group != $group) {
-            $clean = false;
-            if (php_sapi_name() != 'cli') {
-                if ($group == @$_SESSION['banana_group'] && isset($_SESSION['banana_spool'])) {
-                    Banana::$spool = unserialize($_SESSION['banana_spool']);
-                    unset($_SESSION['banana_spool']);
-                    $clean = @(Banana::$profile['lastnews'] != $_SESSION['banana_lastnews']);
-                } else {
-                    unset($_SESSION['banana_message']);
-                    unset($_SESSION['banana_artid']);
-                    unset($_SESSION['banana_showhdr']);
-                }
-            }
-            BananaSpool::getSpool($group, Banana::$profile['lastnews'], Banana::$profile['autoup'] || $clean);
-            if (php_sapi_name() != 'cli') {
-                $_SESSION['banana_group'] = $group;
-                if (!Banana::$profile['display']) {
-                    $_SESSION['banana_spool'] = serialize(Banana::$spool);
-                    $_SESSION['banana_lastnews'] = Banana::$profile['lastnews'];
-                }
-            }
+            BananaSpool::getSpool($group, Banana::$profile['lastnews'], Banana::$profile['autoup']);
             Banana::$spool->setMode(Banana::$profile['display'] ? Banana::SPOOL_UNREAD : Banana::SPOOL_ALL);
         }
         return true;

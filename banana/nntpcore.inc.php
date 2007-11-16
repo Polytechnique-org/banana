@@ -100,9 +100,10 @@ class BananaNNTPCore
     /** get a line from server
      * @return STRING 
      */
-    private function getLine()
+    private function &getLine()
     {
-        return rtrim(@fgets($this->ns, 1200), "\r\n");
+        $data = rtrim(@fgets($this->ns, 1200), "\r\n");
+        return $data;
     }
 
     /** fetch data (and on delimitor)
@@ -111,11 +112,13 @@ class BananaNNTPCore
     private function &fetchResult()
     {
         $array = Array();
-        while (($result = $this->getLine()) != '.') {
-            $array[] = $result;
+        while (($result =& $this->getLine()) != '.') {
+            $array[] =& $result;
         }
         if ($this->debug && $this->bt) {
-            $this->bt[count($this->bt) - 1]['response'] = count($array);
+            $trace =& $this->bt[count($this->bt) - 1];
+            $trace['response'] = count($array);
+            $trace['time']     = microtime(true) - $trace['start'];
         }
         return $array;
     }
@@ -131,7 +134,7 @@ class BananaNNTPCore
         }
         if ($this->debug) {
             $db_line = preg_replace('/PASS .*/', 'PASS *******', $line);
-            $this->bt[] = array('action' => $db_line, 'time' => microtime(true));
+            $this->bt[] = array('action' => $db_line, 'start' => microtime(true));
         }
         return @fputs($this->ns, $line, strlen($line));
     }
@@ -172,7 +175,7 @@ class BananaNNTPCore
         $this->lastresulttext = substr($result, 4);
         if ($this->debug && $this->bt) {
             $trace =& $this->bt[count($this->bt) - 1];
-            $trace['time']     = microtime(true) - $trace['time'];
+            $trace['time']     = microtime(true) - $trace['start'];
             $trace['code']     = $this->lastresultcode;
             $trace['message']  = $this->lastresulttext;
             $trace['response'] = 0;
