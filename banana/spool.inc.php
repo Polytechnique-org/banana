@@ -430,6 +430,7 @@ class BananaSpool
 
         // Remove from the message tree
         if (!is_null($parent)) {
+            $time = time();
             foreach ($parent->children as $key=>&$child) {
                 if ($child === $overview) {
                     unset($parent->children[$key]);
@@ -437,12 +438,12 @@ class BananaSpool
                 }
             }
             if (sizeof($overview->children)) {
-                $parent->children = array_merge($parent->children, $overview->children);
                 foreach ($overview->children as &$child) {
+                    $parent->children[] =& $child;
+                    $child->time   = $time;
                     $child->parent =& $parent;
                 }
             }
-            $time = time();
             while (!is_null($parent)) {
                 $parent->desc--;
                 $parent->time = $time;
