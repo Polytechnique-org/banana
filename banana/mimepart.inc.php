@@ -238,6 +238,9 @@ class BananaMimePart
     {
         if ($is_filename) {
             $type = mime_content_type($data);
+            if ($type == 'text/plain') { // XXX Workaround a bug of php 5.2.0+etch10 (fallback for mime_content_type is text/plain)
+                $type = preg_replace('/;.*/', '', trim(shell_exec('file -bi ' . escapeshellarg($data))));
+            }
         } else {
             $arg = escapeshellarg($data);
             $type = preg_replace('/;.*/', '', trim(shell_exec("echo $arg | file -bi -")));
