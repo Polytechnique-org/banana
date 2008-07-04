@@ -37,6 +37,10 @@ class Banana
     static public $spool_tmax    = 10;
     static public $spool_boxlist = true;
 
+### Tree options ###
+    static public $tree_read  = '';
+    static public $tree_unread = 'r';
+
 ### Message processing ###
     static public $msgparse_headers = array('content-disposition', 'content-transfer-encoding',
                                        'content-type', 'content-id', 'date', 'followup-to',
