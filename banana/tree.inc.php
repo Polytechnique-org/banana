@@ -100,16 +100,16 @@ class BananaTree
         if (!isset($t_e)) {
             $tree  = array();
             $t_e   = Banana::$page->makeImg(Array('img' => 'e',  'alt' => ' ', 'height' => 18, 'width' => 14));
-            $tree['+'] = array(Banana::$page->makeImg(Array('img' => 'T2', 'alt' => '-', 'height' => 18,  'width' => 14)),
-                               Banana::$page->makeImg(Array('img' => 'T2r', 'alt' => '+', 'height' => 18, 'width' => 14)));
-            $tree['-'] = array(Banana::$page->makeImg(Array('img' => 'h2', 'alt' => '-', 'height' => 18,  'width' => 14)),
-                               Banana::$page->makeImg(Array('img' => 'h2r', 'alt' => '-', 'height' => 18, 'width' => 14)));
+            $tree['+'] = array(Banana::$page->makeImg(Array('img' => 'p2', 'alt' => '-', 'height' => 18,  'width' => 14)),
+                               Banana::$page->makeImg(Array('img' => 'p2r', 'alt' => '+', 'height' => 18, 'width' => 14)));
+            $tree['-'] = array(Banana::$page->makeImg(Array('img' => 'm2', 'alt' => '-', 'height' => 18,  'width' => 14)),
+                               Banana::$page->makeImg(Array('img' => 'm2r', 'alt' => '-', 'height' => 18, 'width' => 14)));
             $tree['|'] = array(Banana::$page->makeImg(Array('img' => 'l2', 'alt' => '|', 'height' => 18, 'width' => 14)),
                                Banana::$page->makeImg(Array('img' => 'l2r', 'alt' => '|', 'height' => 18, 'width' => 14)));
-            $tree['`'] = array(Banana::$page->makeImg(Array('img' => 't2', 'alt' => '`', 'height' => 18, 'width' => 14)),
-                               Banana::$page->makeImg(Array('img' => 't2r', 'alt' => '`', 'height' => 18, 'width' => 14)));
-            $tree['t'] = array(Banana::$page->makeImg(Array('img' => 'f2', 'alt' => 't', 'height' => 18, 'width' => 14)),
-                               Banana::$page->makeImg(Array('img' => 'f2r', 'alt' => 't', 'height' => 18, 'width' => 14)));
+            $tree['`'] = array(Banana::$page->makeImg(Array('img' => 'a2', 'alt' => '`', 'height' => 18, 'width' => 14)),
+                               Banana::$page->makeImg(Array('img' => 'a2r', 'alt' => '`', 'height' => 18, 'width' => 14)));
+            $tree['t'] = array(Banana::$page->makeImg(Array('img' => 't2', 'alt' => 't', 'height' => 18, 'width' => 14)),
+                               Banana::$page->makeImg(Array('img' => 't2r', 'alt' => 't', 'height' => 18, 'width' => 14)));
         }
         $text = '<div class="tree">';
         foreach ($this->data as &$line) {
