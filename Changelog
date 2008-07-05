@@ -1,3 +1,12 @@
+Sat, 5 Jul 2008                       Nicolas Cortot <nicolas.cortot@m4x.org>
+
+	* More branch colors
+
+Fri, 4 Jul 2008                     Florent Bruneau <florent.bruneau@m4x.org>
+
+	* The color of the branches of the tree are configurable.
+
+
 ================================================================================
 VERSION 1.8
 
@@ -15,7 +24,7 @@ Fri, 19 Oct 2007                    Florent Bruneau <florent.bruneau@m4x.org>
 ================================================================================
 VERSION 1.7
 
-Sun, 30 Sep 2007				    Florent Bruneau <florent.bruneau@m4x.org>
+Sun, 30 Sep 2007					Florent Bruneau <florent.bruneau@m4x.org>
 
 	* Can overlaod the xface generation
 
@@ -82,7 +91,7 @@ Wed, 21 Feb 2007                    Florent Bruneau <florent.bruneau@m4x.org>
 ================================================================================
 VERSION 1.5
 
-Dec 2006, Jan 2007	                Florent Bruneau <florent.bruneau@m4x.org>
+Dec 2006, Jan 2007					Florent Bruneau <florent.bruneau@m4x.org>
 
 	* Use Smarty for page rendering
 	* XHTML output
@@ -223,7 +232,7 @@ Mon, 03 Jan 2005					Pierre Habouzit <pierre.habouzit@m4x.org>
 	* $banana is now the only global variable we need.
 	* exit format.inc.php.
 
-Sun, 02 Jan 2005               		Pierre Habouzit <pierre.habouzit@m4x.org>
+Sun, 02 Jan 2005					Pierre Habouzit <pierre.habouzit@m4x.org>
 
 	* _(..) -> _b_(..) that performs a dgettext('banana', ...).
 	* use gettext and no more $locales.
