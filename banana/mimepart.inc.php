@@ -201,7 +201,14 @@ class BananaMimePart
             $parts = $this->findUUEncoded();
             if (count($parts)) {
                 $this->convertToMultiPart();
-                $this->multipart    = array_merge(array($textpart), $parts);
+                $this->multipart = array_merge($this->multipart, $parts);
+                // Restore "message" headers to the previous level"
+                $this->headers = array();
+                foreach (Banana::$msgshow_headers as $hdr) {
+                    if (isset($this->multipart[0]->headers[$hdr])) {
+                        $this->headers[$hdr] = $this->multipart[0]->headers[$hdr];
+                    }
+                }
             }
         }
     }
@@ -260,11 +267,12 @@ class BananaMimePart
                 if ($mime != 'application/x-empty') {
                     $this->body = trim(str_replace($match[0], '', $this->body));
                     $newpart = new BananaMimePart;
+                    self::decodeHeader($match[2]);
                     $newpart->makeDataPart($data, $mime, '8bit', $match[2], 'attachment');
                     $parts[] = $newpart;
                 }
-            }   
-        } 
+            }
+        }
         return $parts;
     }
 
@@ -275,7 +283,7 @@ class BananaMimePart
         return str_replace('_', ' ', $s);
     }
 
-    static public function decodeHeader(&$val, $key)
+    static public function decodeHeader(&$val, $key = null)
     {
         if (preg_match('/[\x80-\xff]/', $val)) {
             if (!is_utf8($val)) {

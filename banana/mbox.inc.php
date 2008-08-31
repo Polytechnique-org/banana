@@ -302,7 +302,7 @@ class BananaMBox implements BananaProtocoleInterface
      */
     private function getMBoxPosition(array &$options, $id = null)
     {
-        if (Banana::$spool->overview) {
+        if (Banana::$spool && Banana::$spool->overview) {
             if (!is_null($id) && isset(Banana::$spool->overview[$id])) {
                 $key = $id;
             } else {
