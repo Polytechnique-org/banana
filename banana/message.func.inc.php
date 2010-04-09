@@ -88,13 +88,16 @@ function banana_catchFormats($text)
                         'strong' => array('\B\*\b', '\b\*\B'));
     $url = Banana::$msgshow_url;
     preg_match_all("/$url/ui", $text, $urls);
-    $text = str_replace($urls[0], "&&&urls&&&", $text);
+    $urls = $urls[0];
+    $replace = $urls;
+    rsort($replace);
+    $text = str_replace($replace, "&&&urls&&&", $text);
     foreach ($formatting as $mark=>$limit) {
         list($ll, $lr) = $limit;
         $text = preg_replace('/' . $ll . '(\w+?)' . $lr . '/us',
                              "<$mark>\\1</$mark>", $text);
     }
-    return preg_replace('/&&&urls&&&/e', 'array_shift($urls[0])', $text);
+    return preg_replace('/&&&urls&&&/e', 'array_shift($urls)', $text);
 }
 
 /** Build a flowed text from plain text
