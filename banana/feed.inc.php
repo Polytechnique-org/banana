@@ -138,7 +138,7 @@ class BananaFeed
 
     /** Merge to feeds into a new one
      */
-    static public function &merge(&$feed1, &$feed2, $name, $description = null)
+    static public function &merge($feed1, $feed2, $name, $description = null)
     {
         if (!$feed1) {
             $feed  = null;

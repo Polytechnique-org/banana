@@ -40,7 +40,7 @@ class BananaTree
 
     /** Construct a new tree from a given root
      */
-    public function __construct(BananaSpoolHead &$root)
+    public function __construct(BananaSpoolHead $root)
     {
         if (empty($root->children)) {
             $this->data = null;
@@ -52,7 +52,7 @@ class BananaTree
         $this->saveToFile($root->id);
     }
 
-    private function &builder(BananaSpoolHead &$head)
+    private function &builder(BananaSpoolHead $head)
     {
         $array = array(array($head->id));
         $this->urls[$head->id]  = banana_entities(Banana::$page->makeURL(array('group' => Banana::$group,

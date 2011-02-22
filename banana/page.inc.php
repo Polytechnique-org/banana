@@ -236,7 +236,7 @@ class BananaPage extends Smarty
      *
      * smarty funciton : {url param1=... param2=...}
      */
-    public function makeUrl(array $params, &$smarty = null)
+    public function makeUrl(array $params, $smarty = null)
     {
         if (function_exists('hook_makeLink')
                 && $res = hook_makeLink($params)) {
@@ -274,7 +274,7 @@ class BananaPage extends Smarty
      *
      * Smarty function : {link param1=... param2=...}
      */
-    public function makeLink(array $params, &$smarty = null)
+    public function makeLink(array $params, $smarty = null)
     {
         $catch = array('text', 'popup', 'class', 'accesskey', 'style');
         foreach ($catch as $key) {
@@ -318,7 +318,7 @@ class BananaPage extends Smarty
      *
      * Smarty function: {img img=... alt=... [height=...] [width=...]}
      */
-    public function makeImg(array $params, &$smarty = null)
+    public function makeImg(array $params, $smarty = null)
     {
         $catch = array('img', 'alt', 'height', 'width');
         foreach ($catch as $key) {
@@ -377,7 +377,7 @@ class BananaPage extends Smarty
      *
      * Smarty function : {imglink img=... alt=... [param1=...]}
      */
-    public function makeImgLink(array $params, &$smarty = null)
+    public function makeImgLink(array $params, $smarty = null)
     {
         if (!isset($params['popup'])) {
             $params['popup'] = @$params['alt'];
@@ -406,7 +406,7 @@ class BananaPage extends Smarty
 
 // {{{  function banana_trimwhitespace
 
-function banana_trimwhitespace($source, &$smarty)
+function banana_trimwhitespace($source, $smarty)
 {
     $tags = array('script', 'pre', 'textarea');
 

@@ -234,7 +234,7 @@ function banana_wrap($text, $base_level = 0, $strict = true)
     return $text;
 }
 
-function banana_formatPlainText(BananaMimePart &$part, $base_level = 0)
+function banana_formatPlainText(BananaMimePart $part, $base_level = 0)
 {
     $text = $part->getText();
     if ($part->isFlowed()) {
@@ -244,7 +244,7 @@ function banana_formatPlainText(BananaMimePart &$part, $base_level = 0)
     return banana_plainTextToHtml($text, $part->isFlowed());
 }
 
-function banana_quotePlainText(BananaMimePart &$part)
+function banana_quotePlainText(BananaMimePart $part)
 {
     $text = $part->getText();
     if ($part->isFlowed()) {
@@ -488,7 +488,7 @@ function banana_htmlToPlainText($res)
     return banana_html_entity_decode($res);    
 }
 
-function banana_formatHtml(BananaMimePart &$part)
+function banana_formatHtml(BananaMimePart $part)
 {
     $text = $part->getText();
     $text = banana_catchHtmlSignature($text);
@@ -499,7 +499,7 @@ function banana_formatHtml(BananaMimePart &$part)
     return banana_cleanHtml($text, true);
 }
 
-function banana_quoteHtml(BananaMimePart &$part)
+function banana_quoteHtml(BananaMimePart $part)
 {
     $text = $part->getText();
     $text = banana_htmlToPlainText($text);
@@ -542,7 +542,7 @@ function banana_richtextToHtml($source)
     return banana_cleanHtml($source);
 }
 
-function banana_formatRichText(BananaMimePart &$part)
+function banana_formatRichText(BananaMimePart $part)
 {
     $text = $part->getText();
     $text = banana_richtextToHtml($text);
@@ -550,7 +550,7 @@ function banana_formatRichText(BananaMimePart &$part)
     return banana_cleanHtml($text);
 }
 
-function banana_quoteRichtText(BananaMimePart &$part)
+function banana_quoteRichtText(BananaMimePart $part)
 {
     $text = $part->getText();
     $text = banana_richtextToHtml($text);

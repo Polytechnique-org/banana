@@ -90,12 +90,12 @@ interface BananaProtocoleInterface
     /** Send a message
      * @return true if it was successfull
      */
-    public function send(BananaMessage &$message);
+    public function send(BananaMessage $message);
 
     /** Cancel a message
      * @return true if it was successfull
      */
-    public function cancel(BananaMessage &$message);
+    public function cancel(BananaMessage $message);
 
     /** Return the protocole name
      */

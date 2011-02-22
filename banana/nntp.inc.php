@@ -209,7 +209,7 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
 
     /** Send the message
      */
-    public function send(BananaMessage &$message)
+    public function send(BananaMessage $message)
     {
         $sources = $message->get(true);
         return $this->post($sources);
@@ -217,7 +217,7 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
 
     /** Cancel the message
      */
-    public function cancel(BananaMessage &$message)
+    public function cancel(BananaMessage $message)
     {
         $headers = Array('From' => Banana::$profile['From'],
                          'Newsgroups' => Banana::$group,

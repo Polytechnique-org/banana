@@ -469,7 +469,7 @@ class BananaNNTPCore
         $array  =& $this->fetchResult();
         $groups = array();
         foreach ($array as &$result) {
-            @list($group, $desc) = split("[ \t]", $result, 2);
+            @list($group, $desc) = preg_split("[ \t]", $result, 2);
             $groups[$group] = $desc;
         }
         return $groups;

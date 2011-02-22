@@ -164,7 +164,7 @@ class BananaSpool
         return $spool;
     }
 
-    private function compare(&$a, &$b)
+    private function compare($a, $b)
     {
         return ($b->date - $a->date);
     }
@@ -468,7 +468,7 @@ class BananaSpool
         }
     }
 
-    public function formatDate(BananaSpoolHead &$head)
+    public function formatDate(BananaSpoolHead $head)
     {
         $stamp  = $head->date;
         $today  = intval(time() / (24*3600));
@@ -488,7 +488,7 @@ class BananaSpool
         return strftime($format, $stamp);
     }
 
-    public function formatSubject(BananaSpoolHead &$head)
+    public function formatSubject(BananaSpoolHead $head)
     {
         $subject = $popup = $head->subject;
         $popup = $subject;
@@ -508,7 +508,7 @@ class BananaSpool
         return $subject . $link;
     }
 
-    public function formatFrom(BananaSpoolHead &$head)
+    public function formatFrom(BananaSpoolHead $head)
     {
         return BananaMessage::formatFrom($head->from);
     }
@@ -652,7 +652,7 @@ class BananaSpool
     /** Look for an unread message in the thread rooted by the message
      * @param id INTEGER message number
      */
-    private function _nextUnread(BananaSpoolHead &$cur)
+    private function _nextUnread(BananaSpoolHead $cur)
     {
         if (!$cur->isread) {
             return $cur->id;

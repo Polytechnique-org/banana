@@ -226,7 +226,7 @@ class BananaMBox implements BananaProtocoleInterface
     /** Send a message
      * @return true if it was successfull
      */
-    public function send(BananaMessage &$message)
+    public function send(BananaMessage $message)
     {
         $headers = $message->getHeaders();
         $to      = $headers['To'];
@@ -246,7 +246,7 @@ class BananaMBox implements BananaProtocoleInterface
     /** Cancel a message
      * @return true if it was successfull
      */
-    public function cancel(BananaMessage &$message)
+    public function cancel(BananaMessage $message)
     {
         return false;
     }
