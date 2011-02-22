@@ -509,7 +509,7 @@ class Banana
                     $hdr_values[$header] = utf8_encode($hdr_values[$header]);
                 }
             }
-            $values = preg_split('[,; ]', $hdr_values[$hdrs['dest']]);
+            $values = preg_split('/[,; ]/', $hdr_values[$hdrs['dest']]);
             $hdr_values[$hdrs['dest']] = preg_replace('/,+/', ',', implode(',', $values));
             if (!is_null($artid)) {
                 $old =& $this->loadMessage($group, $artid);
