@@ -11,6 +11,7 @@ msgstr ""
 "PO-Revision-Date: 2005-01-02 17:13+0100\n"
 "Last-Translator: Florent Bruneau <florent.bruneau@m4x.org>\n"
 "Language-Team:  <fr@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -104,8 +105,10 @@ msgid "(pas de sujet)"
 msgstr "(pas de sujet)"
 
 #: template.php:2
-msgid "Les nouveaux groupes suivants ont été créés depuis votre dernière visite"
-msgstr "Les nouveaux groupes suivants ont été créés depuis votre dernière visite"
+msgid ""
+"Les nouveaux groupes suivants ont été créés depuis votre dernière visite"
+msgstr ""
+"Les nouveaux groupes suivants ont été créés depuis votre dernière visite"
 
 #: template.php:3
 msgid "Voulez-vous vraiment annuler ce message ?"
