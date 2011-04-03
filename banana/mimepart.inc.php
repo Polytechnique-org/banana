@@ -156,10 +156,12 @@ class BananaMimePart
             return;
         }
         $content       = join("\n", $lines);
+        unset($lines);
         $test          = trim($content);
         if (empty($test)) {
             return;
         }
+        unset($test);
 
         $content_type = strtolower($this->getHeader('content-type', '/^\s*([^ ;]+?)(;|$)/'));
         if (empty($content_type)) {
