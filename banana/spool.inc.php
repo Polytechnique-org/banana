@@ -501,6 +501,9 @@ class BananaSpool
         if (empty($subject)) {
             $subject = _b_('(pas de sujet)');
         }
+        if (strlen($subject) > 100) {
+            $subject = substr($subject, 0, 99) . '&hellip;';
+        }
         if ($head->id !== Banana::$artid) {
             $subject = Banana::$page->makeLink(Array('group' => $this->group, 'artid' => $head->id,
                                                      'text'  => $subject, 'popup' => $popup));
