@@ -8,11 +8,11 @@
         {assign var=nextPost value=$spool->nextPost($artid)}
         {assign var=prevThread value=$spool->prevThread($artid)}
         {assign var=nextThread value=$spool->nextThread($artid)}
-        {if $nextUnread}{imglink group=$group artid=$nextUnread img=next_unread alt="Message non-lu suivant"|b accesskey=u}{/if}
-        {if $prevPost}{imglink group=$group artid=$prevPost img=prev alt="Message précédent"|b accesskey=a}{/if}
-        {if $nextPost}{imglink group=$group artid=$nextPost img=next alt="Message suivant"|b accesskey=z}{/if}
-        {if $prevThread}{imglink group=$group artid=$prevThread img=prev_thread alt="Discussion précédente"|b accesskey=q}{/if}
-        {if $nextThread}{imglink group=$group artid=$nextThread img=next_thread alt="Discussion suivante"|b accesskey=s}{/if}
+        {if $prevThread}{imglink group=$group artid=$prevThread img=prev_thread alt="Discussion précédente"|b accesskey=q}{else}{img img="null"}{/if}
+        {if $nextThread}{imglink group=$group artid=$nextThread img=next_thread alt="Discussion suivante"|b accesskey=s}{else}{img img="null"}{/if}
+        {if $prevPost}{imglink group=$group artid=$prevPost img=prev alt="Message précédent"|b accesskey=a}{else}{img img="null"}{/if}
+        {if $nextPost}{imglink group=$group artid=$nextPost img=next alt="Message suivant"|b accesskey=z}{else}{img img="null"}{/if}
+        {if $nextUnread}{imglink group=$group artid=$nextUnread img=next_unread alt="Message non-lu suivant"|b accesskey=u}{else}{img img="null"}{/if}
       </div>
       <div class="action">
         {if $message->canSend()}
