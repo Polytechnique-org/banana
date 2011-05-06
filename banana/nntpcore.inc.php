@@ -198,7 +198,7 @@ class BananaNNTPCore
      * @param $pass INTEGER password
      * @return BOOLEAN true if authentication was successful
      */
-    protected function authinfo($user, $pass)
+    public function authinfo($user, $pass)
     {
         if ($this->execLine("AUTHINFO USER $user", false)) {
             return $this->execline("AUTHINFO PASS $pass");
@@ -216,7 +216,7 @@ class BananaNNTPCore
      * @see body
      * @see head
      */
-    protected function article($msgid = "")
+    public function article($msgid = "")
     {
         if (!$this->execLine("ARTICLE $msgid")) {
             return false;
@@ -229,7 +229,7 @@ class BananaNNTPCore
      * @param $_message STRING message to post
      * @return STRING MSGID of article 
      */
-    protected function post($message)
+    public function post($message)
     {
         if (!$this->execLine("POST ", false)) {
             return false;
@@ -251,7 +251,7 @@ class BananaNNTPCore
      * @see article
      * @see head
      */
-    protected function body($msgid = '')
+    public function body($msgid = '')
     {
         if ($this->execLine("BODY $msgid")) {
             return false;
@@ -266,7 +266,7 @@ class BananaNNTPCore
      * @see article
      * @see body
      */
-    protected function head($msgid = '')
+    public function head($msgid = '')
     {
         if (!$this->execLine("HEAD $msgid")) {
             return false;
@@ -278,7 +278,7 @@ class BananaNNTPCore
      * @param $_group STRING 
      * @return ARRAY array : nb of articles in group, MSGNUM of first article, MSGNUM of last article, and group name
      */
-    protected function group($group)
+    public function group($group)
     {
         if (!$this->execLine("GROUP $group")) {
             return false;
@@ -294,7 +294,7 @@ class BananaNNTPCore
      * @return STRING MSGID of article
      * @see next
      */
-    protected function last()
+    public function last()
     {
         if (!$this->execLine("LAST ")) {
             return false;
@@ -310,7 +310,7 @@ class BananaNNTPCore
      * @see last
      */
 
-    protected function next()
+    public function next()
     {
         if (!$this->execLine('NEXT ')) {
             return false;
@@ -327,7 +327,7 @@ class BananaNNTPCore
      * @see article
      * @see body
      */
-    protected function nntpstat($msgid)
+    public function nntpstat($msgid)
     {
         if (!$this->execLine("STAT $msgid")) {
             return false;
@@ -358,7 +358,7 @@ class BananaNNTPCore
      * @return ARRAY group name => (MSGNUM of first article, MSGNUM of last article, NNTP flags)
      * @see newgroups
      */
-    protected function listGroups()
+    public function listGroups()
     {
         if (!$this->execLine('LIST')) {
             return false;
@@ -381,14 +381,14 @@ class BananaNNTPCore
      * @return ARRAY same format as liste
      * @see liste
      */
-    protected function newgroups($since, $distributions = '')
+    public function newgroups($since, $distributions = '')
     {
         if (!($since = $this->formatDate($since))) {
             return false;
         }
         if (!$this->execLine("NEWGROUPS $since $distributions")) {
             return false;
-        }    
+        }
         return $this->filterGroups();
     }
 
@@ -397,7 +397,7 @@ class BananaNNTPCore
      * @parma $_groups STRING pattern of intersting groups 
      * @return ARRAY MSGID of new articles
      */
-    protected function newnews($groups = '*', $since = 0, $distributions = '')
+    public function newnews($groups = '*', $since = 0, $distributions = '')
     {
         if (!($since = $this->formatDate($since))) {
             return false;
@@ -411,7 +411,7 @@ class BananaNNTPCore
     /** Tell the remote server that I am not a user client, but probably another news server
      * @return BOOLEAN true if sucessful
      */
-    protected function slave()
+    public function slave()
     {
         return $this->execLine("SLAVE ");
     }
@@ -421,7 +421,7 @@ class BananaNNTPCore
      * @param $_message STRING article
      * @return BOOLEAN 
      */
-    protected function ihave($msgid, $message = false)
+    public function ihave($msgid, $message = false)
     {
         if (!$this->execLine("IHAVE $msgid ")) {
             return false;
@@ -431,7 +431,7 @@ class BananaNNTPCore
 
     /** closes connection to server
      */
-    protected function quit()
+    public function quit()
     {
         $this->execLine('QUIT');
         fclose($this->ns);
@@ -445,7 +445,7 @@ class BananaNNTPCore
      * @return INTEGER timestamp 
      */
 
-    protected function date()
+    public function date()
     {
         if (!$this->execLine('DATE ', false)) {
             return false;
@@ -461,7 +461,7 @@ class BananaNNTPCore
      * @return ARRAY group name => description
      */
 
-    protected function xgtitle($pattern = '*')
+    public function xgtitle($pattern = '*')
     {
         if (!$this->execLine("XGTITLE $pattern ")) {
             return false;
@@ -480,7 +480,7 @@ class BananaNNTPCore
      * @param $_range STRING range of articles 
      * @return ARRAY MSGNUM => header value
      */
-    protected function xhdr($hdr, $first = null, $last = null)
+    public function xhdr($hdr, $first = null, $last = null)
     {
         if (is_null($first) && is_null($last)) {
             $range = "";
@@ -505,7 +505,7 @@ class BananaNNTPCore
      * @param $_pat STRING pattern
      * @return ARRAY MSGNUM => header value
      */
-    protected function xpat($_hdr, $_range, $_pat)
+    public function xpat($_hdr, $_range, $_pat)
     {
         if (!$this->execLine("XPAT $hdr $range $pat")) {
             return false;
