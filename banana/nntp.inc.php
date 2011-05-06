@@ -26,14 +26,16 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
         $url = parse_url(Banana::$nntp_host);
         if ($url['scheme'] == 'nntps' || $url['scheme'] == 'snntp') {
             $url['host'] = 'ssl://' . $url['host'];
-        }
-        if (!isset($url['port'])) {
+            if (!isset($url['port'])) {
+                $url['port'] = 563;
+            }
+        } else if (!isset($url['port'])) {
             $url['port'] = 119;
         }
         parent::__construct($url['host'], $url['port']);
         if (isset($url['user'])) {
             $this->authinfo($url['user'], $url['pass']);
-        }      
+        }
     }
 
     /** Return the descript;ion of the current box
