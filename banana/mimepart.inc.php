@@ -124,7 +124,7 @@ class BananaMimePart
         return false;
     }
 
-    protected function getHeader($title, $filter = null)
+    public function getHeader($title, $filter = null)
     {
         if (!isset($this->headers[$title])) {
             return null;
@@ -308,7 +308,7 @@ class BananaMimePart
                 if (strpos($line, ':') !== false) {
                     list($hdr, $val) = explode(":", $line, 2);
                     $hdr = strtolower($hdr);
-                    if (in_array($hdr, Banana::$msgparse_headers)) {  
+                    if (in_array($hdr, Banana::$msgparse_headers)) {
                         $headers[$hdr] = ltrim($val);
                     } else {
                         unset($hdr);
@@ -453,9 +453,9 @@ class BananaMimePart
 
     public function toHtml()
     {
-        $signed =& $this->getSignedPart(); 
-        if ($signed !== $this) { 
-            return $signed->toHtml(); 
+        $signed =& $this->getSignedPart();
+        if ($signed !== $this) {
+            return $signed->toHtml();
         }
         @list($type, $subtype) = $this->getType();
         if ($type == 'image') {

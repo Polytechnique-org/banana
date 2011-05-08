@@ -240,8 +240,12 @@ function banana_formatPlainText(BananaMimePart $part, $base_level = 0)
     if ($part->isFlowed()) {
         $text = banana_unflowed($text);
     }
-    $text = banana_wrap($text, $base_level, $part->isFlowed());
-    return banana_plainTextToHtml($text, $part->isFlowed());
+    if (function_exists('hook_formatPart') && ($ret = hook_formatPart($text, $part, $base_level))) {
+        return $ret;
+    } else {
+        $text = banana_wrap($text, $base_level, $part->isFlowed());
+        return banana_plainTextToHtml($text, $part->isFlowed());
+    }
 }
 
 function banana_quotePlainText(BananaMimePart $part)
