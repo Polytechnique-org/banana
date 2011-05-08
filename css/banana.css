@@ -30,6 +30,7 @@ div.foot {
     border-top: 1px solid #a2c2e1;
     padding-top: 1em;
     margin-top: 1em;
+    font-size: 75%;
 }
 
 a:link, a:visited { color: #f60; background: transparent; }
