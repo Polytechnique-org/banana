@@ -89,7 +89,12 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
             foreach ($this->boxes as $group=>&$desc) {
                 list($msgnum, $first, $last, $groupname) = $this->group($group);
                 $this->ingroup = $group;
-                $new = count($this->newnews($group, $since));
+                $new = $this->newnews($group, $since);
+                if (!is_array($new)) {
+                    $new = 0;
+                } else {
+                    $new = count($new);
+                }
                 $desc['msgnum'] = $msgnum;
                 $desc['unread'] = $new;
             }
