@@ -124,6 +124,7 @@ class BananaTree
         $text = '<div class="tree">';
         foreach ($this->data as &$line) {
             $text .= '<div style="height: 18px">';
+            unset($head);
             foreach ($line as &$item) {
                 if ($item == ' ') {
                     $text .= $t_e;
@@ -142,8 +143,12 @@ class BananaTree
                     if (Banana::$artid == $item) {
                         $text .= ' checked="checked"';
                     }
+                    $last_title = $head->subject;
                     $text .= '/></span>';
                 }
+            }
+            if (function_exists('hook_spoolTagBranch') && isset($head)) {
+                $text .= hook_spoolTagBranch($head);
             }
             $text .= "</div>\n";
         }
