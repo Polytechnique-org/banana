@@ -313,7 +313,7 @@ class BananaSpool
                     if (!isset($this->ids[$msg])) {
                         continue;
                     }
-                    $msg = $this->ids[$msg];
+                    $msg = $this->ids[$msg]->id;
                 }
                 $this->markAsRead($msg);
             }

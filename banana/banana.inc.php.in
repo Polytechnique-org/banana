@@ -480,6 +480,9 @@ class Banana
             $groups    = Banana::$protocole->getBoxList(Banana::BOXES_SUB, Banana::$profile['lastnews'], true);
             Banana::$page->assign('groups', $groups);
         }
+        if (function_exists('hook_markAsRead')) {
+            hook_markAsRead($group, $artid, $msg);
+        }
         Banana::$page->assign_by_ref('message', $msg);
         Banana::$page->assign('extimages', Banana::$msgshow_hasextimages);
         Banana::$page->assign('headers', Banana::$msgshow_headers);
