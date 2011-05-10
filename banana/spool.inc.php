@@ -302,6 +302,22 @@ class BananaSpool
             }
         }
         $this->unreadnb += count($newpostsids);
+
+        if (function_exists('hook_listReadMessages')) {
+            $msgs = hook_listReadMessages($this->group);
+            if (!is_array($msgs)) {
+                return;
+            }
+            foreach ($msgs as $msg) {
+                if (!is_numeric($msg)) {
+                    if (!isset($this->ids[$msg])) {
+                        continue;
+                    }
+                    $msg = $this->ids[$msg];
+                }
+                $this->markAsRead($msg);
+            }
+        }
     }
 
     public function setMode($mode)

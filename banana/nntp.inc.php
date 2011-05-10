@@ -93,7 +93,20 @@ class BananaNNTP extends BananaNNTPCore implements BananaProtocoleInterface
                 if (!is_array($new)) {
                     $new = 0;
                 } else {
-                    $new = count($new);
+                    $c = count($new);
+                    if ($c > 0 && function_exists('hook_listReadMessages')) {
+                        $msgs = hook_listReadMessages($group);
+                        if (is_array($msgs)) {
+                            foreach ($msgs as $msg) {
+                                if (is_numeric($msg)) {
+                                    $c--;
+                                } else if (in_array($msg, $new)) {
+                                    $c--;
+                                }
+                            }
+                        }
+                    }
+                    $new = $c;
                 }
                 $desc['msgnum'] = $msgnum;
                 $desc['unread'] = $new;
