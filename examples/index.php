@@ -30,6 +30,31 @@ class MyBanana extends Banana
     }
 }
 
+// Implements storage of a list of read messages
+// (this is only an example of what is possible)
+function hook_listReadMessages($group)
+{
+    if (!isset($_COOKIE['banana_read'])) {
+        return null;
+    }
+    $msgs = unserialize(gzinflate(base64_decode($_COOKIE['banana_read'])));
+    return array_keys($msgs);
+}
+
+function hook_markAsRead($group, $artid, $msg)
+{
+    $msgs = array();
+    if (isset($_COOKIE['banana_read'])) {
+        $msgs = unserialize(gzinflate(base64_decode($_COOKIE['banana_read'])));
+    }
+    $id = $msg->getHeader('message-id');
+    $msgs[$id] = true;
+    $msgs = base64_encode(gzdeflate(serialize($msgs)));
+    setcookie('banana_read', $msgs, 0);
+    $_COOKIE['banana_read'] = $msgs;
+}
+
+
 // Minimalist login
 if ((@$_GET['action'] == 'rss2') ||
     (!isset($_SESSION['banana_email']) || isset($_POST['change_login']) || isset($_POST['valid_change']))) {
