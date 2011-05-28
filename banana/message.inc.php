@@ -219,7 +219,7 @@ final class BananaMessage extends BananaMimePart
 
     public function hasXFace()
     {
-        return Banana::$msgshow_xface && 
+        return Banana::$msgshow_xface &&
                ((function_exists('hook_hasxface') && hook_hasXFace($this->headers))
                || isset($this->headers['x-face']));
     }

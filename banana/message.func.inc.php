@@ -354,7 +354,7 @@ function banana_filterCss($css)
     }
     return $css;
 }
-    
+
 /**
  * @return string
  * @param string
@@ -366,7 +366,7 @@ function banana_cleanHtml($source, $to_xhtml = false)
         $tidy_config = array('drop-empty-paras' => true,
                              'drop-proprietary-attributes' => true,
                              'hide-comments' => true,
-                             'logical-emphasis' => true, 
+                             'logical-emphasis' => true,
                              'output-xhtml' => true,
                              'replace-color' => true,
                              'join-classes'  => false,
@@ -414,7 +414,7 @@ function banana_cleanHtml($source, $to_xhtml = false)
     // Use inlined style instead of old html attributes
     if ($to_xhtml) {
         $source = preg_replace('/<(\/?\w+)(.*?)(\/?>)/muise', "'<\\1' . banana_cleanStyles('\\1', '\\2') . '\\3'", $source);
-    }    
+    }
     return preg_replace('/<(.*?)>/ie', "'<'.banana_removeEvilAttributes('\\1').'>'", $source);
 }
 
@@ -489,7 +489,7 @@ function banana_htmlToPlainText($res)
     $res = trim(strip_tags($res, '<div><br><p><blockquote>'));
     $res = preg_replace("@</?(br|p|div).*?>@si", "\n", $res);
     $res = banana__convertQuotes($res);
-    return banana_html_entity_decode($res);    
+    return banana_html_entity_decode($res);
 }
 
 function banana_formatHtml(BananaMimePart $part)
@@ -498,7 +498,7 @@ function banana_formatHtml(BananaMimePart $part)
     $text = banana_catchHtmlSignature($text);
     if (!Banana::$msgshow_externalimages) {
         $text = banana_hideExternalImages($text);
-    }    
+    }
     $text = banana_catchPartLinks($text);
     return banana_cleanHtml($text, true);
 }

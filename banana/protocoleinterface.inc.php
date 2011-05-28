@@ -18,11 +18,11 @@ interface BananaProtocoleInterface
     /** Indicate if the Protocole handler has been succesfully built
      */
     public function isValid();
-    
+
     /** Indicate last error n°
      */
     public function lastErrNo();
-    
+
     /** Indicate last error text
      */
     public function lastError();
@@ -49,7 +49,7 @@ interface BananaProtocoleInterface
      * @param id Id of the emssage (can be either an Message-id or a message index)
      * @return The sources of the message (or null)
      */
-    public function getMessageSource($id); 
+    public function getMessageSource($id);
 
     /** Return the indexes of the messages presents in the Box
      * @return Array(number of messages, MSGNUM of the first message, MSGNUM of the last message)

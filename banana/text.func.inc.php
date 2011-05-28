@@ -37,13 +37,13 @@ function banana_entities($source)
 
 function banana_utf8entities($source)
 {
-   // array used to figure what number to decrement from character order value 
+   // array used to figure what number to decrement from character order value
    // according to number of characters used to map unicode to ascii by utf-8
    $decrement[4] = 240;
    $decrement[3] = 224;
    $decrement[2] = 192;
    $decrement[1] = 0;
-   
+
    // the number of bits to shift each charNum by
    $shift[1][0] = 0;
    $shift[2][0] = 6;
@@ -55,7 +55,7 @@ function banana_utf8entities($source)
    $shift[4][1] = 12;
    $shift[4][2] = 6;
    $shift[4][3] = 0;
-   
+
    $pos = 0;
    $len = strlen($source);
    $encodedString = '';
@@ -69,7 +69,7 @@ function banana_utf8entities($source)
          $pos++;
          continue;
       }
-      
+
       $i=1;
       if (($asciiPos >= 240) && ($asciiPos <= 255)) // 4 chars representing one unicode character
          $i=4;
@@ -81,7 +81,7 @@ function banana_utf8entities($source)
          $i=1;
       $thisLetter = substr($source, $pos, $i);
       $pos += $i;
-      
+
       // process the string representing the letter to a unicode entity
       $thisLen = strlen($thisLetter);
       $thisPos = 0;
@@ -99,14 +99,14 @@ function banana_utf8entities($source)
             $charNum = intval($thisCharOrd - 128);
             $decimalCode += ($charNum << $shift[$thisLen][$thisPos]);
          }
-         
+
          $thisPos++;
       }
-      
+
       $encodedLetter = '&#'. str_pad($decimalCode, ($thisLen==1)?3:5, '0', STR_PAD_LEFT).';';
       $encodedString .= $encodedLetter;
    }
-   
+
    return $encodedString;
 }
 

@@ -98,7 +98,7 @@ class BananaNNTPCore
 # Socket functions
 
     /** get a line from server
-     * @return STRING 
+     * @return STRING
      */
     private function &getLine()
     {
@@ -129,7 +129,7 @@ class BananaNNTPCore
     private function putLine($line, $format = false)
     {
         if ($format) {
-            $line = str_replace(array("\r", "\n"), '', $line);  
+            $line = str_replace(array("\r", "\n"), '', $line);
             $line .= "\r\n";
         }
         if ($this->debug) {
@@ -208,9 +208,9 @@ class BananaNNTPCore
 
     /** retrieves an article
      * MSGID is a numeric ID a shown in article's headers. MSGNUM is a
-     * server-dependent ID (see X-Ref on many servers) and retriving 
+     * server-dependent ID (see X-Ref on many servers) and retriving
      * an article by this way will change the current article pointer.
-     * If an error occur, false is returned. 
+     * If an error occur, false is returned.
      * @param $_msgid STRING MSGID or MSGNUM of article
      * @return ARRAY lines of the article
      * @see body
@@ -227,7 +227,7 @@ class BananaNNTPCore
     /** post a message
      * if an error occur, false is returned
      * @param $_message STRING message to post
-     * @return STRING MSGID of article 
+     * @return STRING MSGID of article
      */
     public function post($message)
     {
@@ -275,7 +275,7 @@ class BananaNNTPCore
     }
 
     /** set current group
-     * @param $_group STRING 
+     * @param $_group STRING
      * @return ARRAY array : nb of articles in group, MSGNUM of first article, MSGNUM of last article, and group name
      */
     public function group($group)
@@ -374,10 +374,10 @@ class BananaNNTPCore
         return gmdate("ymd His", $since) . ' GMT';
     }
 
-    /** get information about recent newsgroups 
+    /** get information about recent newsgroups
      * same as list, but information are limited to newgroups created after $_since
      * @param $_since INTEGER unix timestamp
-     * @param $_distributions STRING distributions 
+     * @param $_distributions STRING distributions
      * @return ARRAY same format as liste
      * @see liste
      */
@@ -394,7 +394,7 @@ class BananaNNTPCore
 
     /** gets a list of new articles
      * @param $_since INTEGER unix timestamp
-     * @parma $_groups STRING pattern of intersting groups 
+     * @parma $_groups STRING pattern of intersting groups
      * @return ARRAY MSGID of new articles
      */
     public function newnews($groups = '*', $since = 0, $distributions = '')
@@ -419,7 +419,7 @@ class BananaNNTPCore
     /** implements IHAVE method
      * @param $_msgid STRING MSGID of article
      * @param $_message STRING article
-     * @return BOOLEAN 
+     * @return BOOLEAN
      */
     public function ihave($msgid, $message = false)
     {
@@ -442,7 +442,7 @@ class BananaNNTPCore
 # NNTP Extensions [RFC 2980]
 
     /** Returns the date on the remote server
-     * @return INTEGER timestamp 
+     * @return INTEGER timestamp
      */
 
     public function date()
@@ -477,7 +477,7 @@ class BananaNNTPCore
 
     /** obtain the header field $hdr for all the messages specified
      * @param $_hdr STRING name of the header (eg: 'From')
-     * @param $_range STRING range of articles 
+     * @param $_range STRING range of articles
      * @return ARRAY MSGNUM => header value
      */
     public function xhdr($hdr, $first = null, $last = null)
@@ -501,7 +501,7 @@ class BananaNNTPCore
 
     /** obtain the header field $_hdr matching $_pat for all the messages specified
      * @param $_hdr STRING name of the header (eg: 'From')
-     * @param $_range STRING range of articles 
+     * @param $_range STRING range of articles
      * @param $_pat STRING pattern
      * @return ARRAY MSGNUM => header value
      */
@@ -520,5 +520,5 @@ class BananaNNTPCore
     }
 }
 
-// vim:set et sw=4 sts=4 ts=4 enc=utf-8: 
+// vim:set et sw=4 sts=4 ts=4 enc=utf-8:
 ?>

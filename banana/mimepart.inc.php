@@ -107,7 +107,7 @@ class BananaMimePart
             $this->body         = null;
             $this->format       = null;
             $this->id           = null;
-        } 
+        }
     }
 
     public function addAttachment(array $file, $content_type = null, $disposition = 'attachment')
@@ -136,7 +136,7 @@ class BananaMimePart
             return trim($matches[1]);
         }
         return null;
-    } 
+    }
 
     protected function fromRaw($data)
     {
@@ -229,11 +229,11 @@ class BananaMimePart
         foreach ($parts as &$part) {
             $newpart = new BananaMimePart($part);
             if (!is_null($newpart->content_type)) {
-                if ($signed && $newpart->content_type == $this->signature['protocole']) { 
+                if ($signed && $newpart->content_type == $this->signature['protocole']) {
                     $signature = $newpart->body;
-                } elseif ($signed) { 
-                    $signed_message = $part; 
-                } 
+                } elseif ($signed) {
+                    $signed_message = $part;
+                }
                 $this->multipart[] = $newpart;
             }
         }
@@ -260,7 +260,7 @@ class BananaMimePart
     private function findUUEncoded()
     {
         $this->decodeContent();
-        $parts = array(); 
+        $parts = array();
         if (preg_match_all("/\n(begin \d+ ([^\r\n]+)\r?(?:\n(?!end)[^\n]*)*\nend)/",
             $this->body, $matches, PREG_SET_ORDER)) {
             foreach ($matches as &$match) {
@@ -418,15 +418,15 @@ class BananaMimePart
         $content = "";
         if ($with_headers) {
             foreach ($this->getHeaders() as $key => $value) {
-                $line = "$key: $value"; 
+                $line = "$key: $value";
                 $line = explode("\n", wordwrap($line, Banana::$msgshow_wrap));
                 for ($i = 1 ; $i < count($line) ; $i++) {
                     $line[$i] = "\t" . $line[$i];
                 }
                 $content .= implode("\n", $line) . "\n";
-            } 
+            }
             $content .= "\n";
-        } 
+        }
         if ($this->isType('multipart')) {
             $this->setBoundary();
             foreach ($this->multipart as &$part) {
@@ -443,9 +443,9 @@ class BananaMimePart
 
     public function getText()
     {
-        $signed =& $this->getSignedPart(); 
-        if ($signed !== $this) { 
-            return $signed->getText(); 
+        $signed =& $this->getSignedPart();
+        if ($signed !== $this) {
+            return $signed->getText();
         }
         $this->decodeContent();
         return $this->body;
