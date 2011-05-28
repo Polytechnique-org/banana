@@ -548,7 +548,20 @@ class Banana
         } else {
             if (!is_null($artid)) {
                 $msg    =& $this->loadMessage($group, $artid);
-                $body    = $msg->getSender() . _b_(' a écrit :') . "\n" . $msg->quote();
+                $body    = $msg->quote();
+
+                if (isset($_POST['reply'])) {
+                    $body = explode("\n", $body);
+                    $replies = $_POST['reply'];
+                    krsort($replies);
+                    foreach ($replies as $line => $text) {
+                        $text = explode("\n", "\n" . $text . "\n");
+                        array_splice($body, $line + 1, 0, $text);
+                    }
+                    $body = implode("\n", $body);
+                }
+                $body = $msg->getSender() . _b_(' a écrit :') . "\n" . $body;
+
                 $subject = $msg->getHeaderValue('subject');
                 $headers['Subject']['user'] = 'Re: ' . preg_replace("/^re\s*:\s*/i", '', $subject);
                 $target  = $msg->getHeaderValue($hdrs['reply']);

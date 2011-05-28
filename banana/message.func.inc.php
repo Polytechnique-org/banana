@@ -223,7 +223,7 @@ function banana_wrap($text, $base_level = 0, $strict = true)
             if (!empty($buffer)) {
                 $text  .= banana_wordwrap(implode("\n", $buffer), $level + $base_level) . "\n";
                 $buffer = array();
-            }    
+            }
             $level  = $lvl;
         }
         $buffer[] = $line;
