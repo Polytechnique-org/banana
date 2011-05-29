@@ -551,14 +551,24 @@ class Banana
                 $body    = $msg->quote();
 
                 if (isset($_POST['reply'])) {
+                    $res  = '';
                     $body = explode("\n", $body);
                     $replies = $_POST['reply'];
-                    krsort($replies);
-                    foreach ($replies as $line => $text) {
-                        $text = explode("\n", "\n" . $text . "\n");
-                        array_splice($body, $line + 1, 0, $text);
+                    ksort($replies);
+                    $previous = 0;
+                    foreach ($replies as $line => $data) {
+                        if (!is_array($data)) {
+                            $data = array('quote' => $previous, 'text' => $data);
+                        } else if (!isset($data['quote'])) {
+                            $data['quote'] = $previous;
+                        } else if ($data['quote'] < $previous) {
+                            $data['quote'] = $previous;
+                        }
+                        $res .= implode("\n", array_slice($body, $data['quote'], $line - $data['quote'] + 1));
+                        $res .= "\n\n" . $data['text'] . "\n\n";
+                        $previous = $line + 1;
                     }
-                    $body = implode("\n", $body);
+                    $body = $res;
                 }
                 $body = $msg->getSender() . _b_(' a écrit :') . "\n" . $body;
 
