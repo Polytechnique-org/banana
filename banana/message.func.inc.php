@@ -41,7 +41,7 @@ function banana_quote($line, $level, $mark = '>')
     $lines = explode("\n", $line);
     $quote = str_repeat($mark, $level);
     foreach ($lines as &$line) {
-        $line = $quote . $line;
+        $line = $quote . ' ' . $line;
     }
     return implode("\n", $lines);
 }
