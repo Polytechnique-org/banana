@@ -485,11 +485,11 @@ class BananaMimePart
             if (!$part) {
                 $part = $this->content_type;
             }
-            return '[' . Banana::$page->makeImgLink(array('group' => Banana::$group,
+            return '<span>[' . Banana::$page->makeImgLink(array('group' => Banana::$group,
                                                  'artid' => Banana::$artid,
                                                  'part'  => $part,
                                                  'text'  => $this->filename ? $this->filename : $this->content_type,
-                                                 'img'   => 'save')) . ']';
+                                                 'img'   => 'save')) . ']</span>';
         } elseif ($type == 'multipart' && ($subtype == 'mixed' || $subtype == 'report')) {
             $text = '';
             foreach ($this->multipart as &$part) {
