@@ -54,28 +54,19 @@ class BananaSpoolHead
      */
     public function __construct($id, array &$message)
     {
+        list($name, $from) = BananaMessage::extractMail($message['from']);
         $this->id         = $id;
         $this->msgid      = @$message['message-id'];
         $this->date       = $message['date'];
         $this->subject    = @$message['subject'];
         $this->from       = $message['from'];
-        $this->color      = sprintf('#%06x', abs(crc32($this->from) % 0xffffff));
+        $this->color      = sprintf('#%06x', abs(crc32($from) % 0xffffff));
         $this->desc       = 1;
         $this->isread     = true;
         $this->descunread = 0;
-        if (preg_match("/^([^ ]+@[^ ]+) \((.*)\)$/", $this->from, $regs)) {
-            $this->name = $regs[2];
-        }
-        if (preg_match("/^\"?([^<>\"]+)\"? +<(.+@.+)>$/", $this->from, $regs)) {
-            $this->name = preg_replace("/^'(.*)'$/", '\1', $regs[1]);
-            $this->name = stripslashes($this->name);
-        }
-        if ($this->name) {
-            $this->name =  preg_replace("/\\\(\(|\))/","\\1", $this->name);
-        } else if (preg_match("/([^< ]+)@([^> ]+)/", $this->from, $regs)) {
-            $this->name = $regs[1];
-        } else {
-            $this->name = 'Anonymous';
+        $this->name       = $name;
+        if ($name === $from) {
+            $this->name   = 'Anonymous';
         }
     }
 }

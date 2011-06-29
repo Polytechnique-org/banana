@@ -142,30 +142,33 @@ final class BananaMessage extends BananaMimePart
         return array_merge($headers, parent::getHeaders());
     }
 
+    static public function extractMail($text)
+    {
+        if (preg_match("/^\"?([^<>\"]+)\"? +<(.+@.+)>$/", $text, $regs)) {
+            # From: Mark Horton <mark@cbosgd.ATT.COM>
+            $nom = preg_replace("/^'(.*)'$/", '\1', $regs[1]);
+            $nom = stripslashes($nom);
+            return array($nom, strtolower($regs[2]));
+        } else if (preg_match("/^([^ ]+@[^ ]+) \((.*)\)$/", $text, $regs)) {
+            # From: mark@cbosgd.ATT.COM (Mark Horton)
+            return array($regs[2], strtolower($regs[1]));
+        } else if (preg_match("/^<?([^< ]+@[^> ]+)>?$/", $text, $regs)) {
+            # From: <mark@cbosgd.ATT.COM>
+            return array($regs[1], strtolower($regs[1]));
+        } else {
+            # From: mark@cbosgd.ATT.COM
+            return array($text, strtolower($text));
+        }
+    }
+
     static public function formatFrom($text, $subject = '')
     {
-#     From: mark@cbosgd.ATT.COM
-#     From: <mark@cbosgd.ATT.COM>
-#     From: mark@cbosgd.ATT.COM (Mark Horton)
-#     From: Mark Horton <mark@cbosgd.ATT.COM>
-        $mailto = '<a href="mailto:';
-
-        $result = banana_htmlentities($text);
+        list($name, $email) = self::extractMail($text);
         if ($subject) {
            $subject = '?subject=' . banana_htmlentities(_b_('Re: ') . $subject, ENT_QUOTES);
         }
-        if (preg_match("/^<?([^< ]+@[^> ]+)>?$/", $text, $regs)) {
-            $result = $mailto . $regs[1] . $subject . '">' . banana_htmlentities($regs[1]) . '</a>';
-        }
-        if (preg_match("/^([^ ]+@[^ ]+) \((.*)\)$/", $text, $regs)) {
-            $result = $mailto . $regs[1] . $subject . '">' . banana_htmlentities($regs[2]) . '</a>';
-        }
-        if (preg_match("/^\"?([^<>\"]+)\"? +<(.+@.+)>$/", $text, $regs)) {
-            $nom = preg_replace("/^'(.*)'$/", '\1', $regs[1]);
-            $nom = stripslashes($nom);
-            $result = $mailto . $regs[2] . $subject . '">' . banana_htmlentities($nom) . '</a>';
-        }
-        return preg_replace("/\\\(\(|\))/","\\1",$result);
+        $result = '<a href="mailto:' . $email . $subject . '">' . banana_htmlentities($name) . '</a>';
+        return preg_replace("/\\\(\(|\))/","\\1", $result);
     }
 
     public function getAuthorName()
