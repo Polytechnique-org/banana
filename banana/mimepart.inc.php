@@ -183,6 +183,10 @@ class BananaMimePart
             }
         }
         list($type, $subtype) = explode('/', $content_type);
+        if ($disposition == 'attachment') {
+            $this->makeDataPart($content, $content_type, $encoding, $filename, $disposition, $id);
+            return;
+        }
         switch ($type) {
           case 'text': case 'message':
             $this->makeTextPart($content, $content_type, $encoding, $charset, $format);

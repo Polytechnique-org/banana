@@ -716,7 +716,7 @@ class Banana
             && isset($_SESSION['banana_message'])) {
             $message = unserialize($_SESSION['banana_message']);
             Banana::$msgshow_headers = $_SESSION['banana_showhdr'];
-        }  else {
+        } else {
             $message = Banana::$protocole->getMessage($artid);
             $_SESSION['banana_group'] = $group;
             $_SESSION['banana_artid'] = $artid;
