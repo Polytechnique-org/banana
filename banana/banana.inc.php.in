@@ -184,7 +184,7 @@ class Banana
         if ($pageclass == 'BananaPage') {
             Banana::load('page');
         }
-        Banana::$page = new $pageclass;
+        Banana::$page = new $pageclass(@$this->params['output']);
         $types = array('multipart/report' => _b_('Rapport d\'erreur'),
                        'multipart/mixed'  => _b_('Composition'),
                        'text/html'        => _b_('Texte formaté'),

@@ -20,12 +20,16 @@ class BananaPage extends Smarty
     protected $killed  = array();
     protected $actions = array();
 
+    protected $mode;
+    protected $json_params = array();
+
     public $css = '';
 
-    public function __construct()
+    public function __construct($mode)
     {
         parent::Smarty();
 
+        $this->mode          = strtolower($mode);
         $this->compile_check = Banana::$debug_smarty;
         $this->template_dir  = dirname(__FILE__) . '/templates/';
         $this->compile_dir   = Banana::$spool_root . '/templates_c/';
@@ -61,6 +65,17 @@ class BananaPage extends Smarty
     {
         $this->page = $page;
         return true;
+    }
+
+    /** Assign a variable in the page.
+     */
+    public function assign($var, $value)
+    {
+        if ($this->mode === 'json') {
+            $this->json_params[$var] = $value;
+        } else {
+            parent::assign($var, $value);
+        }
     }
 
     /** Register an action to show on banana page
@@ -148,6 +163,9 @@ class BananaPage extends Smarty
      */
     public function run()
     {
+        if ($this->mode === 'json') {
+            return json_encode($this->json_params);
+        }
         $tpl = $this->prepare();
         if (!isset($this->pages[$this->page])) {
             $this->trig(_b_('La page demandée n\'existe pas'));

@@ -126,6 +126,11 @@ $feed = $banana->feed();      // Get a link to banana's feed. You need to use Ba
 $bt   = $banana->backtrace(); // Get protocole execution backtrace
 
 session_write_close();
+if (@strtolower($_GET['output']) === 'json') {
+    header('Content-Type: text/javascript');
+    echo $res;
+    exit;
+}
 
 // Genererate the page
 ?>

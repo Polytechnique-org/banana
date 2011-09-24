@@ -5,7 +5,7 @@
   <input type="submit" name="validsubs" value="{"Valider"|b}" />
 </p>
 {/if}
-<table class="bicol">
+<table class="bicol banana_box_list">
   <tr>
     {if $withsubs}
     <th></th>
