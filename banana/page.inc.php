@@ -25,7 +25,7 @@ class BananaPage extends Smarty
 
     public $css = '';
 
-    public function __construct($mode)
+    public function __construct($mode = null)
     {
         parent::Smarty();
 
