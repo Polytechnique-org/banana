@@ -68,7 +68,7 @@
 {$smarty.capture.pages|smarty:nodefaults}
 {if $showboxlist}
 <br />
-{include file="banana-boxlist.inc.tpl" grouplist=$groups withstats=true}
+{include file="banana-boxlist.inc.tpl" grouplist=$groups withstats=true withsubs=false withfeed=false}
 {/if}
 
 {* vim:set et sw=2 sts=2 ts=2 enc=utf-8: *}

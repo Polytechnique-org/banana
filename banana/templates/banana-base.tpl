@@ -36,13 +36,13 @@
       <p class="center" style="padding: 0; margin: 0 0 1em 0">{$act.text|smarty:nodefaults}</p>
       {/foreach}
       {if $page eq 'forums'}
-        {include file="banana-boxlist.inc.tpl" grouplist=$groups withstats=true withfeed=$feed_active}
+        {include file="banana-boxlist.inc.tpl" grouplist=$groups withstats=true withfeed=$feed_active withsubs=false}
         {if $newgroups|@count}
         <p>{"Les nouveaux groupes suivants ont été créés depuis votre dernière visite"|b}</p>
-        {include file="banana-boxlist.inc.tpl" grouplist=$newgroups withstats=true}
+        {include file="banana-boxlist.inc.tpl" grouplist=$newgroups withstats=true withsubs=false withfeed=false}
         {/if}
       {elseif $page eq 'subscribe'}
-        {include file="banana-boxlist.inc.tpl" grouplist=$groups withsubs=true}
+        {include file="banana-boxlist.inc.tpl" grouplist=$groups withsubs=true withfeed=false withstats=false}
       {elseif $page eq 'thread'}
         {include file="banana-thread.inc.tpl" withtitle=true}
       {elseif $page eq 'message'}
