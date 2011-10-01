@@ -108,7 +108,10 @@ class BananaMBox implements BananaProtocoleInterface
     {
         $options = array();
         if (@filesize($this->getFileName()) == @Banana::$spool->storage['size']) {
-            return max(array_keys(Banana::$spool->overview)) + 1;
+            if (!empty(Banana::$spool->overview)) {
+                return max(array_keys(Banana::$spool->overview)) + 1;
+            }
+            return 1;
         }
         $this->getMBoxPosition($options);
         $val =& $this->callHelper('-c', $options);

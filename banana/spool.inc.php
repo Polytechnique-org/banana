@@ -232,38 +232,42 @@ class BananaSpool
 
         // Build all the new Spool Heads
         $time = time();
-        foreach ($messages as $id=>&$message) {
-            if (!isset($this->overview[$id])) {
-                $this->overview[$id] = new BananaSpoolHead($id, $message);
-                $head =& $this->overview[$id];
-                $this->ids[$head->msgid] =& $head;
-                $head->time = $time;
-            }
-        }
-
-        // Build tree
-        $null = null;
-        foreach ($messages as $id=>&$message) {
-            $msg         =& $this->overview[$id];
-            $parents     =& $this->getReferences($message);
-            while (!empty($parents) && ($msg->parent === $msg || is_null($msg->parent))) {
-                @$msg->parent =& array_pop($parents);
+        if (!empty($messages)) {
+            foreach ($messages as $id=>&$message) {
+                if (!isset($this->overview[$id])) {
+                    $this->overview[$id] = new BananaSpoolHead($id, $message);
+                    $head =& $this->overview[$id];
+                    $this->ids[$head->msgid] =& $head;
+                    $head->time = $time;
+                }
             }
 
-            if (!is_null($msg->parent)) {
-                $parent =& $msg->parent;
-                $parent->children[] =& $msg;
-                while (!is_null($parent)) {
-                    $parent->desc += $msg->desc;
-                    $parent->time  = $time;
-                    $prev =& $parent;
-                    if ($parent !== $parent->parent) {
-                        $parent =& $parent->parent;
-                    } else {
-                        $parent =& $null;
+            // Build tree
+            $null = null;
+            foreach ($messages as $id=>&$message) {
+                $msg         =& $this->overview[$id];
+                $parents     =& $this->getReferences($message);
+                while (!empty($parents) && ($msg->parent === $msg || is_null($msg->parent))) {
+                    @$msg->parent =& array_pop($parents);
+                }
+
+                if (!is_null($msg->parent)) {
+                    $parent =& $msg->parent;
+                    $parent->children[] =& $msg;
+                    while (!is_null($parent)) {
+                        $parent->desc += $msg->desc;
+                        $parent->time  = $time;
+                        $prev =& $parent;
+                        if ($parent !== $parent->parent) {
+                            $parent =& $parent->parent;
+                        } else {
+                            $parent =& $null;
+                        }
                     }
                 }
             }
+        } else {
+            $messages = array();
         }
         Banana::$protocole->updateSpool($messages);
         return true;
