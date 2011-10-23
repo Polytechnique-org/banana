@@ -174,7 +174,7 @@ class BananaMimePart
             $disposition  = $this->getHeader('content-disposition', '/(inline|attachment)/i');
             $boundary     = $this->getHeader('content-type', '/boundary="?([^ "]+?)"?\s*(;|$)/i');
             $charset      = strtolower($this->getHeader('content-type', '/charset="?([^ "]+?)"?\s*(;|$)/i'));
-            $filename     = $this->getHeader('content-disposition', '/filename="?([^ "]+?)"?\s*(;|$)/i');
+            $filename     = $this->getHeader('content-disposition', '/filename="?([^"]+?)"?\s*(;|$)/i');
             $format       = strtolower($this->getHeader('content-type', '/format="?([^ "]+?)"?\s*(;|$)/i'));
             $id           = $this->getHeader('content-id', '/<(.*?)>/');
             $sign_protocole = strtolower($this->getHeader('content-type', '/protocol="?([^ "]+?)"?\s*(;|$)/i'));
