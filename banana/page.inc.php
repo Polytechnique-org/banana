@@ -299,7 +299,7 @@ class BananaPage extends Smarty
             ${$key} = isset($params[$key]) ? $params[$key] : null;
             unset($params[$key]);
         }
-        $link = $this->makeUrl($params, &$smarty);
+        $link = $this->makeUrl($params, $smarty);
         if (is_null($text)) {
             $text = $link;
         }
