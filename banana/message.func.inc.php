@@ -564,5 +564,5 @@ function banana_quoteRichtText(BananaMimePart $part)
 
 // }}}
 
-// vim:set et sw=4 sts=4 ts=4 enc=utf-8:
+// vim:set et sw=4 sts=4 ts=4 fenc=utf-8:
 ?>
